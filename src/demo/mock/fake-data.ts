@@ -125,19 +125,19 @@ const EXTENSIONS = [".CR2", ".ARW", ".DNG", ".JPG", ".NEF"];
 export function getDrives(): DriveInfo[] {
   return [
     {
-      mountPoint: "E:\\",
+      mountPoint: "E:/",
       driveType: "removable",
       label: "CANON_DC",
       available: true,
     },
     {
-      mountPoint: "C:\\",
+      mountPoint: "C:/",
       driveType: "fixed",
       label: "本地磁盘",
       available: true,
     },
     {
-      mountPoint: "D:\\",
+      mountPoint: "D:/",
       driveType: "fixed",
       label: "照片文件夹",
       available: true,
@@ -150,11 +150,13 @@ export function getDrives(): DriveInfo[] {
 // ---------------------------------------------------------------------------
 
 export function getPhotos(dirPath: string): ScannedPhoto[] {
+  if (!dirPath) return [];
+  const base = dirPath.replace(/\/+$/, ""); // strip trailing slashes
   const photos: ScannedPhoto[] = [];
   for (let i = 0; i < 24; i++) {
     const num = 1 + i;
     const ext = EXTENSIONS[i % EXTENSIONS.length];
-    const path = `${dirPath}/IMG_${String(num).padStart(4, "0")}${ext}`;
+    const path = `${base}/IMG_${String(num).padStart(4, "0")}${ext}`;
     const rng = seededRandom(path);
     const camIdx = Math.floor(rng() * CAMERAS.length);
     const cam = CAMERAS[camIdx];
@@ -193,19 +195,20 @@ export function getPhotos(dirPath: string): ScannedPhoto[] {
 // ---------------------------------------------------------------------------
 
 export function getFolderTree(mountPoint: string): FolderEntry {
-  const dcimPath = `${mountPoint}/DCIM`;
+  const base = mountPoint.replace(/\/+$/, ""); // strip trailing slashes
+  const dcimPath = `${base}/DCIM`;
   const c100Path = `${dcimPath}/100CANON`;
   const c101Path = `${dcimPath}/101CANON`;
-  const privPath = `${mountPoint}/PRIVATE`;
+  const privPath = `${base}/PRIVATE`;
 
-  const rng = seededRandom(mountPoint);
+  const rng = seededRandom(base);
   const c100Count = Math.floor(12 + rng() * 24);
   const c101Count = Math.floor(8 + rng() * 16);
   const privCount = Math.floor(rng() * 6);
 
   return {
-    path: mountPoint,
-    name: mountPoint.split("/").pop() || mountPoint,
+    path: base,
+    name: base.split("/").pop() || base,
     photoCount: c100Count + c101Count + privCount,
     hasSubdirs: true,
     subfolders: [
@@ -247,6 +250,7 @@ export function getFolderTree(mountPoint: string): FolderEntry {
 // ---------------------------------------------------------------------------
 
 export function getCounts(folderPaths: string[]): Record<string, number> {
+  if (!folderPaths || folderPaths.length === 0) return {};
   const result: Record<string, number> = {};
   for (const p of folderPaths) {
     const rng = seededRandom(p, "count");

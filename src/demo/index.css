@@ -1,0 +1,256 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "@fontsource-variable/geist";
+
+@custom-variant dark (&:is(.dark *));
+
+:root {
+  color-scheme: dark;
+  font-family: Inter, system-ui, -apple-system, sans-serif;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  --glass-opacity: 70%;
+  --glass-bg: color-mix(in oklab, var(--color-zinc-900) var(--glass-opacity), transparent);
+  --background-opacity: 0%;
+  --background-bg: color-mix(in oklab, var(--color-zinc-950) var(--background-opacity), transparent);
+  --glass-fade: color-mix(in oklab, var(--color-zinc-950) var(--glass-opacity), transparent);
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.145 0 0);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.145 0 0);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.145 0 0);
+  --primary: oklch(0.205 0 0);
+  --primary-foreground: oklch(0.985 0 0);
+  --secondary: oklch(0.97 0 0);
+  --secondary-foreground: oklch(0.205 0 0);
+  --muted: oklch(0.97 0 0);
+  --muted-foreground: oklch(0.556 0 0);
+  --accent: oklch(0.97 0 0);
+  --accent-foreground: oklch(0.205 0 0);
+  --destructive: oklch(0.577 0.245 27.325);
+  --border: oklch(0.922 0 0);
+  --input: oklch(0.922 0 0);
+  --ring: oklch(0.708 0 0);
+  --chart-1: oklch(0.87 0 0);
+  --chart-2: oklch(0.556 0 0);
+  --chart-3: oklch(0.439 0 0);
+  --chart-4: oklch(0.371 0 0);
+  --chart-5: oklch(0.269 0 0);
+  --radius: 0.625rem;
+  --sidebar: oklch(0.985 0 0);
+  --sidebar-foreground: oklch(0.145 0 0);
+  --sidebar-primary: oklch(0.205 0 0);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.97 0 0);
+  --sidebar-accent-foreground: oklch(0.205 0 0);
+  --sidebar-border: oklch(0.922 0 0);
+  --sidebar-ring: oklch(0.708 0 0);
+}
+
+body {
+  margin: 0;
+  background: transparent;
+  color: #fafafa;
+}
+
+img {
+  image-orientation: from-image;
+}
+
+/* Dot grid on center area */
+.bg-grid {
+  background-image: radial-gradient(rgba(255,255,255,0.025) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+/* 隐藏滚动条但保留滚动功能 */
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { scrollbar-width: none; -ms-overflow-style: none; }
+
+/* 缩略图滑块 — 双色填充渐变 + 无边框球 */
+.thumb-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 4px;
+  border-radius: 9999px;
+  outline: none;
+  /* 默认(深色): 左灰右浅灰 */
+  --thumb-left: #52525b;
+  --thumb-right: #a1a1aa;
+  --thumb-color: #52525b;
+}
+:root[data-theme="light"] .thumb-slider {
+  /* 浅色: 左灰 右淡灰 */
+  --thumb-left: #71717a;
+  --thumb-right: #d4d4d8;
+  --thumb-color: #52525b;
+}
+.thumb-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 12px; height: 12px;
+  border-radius: 9999px;
+  background: var(--thumb-color);
+  border: none;
+  cursor: pointer;
+}
+
+
+/* 照片 hover 描述渐变 — 统一黑色底（深浅主题一致） */
+.hover-overlay {
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.8), transparent);
+}
+
+/* 自定义圆角 tooltip — 替代浏览器默认方形提示
+   position 在 @layer components 内(允许 Tailwind absolute 类覆盖, 用于 absolute 定位的按钮);
+   显示样式在文件末尾无层(优先级最高) */
+@layer components {
+  .tooltip-wrap { position: relative; }
+}
+.tooltip-wrap .tooltip {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.85);
+  color: #e4e4e7;
+  border-radius: 8px;
+  padding: 4px 10px;
+  font-size: 11px;
+  white-space: nowrap;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.15s ease;
+  pointer-events: none;
+  z-index: 60;
+}
+.tooltip-wrap:hover .tooltip {
+  opacity: 1;
+  visibility: visible;
+}
+
+@theme inline {
+  --font-heading: var(--font-sans);
+  --font-sans: 'Geist Variable', sans-serif;
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --color-foreground: var(--foreground);
+  --color-background: var(--background);
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
+}
+
+.dark {
+  --background: oklch(0.145 0 0);
+  --foreground: oklch(0.985 0 0);
+  --card: oklch(0.205 0 0);
+  --card-foreground: oklch(0.985 0 0);
+  --popover: oklch(0.205 0 0);
+  --popover-foreground: oklch(0.985 0 0);
+  --primary: oklch(0.922 0 0);
+  --primary-foreground: oklch(0.205 0 0);
+  --secondary: oklch(0.269 0 0);
+  --secondary-foreground: oklch(0.985 0 0);
+  --muted: oklch(0.269 0 0);
+  --muted-foreground: oklch(0.708 0 0);
+  --accent: oklch(0.269 0 0);
+  --accent-foreground: oklch(0.985 0 0);
+  --destructive: oklch(0.704 0.191 22.216);
+  --border: oklch(1 0 0 / 10%);
+  --input: oklch(1 0 0 / 15%);
+  --ring: oklch(0.556 0 0);
+  --chart-1: oklch(0.87 0 0);
+  --chart-2: oklch(0.556 0 0);
+  --chart-3: oklch(0.439 0 0);
+  --chart-4: oklch(0.371 0 0);
+  --chart-5: oklch(0.269 0 0);
+  --sidebar: oklch(0.205 0 0);
+  --sidebar-foreground: oklch(0.985 0 0);
+  --sidebar-primary: oklch(0.488 0.243 264.376);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.269 0 0);
+  --sidebar-accent-foreground: oklch(0.985 0 0);
+  --sidebar-border: oklch(1 0 0 / 10%);
+  --sidebar-ring: oklch(0.556 0 0);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-transparent text-foreground;
+  }
+  html {
+    @apply font-sans;
+  }
+}
+
+/* ── 浅色主题：反转 zinc 色板，让硬编码类自动适配 ── */
+:root[data-theme="light"] {
+  color-scheme: light;   /* 原生控件(checkbox/slider)跟随浅色 */
+
+  /* 高级选项勾选框 — 底色淡灰 */
+  input[type="checkbox"] { accent-color: rgba(190, 190, 195, 0.9); }
+  --color-zinc-950: oklch(0.985 0 0);   /* 背景 → 近白 */
+  --color-zinc-900: oklch(0.97 0 0);    /* 面板 → 亮灰 */
+  --color-zinc-800: oklch(0.93 0 0);    /* 按钮/面板 */
+  --color-zinc-700: oklch(0.87 0 0);    /* hover */
+  --color-zinc-600: oklch(0.72 0 0);    /* 次要文字 */
+  --color-zinc-500: oklch(0.58 0 0);    /* 次要文字 */
+  --color-zinc-400: oklch(0.45 0 0);    /* 常规文字 */
+  --color-zinc-300: oklch(0.35 0 0);    /* 主文字 */
+  --color-zinc-200: oklch(0.28 0 0);    /* 主文字 */
+  --color-zinc-100: oklch(0.2 0 0);     /* 强调文字 */
+
+  /* 选中态绿色适配 */
+  --color-emerald-900: oklch(0.696 0.17 162.48);
+  --color-emerald-300: oklch(0.696 0.17 162.48);
+  --color-emerald-800: oklch(0.62 0.15 160.5);
+  --color-emerald-700: oklch(0.58 0.13 159);
+
+  /* 点阵背景在浅色下用暗点 */
+  .bg-grid {
+    background-image: radial-gradient(rgba(0,0,0,0.04) 1px, transparent 1px);
+  }
+}
+
+/* ── 网页 demo: 隐藏窗口按钮(最小化/最大化/关闭) ── */
+[data-tauri-drag-region] .tooltip-wrap:nth-last-child(-n+3) {
+  display: none;
+}

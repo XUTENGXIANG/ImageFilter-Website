@@ -4,6 +4,7 @@ import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 
 const tauriMockPath = resolve(import.meta.dirname, "src/demo/mock/tauri-mock.ts");
+const uiBase = resolve(import.meta.dirname, "src/demo/ui");
 
 // https://vite.dev/config/
 export default defineConfig({
@@ -14,6 +15,8 @@ export default defineConfig({
       // and redirect them to the single mock file.
       { find: /^@tauri-apps\/api(\/.*)?$/, replacement: tauriMockPath },
       { find: "@tauri-apps/plugin-dialog", replacement: tauriMockPath },
+      // Match @/ imports from copied UI code (e.g. @/components/ui/dialog)
+      { find: /^@\/(.*)/, replacement: uiBase.replace(/\\/g, "/") + "/$1" },
     ],
   },
 });

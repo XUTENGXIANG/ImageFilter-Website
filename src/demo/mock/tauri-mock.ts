@@ -5,7 +5,7 @@
 // ---------------------------------------------------------------------------
 
 import * as fakeData from "./fake-data";
-import { ImportProgress } from "./fake-data";
+import type { ImportProgress } from "./fake-data";
 import * as placeholder from "./placeholder";
 
 // ---------------------------------------------------------------------------
@@ -14,6 +14,11 @@ import * as placeholder from "./placeholder";
 
 function delay<T>(ms: number, value: T): Promise<T> {
   return new Promise((r) => setTimeout(() => r(value), ms));
+}
+
+/** Normalize backslash paths to forward-slash (FAKE:/ convention) */
+function norm(s: string): string {
+  return s.replace(/\\/g, "/").replace(/\/+$/, "");
 }
 
 /** DJB2 hash — same as fake-data / placeholder */
@@ -60,13 +65,13 @@ const handlers: Record<string, Handler> = {
   detect_drives: async () => fakeData.getDrives(),
 
   browse_directory: async (a) =>
-    fakeData.getFolderTree(a.dirPath as string),
+    fakeData.getFolderTree(norm(a.dirPath as string)),
 
   count_folders: async (a) =>
-    fakeData.getCounts(a.folderPaths as string[]),
+    fakeData.getCounts((a.folderPaths as string[]).map(norm)),
 
   scan_directory: async (a) =>
-    delay(300, fakeData.getPhotos(a.dirPath as string)),
+    delay(300, fakeData.getPhotos(norm(a.dirPath as string))),
 
   // ---- thumbnails / images ----
   batch_thumbnails: async (a) => {

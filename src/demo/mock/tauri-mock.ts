@@ -18,6 +18,7 @@ function delay<T>(ms: number, value: T): Promise<T> {
 
 /** Normalize backslash paths to forward-slash (FAKE:/ convention) */
 function norm(s: string): string {
+  if (!s) return "";
   return s.replace(/\\/g, "/").replace(/\/+$/, "");
 }
 

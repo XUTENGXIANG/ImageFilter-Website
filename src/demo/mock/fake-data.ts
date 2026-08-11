@@ -195,6 +195,7 @@ export function getPhotos(dirPath: string): ScannedPhoto[] {
 // ---------------------------------------------------------------------------
 
 export function getFolderTree(mountPoint: string): FolderEntry {
+  if (!mountPoint) return { path: "", name: "", photoCount: 0, hasSubdirs: false, subfolders: [] };
   const base = mountPoint.replace(/\/+$/, ""); // strip trailing slashes
   const dcimPath = `${base}/DCIM`;
   const c100Path = `${dcimPath}/100CANON`;

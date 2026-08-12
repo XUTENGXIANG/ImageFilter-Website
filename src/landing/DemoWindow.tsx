@@ -13,7 +13,7 @@ export default function DemoWindow({ lang }: DemoWindowProps) {
 
   return (
     <section
-      id="screenshots"
+      id="demo"
       className="relative scroll-mt-28 px-4 pb-32 sm:px-6 lg:px-8"
     >
       <div className="mx-auto max-w-5xl">

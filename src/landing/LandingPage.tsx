@@ -1,8 +1,10 @@
 import { useState } from "react";
 import type { Lang } from "./i18n";
 import DemoWindow from "./DemoWindow";
+import Features from "./Features";
 import Hero from "./Hero";
 import Nav from "./Nav";
+import Screenshots from "./Screenshots";
 
 function PlaceholderSection({ id, label }: { id: string; label: string }) {
   return (
@@ -39,7 +41,8 @@ export default function LandingPage() {
       <main>
         <Hero lang={lang} />
         <DemoWindow lang={lang} />
-        <PlaceholderSection id="features" label="Features" />
+        <Screenshots lang={lang} />
+        <Features lang={lang} />
         <PlaceholderSection id="workflow" label="Workflow" />
         <PlaceholderSection id="download" label="Download" />
       </main>

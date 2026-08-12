@@ -1,4 +1,4 @@
-import FoldText from "@/components/FoldText";
+import ParticleText from "@/components/ParticleText";
 import { Apple, Monitor } from "lucide-react";
 import type { Lang } from "./i18n";
 import { translations } from "./i18n";
@@ -26,17 +26,20 @@ export default function Hero({ lang }: HeroProps) {
           {t.hero.eyebrow}
         </p>
         <h1 className="mt-8 max-w-5xl">
-          <FoldText
+          <ParticleText
             text={t.hero.title}
-            splitBy="line"
-            hinge="bottom"
-            trigger="scroll"
-            duration={0.9}
-            stagger={0.12}
-            perspective={900}
+            color="#f8fafc"
+            highlightColor="#8b5cf6"
+            particleSize={2.2}
+            density={4}
             fontSize="clamp(3.5rem, 12vw, 9rem)"
             fontWeight={800}
-            color="#f8fafc"
+            scatter={200}
+            gatherDuration={1800}
+            stagger={480}
+            pointerRepel={40}
+            repelRadius={130}
+            glow
           />
         </h1>
         <p className="mt-8 max-w-2xl text-pretty text-base leading-relaxed text-white/65 sm:text-lg">

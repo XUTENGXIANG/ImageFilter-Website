@@ -206,7 +206,13 @@ const ParticleText = ({
         gathering = false;
       }
 
-      animationFrame = window.requestAnimationFrame(render);
+      // 性能: 聚集完成且鼠标未活动时暂停渲染循环(静止画面无需重绘),
+      // pointer 移动时由 ensureRenderLoop 恢复
+      if (gathering || pointer.active) {
+        animationFrame = window.requestAnimationFrame(render);
+      } else {
+        animationFrame = null;
+      }
     };
 
     const ensureRenderLoop = () => {
@@ -354,6 +360,7 @@ const ParticleText = ({
       pointer.x = event.clientX - rect.left;
       pointer.y = event.clientY - rect.top;
       pointer.active = true;
+      ensureRenderLoop();
     };
 
     const handlePointerLeave = () => {

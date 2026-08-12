@@ -36,6 +36,7 @@ export default function Hero({ lang }: HeroProps) {
           stagger={500}
           pointerRepel={40}
           repelRadius={140}
+          idleDrift={0}
           glow
         />
       </div>

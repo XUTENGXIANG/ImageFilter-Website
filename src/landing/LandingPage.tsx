@@ -1,4 +1,5 @@
 import { useState } from "react";
+import ClickSpark from "@/components/ClickSpark";
 import LiquidEther from "@/components/LiquidEther";
 import type { Lang } from "./i18n";
 import Compare from "./Compare";
@@ -32,6 +33,8 @@ export default function LandingPage() {
   };
 
   return (
+    // 全局点击火花效果（点击页面任意位置绽放紫色火花）
+    <ClickSpark sparkColor="#a78bfa" sparkSize={10} sparkRadius={20} sparkCount={10} duration={450}>
     <div className="relative min-h-screen overflow-x-clip bg-[#05060a] text-slate-50">
       {/* 全局背景: LiquidEther 液态流体 + 三色光晕 */}
       <div className="pointer-events-none fixed inset-0" aria-hidden="true">
@@ -61,5 +64,6 @@ export default function LandingPage() {
       </main>
       <Footer lang={lang} />
     </div>
+    </ClickSpark>
   );
 }

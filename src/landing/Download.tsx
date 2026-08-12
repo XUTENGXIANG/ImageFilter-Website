@@ -1,12 +1,32 @@
+import { useState } from "react";
 import BorderGlow from "@/components/BorderGlow";
+import LineSidebar from "@/components/LineSidebar";
 import SpecularButton from "@/components/SpecularButton";
 import SpotlightCard from "@/components/SpotlightCard";
-import { Apple, Monitor } from "lucide-react";
-import { motion } from "motion/react";
+import { AnimatePresence, motion } from "motion/react";
+import { Apple, ChevronDown, DownloadCloud, Monitor } from "lucide-react";
 import type { Lang } from "./i18n";
 import { translations } from "./i18n";
 
 const RELEASES_PAGE = "https://github.com/XUTENGXIANG/ImageFilter/releases";
+
+// ─── 国内直链（蓝奏云）────────────────────────────────────────
+// 手动添加直链的方法：
+//   1. 在蓝奏云上传新版本安装包，复制分享链接
+//   2. 在下面的数组中新增一条记录（建议按平台排序）：
+//      { name: "文件名（页面展示用，建议带版本号）", href: "蓝奏云分享链接" }
+//   3. 列表会按数组顺序自动渲染，点击即在新标签页打开
+// 注意：name 会直接展示在页面上，版本升级后记得同步更新文件名。
+const CN_DOWNLOADS = [
+  {
+    name: "ImageFilter_1.0.0_x64-setup.exe",
+    href: "https://wwbny.lanzoue.com/iO3ka420hdmj?webpage=AjMAYF47UjBVNlQ2BmECM1M9AjBScQU0AjVWZ1M7UmcDM1o_aCmQAbQgiUzQ_c",
+  },
+  {
+    name: "ImageFilter_1.0.0_universal.dmg",
+    href: "https://wwbny.lanzoue.com/i6bKM420hclc?webpage=BDVSMghtDmxVNgJgBmFWZwFvU2ECIQc2ADdUZQJqWm9XZwJnDWBTNVJ4AmU_c",
+  },
+];
 
 const fileNames = [
   "ImageFilter_1.0.0_x64-setup.exe",
@@ -28,6 +48,7 @@ interface DownloadProps {
 
 export default function Download({ lang }: DownloadProps) {
   const t = translations[lang];
+  const [cnOpen, setCnOpen] = useState(false);
 
   return (
     <section
@@ -139,6 +160,68 @@ export default function Download({ lang }: DownloadProps) {
             );
           })}
         </div>
+
+        {/* 国内直链下载（蓝奏云） */}
+        <motion.div
+          initial={{ opacity: 0, y: 14 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-80px" }}
+          transition={{ duration: 0.5, delay: 0.2 }}
+          className="mt-12 flex flex-col items-center"
+        >
+          <button
+            type="button"
+            onClick={() => setCnOpen((o) => !o)}
+            aria-expanded={cnOpen}
+            className="group inline-flex items-center gap-2.5 rounded-full border border-white/10 bg-white/5 px-7 py-3 text-sm font-medium text-white/80 transition hover:border-violet-300/40 hover:bg-white/10 hover:text-white focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-cyan-200/70"
+          >
+            <DownloadCloud className="h-4 w-4 text-violet-200/70" />
+            {t.download.cnDownload}
+            <ChevronDown
+              className={`h-4 w-4 text-white/40 transition-transform duration-300 ${
+                cnOpen ? "rotate-180" : ""
+              }`}
+            />
+          </button>
+
+          <AnimatePresence>
+            {cnOpen && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: "auto" }}
+                exit={{ opacity: 0, height: 0 }}
+                transition={{ duration: 0.3, ease: "easeOut" }}
+                className="w-full overflow-hidden"
+              >
+                <div className="mx-auto mt-6 max-w-lg rounded-2xl border border-white/10 bg-white/[0.03] p-6 backdrop-blur-sm">
+                  <LineSidebar
+                    items={CN_DOWNLOADS.map((d) => d.name)}
+                    accentColor="#a78bfa"
+                    textColor="rgba(255,255,255,0.72)"
+                    markerColor="rgba(255,255,255,0.22)"
+                    proximityRadius={60}
+                    fontSize={0.95}
+                    showIndex={false}
+                    onItemClick={(index) =>
+                      window.open(CN_DOWNLOADS[index].href, "_blank", "noreferrer")
+                    }
+                  />
+                  <p className="mt-5 border-t border-white/10 pt-4 text-center text-xs text-white/45">
+                    {t.download.msiNote}{" "}
+                    <a
+                      href={RELEASES_PAGE}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="text-violet-200/80 underline-offset-2 transition hover:text-violet-100 hover:underline"
+                    >
+                      GitHub Releases
+                    </a>
+                  </p>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </motion.div>
 
         <motion.div
           initial={{ opacity: 0, y: 14 }}

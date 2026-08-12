@@ -60,10 +60,14 @@ export interface LandingMessages {
       action: string;
     }[];
     releases: string;
+    cnDownload: string;
+    msiNote: string;
   };
   footer: {
     tagline: string;
     github: string;
+    douyin: string;
+    email: string;
     mit: string;
     backToDemo: string;
     copyright: string;
@@ -190,10 +194,14 @@ export const zh: LandingMessages = {
       },
     ],
     releases: "查看 GitHub Releases →",
+    cnDownload: "国内直链下载",
+    msiNote: "MSI 安装包请前往",
   },
   footer: {
     tagline: "RAW 选片与归档工作流",
     github: "GitHub 仓库",
+    douyin: "抖音",
+    email: "mail@tensyn.online",
     mit: "MIT 许可",
     backToDemo: "回到演示",
     copyright: "© 2026 ImageFilter · MIT License",
@@ -323,10 +331,14 @@ export const en: LandingMessages = {
       },
     ],
     releases: "View GitHub Releases →",
+    cnDownload: "Direct China Links",
+    msiNote: "MSI installer: see",
   },
   footer: {
     tagline: "A RAW culling and archiving workflow",
     github: "GitHub Repository",
+    douyin: "Douyin",
+    email: "mail@tensyn.online",
     mit: "MIT License",
     backToDemo: "Back to Demo",
     copyright: "© 2026 ImageFilter · MIT License",

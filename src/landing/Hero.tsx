@@ -1,4 +1,3 @@
-import DotField from "@/components/DotField";
 import FoldText from "@/components/FoldText";
 import { Apple, Monitor } from "lucide-react";
 import type { Lang } from "./i18n";
@@ -22,24 +21,6 @@ export default function Hero({ lang }: HeroProps) {
       id="top"
       className="relative overflow-hidden px-4 pb-24 pt-36 sm:px-6 md:pt-44 lg:px-8"
     >
-      <div className="pointer-events-none absolute inset-0" aria-hidden="true">
-        <DotField
-          className="absolute inset-0"
-          dotRadius={1.5}
-          dotSpacing={18}
-          cursorRadius={520}
-          cursorForce={0.08}
-          bulgeStrength={72}
-          glowRadius={280}
-          gradientFrom="rgba(168, 85, 247, 0.18)"
-          gradientTo="rgba(34, 211, 238, 0.08)"
-          glowColor="#8b5cf6"
-        />
-        <div className="absolute -left-32 top-12 h-[32rem] w-[32rem] rounded-full bg-violet-600/20 blur-3xl" />
-        <div className="absolute right-[-10rem] top-1/3 h-[36rem] w-[36rem] rounded-full bg-blue-500/15 blur-3xl" />
-        <div className="absolute bottom-[-12rem] left-1/2 h-[34rem] w-[34rem] -translate-x-1/2 rounded-full bg-cyan-400/10 blur-3xl" />
-      </div>
-
       <div className="relative z-10 mx-auto flex max-w-6xl flex-col items-center text-center">
         <p className="inline-flex items-center rounded-full border border-white/10 bg-white/5 px-4 py-2 text-xs font-medium text-white/60 backdrop-blur">
           {t.hero.eyebrow}

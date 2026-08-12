@@ -33,12 +33,13 @@ export default function LandingPage() {
 
   return (
     <div className="relative min-h-screen overflow-x-clip bg-[#05060a] text-slate-50">
-      {/* 全局背景: DotField 交互点阵 + 三色光晕(整页可见, 随滚动自然铺开) */}
-      <div className="pointer-events-none absolute inset-0" aria-hidden="true">
+      {/* 全局背景: DotField 交互点阵 + 三色光晕
+          fixed 视口画布(点阵只画当前视口, 滚动不重绘, 性能优化) */}
+      <div className="pointer-events-none fixed inset-0" aria-hidden="true">
         <DotField
           className="absolute inset-0"
           dotRadius={1.5}
-          dotSpacing={18}
+          dotSpacing={22}
           cursorRadius={520}
           cursorForce={0.08}
           bulgeStrength={72}

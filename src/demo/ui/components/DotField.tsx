@@ -119,6 +119,16 @@ const DotField = memo(({
       mouseRef.current.y = e.pageY - s.offsetY;
     }
 
+    // 滚动时同步容器偏移(fixed 容器 rect 随滚动保持, 但 scrollY 变化;
+    // 不刷新会导致鼠标光效与指针错位)
+    function onScroll() {
+      const el = canvas!.parentElement;
+      if (!el) return;
+      const rect = el.getBoundingClientRect();
+      sizeRef.current.offsetX = rect.left + window.scrollX;
+      sizeRef.current.offsetY = rect.top + window.scrollY;
+    }
+
     function updateMouseSpeed() {
       const m = mouseRef.current;
       const dx = m.prevX - m.x;
@@ -233,6 +243,7 @@ const DotField = memo(({
 
     doResize();
     window.addEventListener('resize', resize);
+    window.addEventListener('scroll', onScroll, { passive: true });
     window.addEventListener('mousemove', onMouseMove, { passive: true });
     rafRef.current = requestAnimationFrame(tick);
 
@@ -246,6 +257,7 @@ const DotField = memo(({
       clearInterval(speedInterval);
       clearTimeout(resizeTimer);
       window.removeEventListener('resize', resize);
+      window.removeEventListener('scroll', onScroll);
       window.removeEventListener('mousemove', onMouseMove);
     };
   // eslint-disable-next-line react-hooks/exhaustive-deps

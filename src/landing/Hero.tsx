@@ -1,9 +1,8 @@
 import ParticleText from "@/components/ParticleText";
+import SpecularButton from "@/components/SpecularButton";
 import { Apple, Monitor } from "lucide-react";
 import type { Lang } from "./i18n";
 import { translations } from "./i18n";
-
-const RELEASES_URL = "https://github.com/XUTENGXIANG/ImageFilter/releases";
 
 interface HeroProps {
   lang: Lang;
@@ -12,8 +11,8 @@ interface HeroProps {
 export default function Hero({ lang }: HeroProps) {
   const t = translations[lang];
   const buttons = [
-    { href: RELEASES_URL, label: t.hero.windows, icon: Monitor },
-    { href: RELEASES_URL, label: t.hero.macos, icon: Apple },
+    { label: t.hero.windows, icon: Monitor },
+    { label: t.hero.macos, icon: Apple },
   ];
 
   return (
@@ -51,16 +50,30 @@ export default function Hero({ lang }: HeroProps) {
           {t.hero.subtitle}
         </p>
         <div className="mt-10 flex w-full max-w-xl flex-col items-center justify-center gap-3 sm:flex-row">
-          {buttons.map(({ href, label, icon: Icon }) => (
+          {buttons.map(({ label, icon: Icon }) => (
             <a
               key={label}
-              href={href}
-              target="_blank"
-              rel="noreferrer"
-              className="flex min-h-12 w-full items-center justify-center gap-2.5 rounded-2xl border border-white/10 bg-white/5 px-6 text-sm font-medium text-white shadow-2xl shadow-black/20 backdrop-blur transition hover:border-white/20 hover:bg-white/10 hover:shadow-[0_0_36px_rgba(139,92,246,0.22)] sm:w-auto"
+              href="#download"
+              className="block w-full rounded-2xl outline-none transition hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-cyan-200/70 sm:w-auto"
             >
-              <Icon className="h-4 w-4 text-white/80" />
-              <span>{label}</span>
+              <SpecularButton
+                size="md"
+                radius={16}
+                tint="#0f172a"
+                tintOpacity={0.55}
+                blur={14}
+                baseColor="#323a4d"
+                lineColor="#c7d2fe"
+                textColor="#f8fafc"
+                intensity={1.1}
+                proximity={360}
+                className="w-full"
+              >
+                <span className="flex items-center justify-center gap-2.5">
+                  <Icon className="h-4 w-4" />
+                  <span>{label}</span>
+                </span>
+              </SpecularButton>
             </a>
           ))}
         </div>

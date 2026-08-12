@@ -35,14 +35,14 @@ export default function LandingPage() {
     <div className="relative min-h-screen overflow-x-clip bg-[#05060a] text-slate-50">
       {/* 全局背景: LiquidEther 液态流体 + 三色光晕 */}
       <div className="pointer-events-none fixed inset-0" aria-hidden="true">
-        <div className="absolute inset-0 opacity-50">
+        <div className="absolute inset-0 opacity-90">
           <LiquidEther
-            colors={["#4c1d95", "#0e7490", "#7c3aed"]}
+            colors={["#7c3aed", "#0ea5e9", "#ec4899"]}
             autoDemo
-            autoSpeed={0.4}
-            autoIntensity={1.6}
+            autoSpeed={0.8}
+            autoIntensity={3}
             resolution={0.4}
-            mouseForce={0}
+            mouseForce={20}
           />
         </div>
         <div className="absolute -left-32 top-12 h-[32rem] w-[32rem] rounded-full bg-violet-600/20 blur-3xl" />

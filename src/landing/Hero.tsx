@@ -25,7 +25,7 @@ export default function Hero({ lang }: HeroProps) {
         <p className="inline-flex items-center rounded-full border border-white/10 bg-white/5 px-4 py-2 text-xs font-medium text-white/60 backdrop-blur">
           {t.hero.eyebrow}
         </p>
-        <h1 className="mt-8 max-w-5xl">
+        <h1 className="mt-8 w-full max-w-5xl">
           <ParticleText
             text={t.hero.title}
             color="#f8fafc"

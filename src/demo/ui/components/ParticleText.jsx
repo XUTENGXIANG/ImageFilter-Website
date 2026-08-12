@@ -42,11 +42,17 @@ const resolveFontSize = (value, container, fontWeight, fontFamily) => {
 const waitForFonts = async font => {
   if (!('fonts' in document)) return;
 
+  // 字体加载最多等 2.5s — 字体缺失/环境异常时 fonts.ready 可能永不 resolve,
+  // 导致粒子永远无法生成(标题空白)
+  const timeout = new Promise(resolve => setTimeout(resolve, 2500));
+
   try {
-    await document.fonts.load(font);
+    await Promise.race([document.fonts.load(font), timeout]);
   } catch {}
 
-  await document.fonts.ready;
+  try {
+    await Promise.race([document.fonts.ready, timeout]);
+  } catch {}
 };
 
 const ParticleText = ({
@@ -81,6 +87,9 @@ const ParticleText = ({
 
     const ctx = canvas.getContext('2d');
     if (!ctx) return undefined;
+
+    // [调试] 挂载时输出容器与 canvas 状态
+    console.log('[ParticleText] mount rect=', container.getBoundingClientRect(), 'canvas=', canvas.width, canvas.height);
 
     let particles = [];
     let animationFrame = null;
@@ -212,6 +221,7 @@ const ParticleText = ({
       width = Math.floor(rect.width);
       height = Math.floor(rect.height);
 
+      console.log('[ParticleText] sample rect=', rect.width, rect.height);
       if (width <= 0 || height <= 0) return;
 
       dpr = Math.min(window.devicePixelRatio || 1, 2);
@@ -287,6 +297,7 @@ const ParticleText = ({
       const highlightRgb = hexToRgb(highlightColor);
       const selected = targets.filter((_, index) => index % stride === 0);
 
+      console.log('[ParticleText] particles=', selected.length, 'canvas=', canvas.width, canvas.height);
       particles = selected.map((target, index) => {
         const seed = ((index * 9301 + 49297) % 233280) / 233280;
         const depth = 0.45 + (((index * 233 + 97) % 1000) / 1000) * 0.9;

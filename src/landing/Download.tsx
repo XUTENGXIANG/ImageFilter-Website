@@ -1,3 +1,4 @@
+import BorderGlow from "@/components/BorderGlow";
 import SpecularButton from "@/components/SpecularButton";
 import SpotlightCard from "@/components/SpotlightCard";
 import { Apple, Monitor } from "lucide-react";
@@ -67,8 +68,19 @@ export default function Download({ lang }: DownloadProps) {
                 transition={{ duration: 0.55, delay: index * 0.08 }}
                 className="h-full"
               >
+                <BorderGlow
+                  className="h-full rounded-2xl"
+                  backgroundColor="rgba(255,255,255,0.04)"
+                  borderRadius={16}
+                  colors={["#a78bfa", "#22d3ee", "#7dd3fc"]}
+                  glowColor="250 85 80"
+                  glowRadius={28}
+                  glowIntensity={0.55}
+                  edgeSensitivity={22}
+                  fillOpacity={0.12}
+                >
                 <SpotlightCard
-                  className="h-full border-white/10 bg-white/[0.04] backdrop-blur-xl"
+                  className="h-full border-white/10 bg-transparent backdrop-blur-xl"
                   spotlightColor="rgba(139, 92, 246, 0.18)"
                 >
                   <div className="flex h-full flex-col p-6">
@@ -122,6 +134,7 @@ export default function Download({ lang }: DownloadProps) {
                     </div>
                   </div>
                 </SpotlightCard>
+                </BorderGlow>
               </motion.article>
             );
           })}

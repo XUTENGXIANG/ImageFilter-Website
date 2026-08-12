@@ -1,3 +1,4 @@
+import BorderGlow from "@/components/BorderGlow";
 import SpotlightCard from "@/components/SpotlightCard";
 import {
   Detection,
@@ -60,25 +61,37 @@ export default function Features({ lang }: FeaturesProps) {
                 transition={{ duration: 0.55, delay: index * 0.08 }}
                 className="h-full"
               >
-                <SpotlightCard
-                  className="h-full border-white/10 bg-white/[0.04] backdrop-blur-xl"
-                  spotlightColor="rgba(139, 92, 246, 0.18)"
+                <BorderGlow
+                  className="h-full rounded-2xl"
+                  backgroundColor="rgba(255,255,255,0.04)"
+                  borderRadius={16}
+                  colors={["#a78bfa", "#22d3ee", "#7dd3fc"]}
+                  glowColor="250 85 80"
+                  glowRadius={28}
+                  glowIntensity={0.55}
+                  edgeSensitivity={22}
+                  fillOpacity={0.12}
                 >
-                  <div className="flex h-full flex-col p-6">
-                    <div className="flex h-12 w-12 items-center justify-center rounded-xl border border-white/10 bg-gradient-to-br from-violet-400/20 to-cyan-300/15 text-violet-100">
-                      <Icon size={22} strokeWidth={2} fill="currentColor" aria-hidden="true" />
+                  <SpotlightCard
+                    className="h-full border-white/10 bg-transparent backdrop-blur-xl"
+                    spotlightColor="rgba(139, 92, 246, 0.18)"
+                  >
+                    <div className="flex h-full flex-col p-6">
+                      <div className="flex h-12 w-12 items-center justify-center rounded-xl border border-white/10 bg-gradient-to-br from-violet-400/20 to-cyan-300/15 text-violet-100">
+                        <Icon size={22} strokeWidth={2} fill="currentColor" aria-hidden="true" />
+                      </div>
+                      <h3 className="mt-5 text-base font-semibold text-white">
+                        {feature.title}
+                      </h3>
+                      <p className="mt-2 text-sm leading-relaxed text-white/55">
+                        {feature.description}
+                      </p>
+                      <span className="mt-auto pt-6 text-xs tabular-nums text-white/30">
+                        {String(index + 1).padStart(2, "0")}
+                      </span>
                     </div>
-                    <h3 className="mt-5 text-base font-semibold text-white">
-                      {feature.title}
-                    </h3>
-                    <p className="mt-2 text-sm leading-relaxed text-white/55">
-                      {feature.description}
-                    </p>
-                    <span className="mt-auto pt-6 text-xs tabular-nums text-white/30">
-                      {String(index + 1).padStart(2, "0")}
-                    </span>
-                  </div>
-                </SpotlightCard>
+                  </SpotlightCard>
+                </BorderGlow>
               </motion.article>
             );
           })}

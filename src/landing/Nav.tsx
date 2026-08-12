@@ -1,4 +1,4 @@
-import { Camera } from "@icon-park/react";
+import logo from "../assets/logo.png";
 import type { Lang } from "./i18n";
 import { translations } from "./i18n";
 
@@ -35,8 +35,8 @@ export default function Nav({ lang, onLangChange }: NavProps) {
     <header className="fixed inset-x-0 top-0 z-50 border-b border-white/10 bg-[#06070d]/75 backdrop-blur-xl">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
         <a href="#top" className="group flex min-w-0 items-center gap-2.5">
-          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-white/10 bg-white/5 text-violet-300 transition group-hover:border-violet-300/30 group-hover:bg-violet-300/10">
-            <Camera size={20} fill="currentColor" />
+          <span className="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-white/10 bg-white/5 transition group-hover:border-violet-300/30 group-hover:bg-violet-300/10">
+            <img src={logo} alt="ImageFilter" className="h-6 w-6" />
           </span>
           <span className="hidden text-sm font-semibold text-white sm:inline">
             ImageFilter

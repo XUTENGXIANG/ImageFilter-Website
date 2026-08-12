@@ -1,4 +1,5 @@
-import { Camera, Github } from "@icon-park/react";
+import { Github } from "@icon-park/react";
+import logo from "../assets/logo.png";
 import type { Lang } from "./i18n";
 import { translations } from "./i18n";
 
@@ -16,8 +17,8 @@ export default function Footer({ lang }: FooterProps) {
       <div className="mx-auto max-w-6xl">
         <div className="flex flex-col gap-6 border-b border-white/10 pb-8 lg:flex-row lg:items-start lg:justify-between">
           <div className="flex items-center gap-3">
-            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-white/10 bg-gradient-to-br from-violet-400/20 to-cyan-300/15 text-violet-200">
-              <Camera size={20} fill="currentColor" />
+            <span className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-white/10 bg-gradient-to-br from-violet-400/20 to-cyan-300/15 text-violet-200">
+              <img src={logo} alt="ImageFilter" className="h-6 w-6" />
             </span>
             <div>
               <p className="text-sm font-semibold text-white">ImageFilter</p>

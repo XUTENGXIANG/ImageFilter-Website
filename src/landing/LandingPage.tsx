@@ -1,5 +1,5 @@
 import { useState } from "react";
-import DotField from "@/components/DotField";
+import LiquidEther from "@/components/LiquidEther";
 import type { Lang } from "./i18n";
 import Compare from "./Compare";
 import DemoWindow from "./DemoWindow";
@@ -33,21 +33,18 @@ export default function LandingPage() {
 
   return (
     <div className="relative min-h-screen overflow-x-clip bg-[#05060a] text-slate-50">
-      {/* 全局背景: DotField 交互点阵 + 三色光晕
-          fixed 视口画布(点阵只画当前视口, 滚动不重绘, 性能优化) */}
+      {/* 全局背景: LiquidEther 液态流体 + 三色光晕 */}
       <div className="pointer-events-none fixed inset-0" aria-hidden="true">
-        <DotField
-          className="absolute inset-0"
-          dotRadius={1.5}
-          dotSpacing={22}
-          cursorRadius={520}
-          cursorForce={0.08}
-          bulgeStrength={72}
-          glowRadius={280}
-          gradientFrom="rgba(168, 85, 247, 0.18)"
-          gradientTo="rgba(34, 211, 238, 0.08)"
-          glowColor="#8b5cf6"
-        />
+        <div className="absolute inset-0 opacity-50">
+          <LiquidEther
+            colors={["#4c1d95", "#0e7490", "#7c3aed"]}
+            autoDemo
+            autoSpeed={0.4}
+            autoIntensity={1.6}
+            resolution={0.4}
+            mouseForce={0}
+          />
+        </div>
         <div className="absolute -left-32 top-12 h-[32rem] w-[32rem] rounded-full bg-violet-600/20 blur-3xl" />
         <div className="absolute right-[-10rem] top-1/3 h-[36rem] w-[36rem] rounded-full bg-blue-500/15 blur-3xl" />
         <div className="absolute bottom-[-12rem] left-1/2 h-[34rem] w-[34rem] -translate-x-1/2 rounded-full bg-cyan-400/10 blur-3xl" />

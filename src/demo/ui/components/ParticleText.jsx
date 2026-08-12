@@ -206,9 +206,8 @@ const ParticleText = ({
         gathering = false;
       }
 
-      // 性能: 聚集完成且鼠标未活动时暂停渲染循环(静止画面无需重绘),
-      // pointer 移动时由 ensureRenderLoop 恢复
-      if (gathering || pointer.active) {
+      // 性能: 聚集完成后暂停渲染循环(画面定格, 零重绘开销)
+      if (gathering) {
         animationFrame = window.requestAnimationFrame(render);
       } else {
         animationFrame = null;

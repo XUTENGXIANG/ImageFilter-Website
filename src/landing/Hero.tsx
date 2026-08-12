@@ -34,8 +34,6 @@ export default function Hero({ lang }: HeroProps) {
           scatter={1300}
           gatherDuration={2000}
           stagger={500}
-          pointerRepel={40}
-          repelRadius={140}
           idleDrift={0}
           glow
         />

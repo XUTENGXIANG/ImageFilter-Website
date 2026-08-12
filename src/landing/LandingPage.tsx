@@ -37,7 +37,7 @@ export default function LandingPage() {
       <div className="pointer-events-none fixed inset-0" aria-hidden="true">
         <div className="absolute inset-0 opacity-90">
           <LiquidEther
-            colors={["#7c3aed", "#0ea5e9", "#ec4899"]}
+            colors={["#7c3aed", "#8b5cf6", "#0ea5e9"]}
             autoDemo
             autoSpeed={0.8}
             autoIntensity={3}

@@ -1,53 +1,8 @@
-import { useRef, useEffect, type CSSProperties, type ReactNode, type MouseEventHandler } from 'react';
+import { useRef, useEffect } from 'react';
 import { Renderer, Program, Mesh, Triangle, Color } from 'ogl';
-
-type ButtonSize = 'sm' | 'md' | 'lg';
-
-export interface SpecularButtonProps {
-  children?: ReactNode;
-  size?: ButtonSize;
-  radius?: number;
-  tint?: string;
-  tintOpacity?: number;
-  blur?: number;
-  textColor?: string;
-  lineColor?: string;
-  baseColor?: string;
-  intensity?: number;
-  shineSize?: number;
-  shineFade?: number;
-  thickness?: number;
-  speed?: number;
-  followMouse?: boolean;
-  proximity?: number;
-  autoAnimate?: boolean;
-  disabled?: boolean;
-  onClick?: MouseEventHandler<HTMLButtonElement>;
-  className?: string;
-  type?: 'button' | 'submit' | 'reset';
-}
-
-interface ShaderProps {
-  radius: number;
-  lineColor: string;
-  baseColor: string;
-  intensity: number;
-  shineSize: number;
-  shineFade: number;
-  thickness: number;
-  speed: number;
-  followMouse: boolean;
-  proximity: number;
-  autoAnimate: boolean;
-}
+import './SpecularButton.css';
 
 const PAD = 20;
-
-const SIZES: Record<ButtonSize, string> = {
-  sm: 'text-[0.85rem] px-[22px] py-[10px]',
-  md: 'text-[1rem] px-[30px] py-[14px]',
-  lg: 'text-[1.15rem] px-10 py-[18px]'
-};
 
 const VERT = `#version 300 es
 in vec2 position;
@@ -133,10 +88,10 @@ const SpecularButton = ({
   onClick,
   className = '',
   type = 'button'
-}: SpecularButtonProps) => {
-  const btnRef = useRef<HTMLButtonElement>(null);
-  const fxRef = useRef<HTMLSpanElement>(null);
-  const propsRef = useRef<ShaderProps>({} as ShaderProps);
+}) => {
+  const btnRef = useRef(null);
+  const fxRef = useRef(null);
+  const propsRef = useRef({});
 
   propsRef.current = { radius, lineColor, baseColor, intensity, shineSize, shineFade, thickness, speed, followMouse, proximity, autoAnimate };
 
@@ -197,9 +152,9 @@ const SpecularButton = ({
 
     // Light angle steers toward the pointer (anywhere on the page) and falls
     // back to a slow sweep when the pointer hasn't moved yet.
-    let pointerAngle: number | null = null;
+    let pointerAngle = null;
     let proximityT = 0;
-    const onPointerMove = (e: PointerEvent) => {
+    const onPointerMove = e => {
       const rect = btn.getBoundingClientRect();
       const cx = rect.left + rect.width / 2;
       const cy = rect.top + rect.height / 2;
@@ -229,7 +184,7 @@ const SpecularButton = ({
     const lineC = new Color();
     const baseC = new Color();
 
-    const update = (now: number) => {
+    const update = now => {
       raf = requestAnimationFrame(update);
       const dt = Math.min((now - last) / 1000, 0.05);
       last = now;
@@ -237,7 +192,7 @@ const SpecularButton = ({
 
       idleAngle += p.speed * dt;
       const steer = p.followMouse && pointerAngle != null && (!p.autoAnimate || proximityT > 0);
-      const target = steer ? pointerAngle! : idleAngle;
+      const target = steer ? pointerAngle : idleAngle;
       const diff = ((target - angle + Math.PI * 3) % (Math.PI * 2)) - Math.PI;
       angle += diff * (1 - Math.exp(-dt * 7));
 
@@ -274,19 +229,17 @@ const SpecularButton = ({
       type={type}
       disabled={disabled}
       onClick={onClick}
-      className={`relative m-0 inline-flex cursor-pointer items-center justify-center border-none font-medium leading-none tracking-[0.01em] outline-none transition-transform duration-150 active:scale-[0.97] disabled:cursor-default disabled:opacity-55 disabled:active:scale-100 [color:var(--sb-text-color)] [border-radius:var(--sb-radius)] [background:color-mix(in_srgb,var(--sb-tint)_calc(var(--sb-tint-opacity)*100%),transparent)] [backdrop-filter:blur(var(--sb-blur))] shadow-[inset_0_1px_0_rgba(255,255,255,0.04),0_8px_24px_rgba(0,0,0,0.25)] focus-visible:outline-2 focus-visible:outline-offset-[3px] ${SIZES[size] || SIZES.md}${className ? ` ${className}` : ''}`}
-      style={
-        {
-          '--sb-radius': `${radius}px`,
-          '--sb-tint': tint,
-          '--sb-tint-opacity': tintOpacity,
-          '--sb-blur': `${blur}px`,
-          '--sb-text-color': textColor
-        } as CSSProperties
-      }
+      className={`specular-button specular-button--${size}${className ? ` ${className}` : ''}`}
+      style={{
+        '--sb-radius': `${radius}px`,
+        '--sb-tint': tint,
+        '--sb-tint-opacity': tintOpacity,
+        '--sb-blur': `${blur}px`,
+        '--sb-text-color': textColor
+      }}
     >
-      <span ref={fxRef} aria-hidden="true" className="pointer-events-none absolute -inset-5 z-[1] [&_canvas]:block [&_canvas]:h-full [&_canvas]:w-full" />
-      <span className="relative z-[2]">{children}</span>
+      <span ref={fxRef} className="specular-button__fx" aria-hidden="true" />
+      <span className="specular-button__label">{children}</span>
     </button>
   );
 };

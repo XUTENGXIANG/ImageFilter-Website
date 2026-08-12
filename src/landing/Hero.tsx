@@ -21,27 +21,33 @@ export default function Hero({ lang }: HeroProps) {
       id="top"
       className="relative overflow-hidden px-4 pb-24 pt-36 sm:px-6 md:pt-44 lg:px-8"
     >
+      {/* 标题粒子层: 覆盖 hero 全屏, 粒子从四处散布聚集成文字 */}
+      <div className="absolute inset-0 z-[5]">
+        <ParticleText
+          text={t.hero.title}
+          color="#f8fafc"
+          highlightColor="#8b5cf6"
+          particleSize={2.2}
+          density={4}
+          fontSize="clamp(3.5rem, 12vw, 9rem)"
+          fontWeight={800}
+          scatter={1300}
+          gatherDuration={2000}
+          stagger={500}
+          pointerRepel={40}
+          repelRadius={140}
+          glow
+        />
+      </div>
+
       <div className="relative z-10 mx-auto flex max-w-6xl flex-col items-center text-center">
         <p className="inline-flex items-center rounded-full border border-white/10 bg-white/5 px-4 py-2 text-xs font-medium text-white/60 backdrop-blur">
           {t.hero.eyebrow}
         </p>
-        <h1 className="mt-8 w-full max-w-5xl">
-          <ParticleText
-            text={t.hero.title}
-            color="#f8fafc"
-            highlightColor="#8b5cf6"
-            particleSize={2.2}
-            density={4}
-            fontSize="clamp(3.5rem, 12vw, 9rem)"
-            fontWeight={800}
-            scatter={200}
-            gatherDuration={1800}
-            stagger={480}
-            pointerRepel={40}
-            repelRadius={130}
-            glow
-          />
-        </h1>
+        <h1
+          className="mt-8 h-[30vh] min-h-[220px] w-full max-w-5xl"
+          aria-label={t.hero.title}
+        ></h1>
         <p className="mt-8 max-w-2xl text-pretty text-base leading-relaxed text-white/65 sm:text-lg">
           {t.hero.subtitle}
         </p>

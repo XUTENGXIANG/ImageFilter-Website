@@ -6,6 +6,7 @@ export interface LandingMessages {
     compare: string;
     workflow: string;
     download: string;
+    starOnGithub: string;
   };
   hero: {
     eyebrow: string;
@@ -75,6 +76,7 @@ export const zh: LandingMessages = {
     compare: "对比",
     workflow: "工作流",
     download: "下载",
+    starOnGithub: "Star on GitHub",
   },
   hero: {
     eyebrow: "摄影选片 · 归档 · 创作",
@@ -204,6 +206,7 @@ export const en: LandingMessages = {
     compare: "Compare",
     workflow: "Workflow",
     download: "Download",
+    starOnGithub: "Star on GitHub",
   },
   hero: {
     eyebrow: "Cull · Archive · Create",

@@ -1,4 +1,5 @@
 import logo from "../assets/logo.png";
+import GitHubStarButton from "./GitHubStarButton";
 import type { Lang } from "./i18n";
 import { translations } from "./i18n";
 
@@ -49,6 +50,10 @@ export default function Nav({ lang, onLangChange }: NavProps) {
         >
           {renderLinks()}
         </nav>
+
+        <div className="hidden md:block">
+          <GitHubStarButton lang={lang} />
+        </div>
 
         <div
           className="flex items-center rounded-full border border-white/10 bg-white/5 p-1"

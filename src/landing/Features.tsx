@@ -1,4 +1,4 @@
-import BorderGlow from "@/components/BorderGlow";
+import SpotlightCard from "@/components/SpotlightCard";
 import {
   Detection,
   FileHash,
@@ -12,7 +12,7 @@ import type { Lang } from "./i18n";
 import { translations } from "./i18n";
 
 // CardSwap is a position-swapping deck for absolutely positioned cards. It
-// would fight the responsive feature grid, so this section uses BorderGlow
+// would fight the responsive feature grid, so this section uses SpotlightCard
 // hover accents with a motion fade-up stagger instead.
 const featureIcons = [ImageFiles, Star, Detection, Folder, FileHash, Local];
 
@@ -60,18 +60,11 @@ export default function Features({ lang }: FeaturesProps) {
                 transition={{ duration: 0.55, delay: index * 0.08 }}
                 className="h-full"
               >
-                <BorderGlow
-                  className="h-full [border-color:rgba(255,255,255,0.1)]"
-                  backgroundColor="rgba(255,255,255,0.05)"
-                  borderRadius={16}
-                  colors={["#a78bfa", "#22d3ee", "#7dd3fc"]}
-                  glowColor="250 85 80"
-                  glowRadius={28}
-                  glowIntensity={0.55}
-                  edgeSensitivity={22}
-                  fillOpacity={0.12}
+                <SpotlightCard
+                  className="h-full border-white/10 bg-white/[0.04] backdrop-blur-xl"
+                  spotlightColor="rgba(139, 92, 246, 0.18)"
                 >
-                  <div className="flex h-full flex-col p-6 backdrop-blur-xl">
+                  <div className="flex h-full flex-col p-6">
                     <div className="flex h-12 w-12 items-center justify-center rounded-xl border border-white/10 bg-gradient-to-br from-violet-400/20 to-cyan-300/15 text-violet-100">
                       <Icon size={22} strokeWidth={2} fill="currentColor" aria-hidden="true" />
                     </div>
@@ -85,7 +78,7 @@ export default function Features({ lang }: FeaturesProps) {
                       {String(index + 1).padStart(2, "0")}
                     </span>
                   </div>
-                </BorderGlow>
+                </SpotlightCard>
               </motion.article>
             );
           })}

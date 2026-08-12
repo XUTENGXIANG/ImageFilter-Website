@@ -11,7 +11,7 @@ export default function Nav({ lang, onLangChange }: NavProps) {
   const t = translations[lang];
   const links = [
     { href: "#features", label: t.nav.features },
-    { href: "#screenshots", label: t.nav.screenshots },
+    { href: "#compare", label: t.nav.compare },
     { href: "#workflow", label: t.nav.workflow },
     { href: "#download", label: t.nav.download },
   ];

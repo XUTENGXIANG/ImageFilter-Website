@@ -1,13 +1,13 @@
 import { useState } from "react";
 import DotField from "@/components/DotField";
 import type { Lang } from "./i18n";
+import Compare from "./Compare";
 import DemoWindow from "./DemoWindow";
 import Download from "./Download";
 import Features from "./Features";
 import Footer from "./Footer";
 import Hero from "./Hero";
 import Nav from "./Nav";
-import Screenshots from "./Screenshots";
 import Workflow from "./Workflow";
 
 function getInitialLang(): Lang {
@@ -57,7 +57,7 @@ export default function LandingPage() {
       <main className="relative z-10">
         <Hero lang={lang} />
         <DemoWindow lang={lang} />
-        <Screenshots lang={lang} />
+        <Compare lang={lang} />
         <Features lang={lang} />
         <Workflow lang={lang} />
         <Download lang={lang} />

@@ -3,7 +3,7 @@ export type Lang = "zh" | "en";
 export interface LandingMessages {
   nav: {
     features: string;
-    screenshots: string;
+    compare: string;
     workflow: string;
     download: string;
   };
@@ -18,13 +18,17 @@ export interface LandingMessages {
     langHint: string;
     hint: string;
   };
-  screenshots: {
+  compare: {
     title: string;
     subtitle: string;
-    caption: string;
-    mainInterface: string;
-    placeholder: string;
-    placeholderSecondary: string;
+    manual: string;
+    manualCaption: string;
+    imagefilter: string;
+    imagefilterCaption: string;
+    rows: {
+      manual: string;
+      app: string;
+    }[];
   };
   features: {
     eyebrow: string;
@@ -68,7 +72,7 @@ export interface LandingMessages {
 export const zh: LandingMessages = {
   nav: {
     features: "特性",
-    screenshots: "界面",
+    compare: "对比",
     workflow: "工作流",
     download: "下载",
   },
@@ -83,13 +87,31 @@ export const zh: LandingMessages = {
     langHint: "中 / EN",
     hint: "点击照片体验选片流程",
   },
-  screenshots: {
-    title: "界面",
-    subtitle: "从导入到成片，界面始终围绕摄影师的工作节奏组织。",
-    caption: "工作流 · 创作 · 影像",
-    mainInterface: "主界面 — 三栏布局",
-    placeholder: "截图待补充",
-    placeholderSecondary: "Screenshot coming soon",
+  compare: {
+    title: "对比",
+    subtitle: "同样是整理照片，传统方式与 ImageFilter 的差距，在一次导入后就显现。",
+    manual: "传统方式",
+    manualCaption: "手动文件夹管理",
+    imagefilter: "ImageFilter",
+    imagefilterCaption: "完整选片工作流",
+    rows: [
+      {
+        manual: "上千张 RAW 逐张翻找，凭记忆打星标",
+        app: "RAW 秒级预览，LrC 同款星级体系一键初筛",
+      },
+      {
+        manual: "肉眼判断模糊与过曝，漏看是常态",
+        app: "AI 自动识别模糊 / 过曝 / 连拍重复",
+      },
+      {
+        manual: "手工改名、新建文件夹，一次拍摄耗半小时",
+        app: "命名规则模板自动归档，插卡即导入",
+      },
+      {
+        manual: "复制粘贴完成，拷完即忘、无从校验",
+        app: "MD5 全程校验，数据完整可追溯",
+      },
+    ],
   },
   features: {
     eyebrow: "工作流 · 创作 · 影像",
@@ -179,7 +201,7 @@ export const zh: LandingMessages = {
 export const en: LandingMessages = {
   nav: {
     features: "Features",
-    screenshots: "Interface",
+    compare: "Compare",
     workflow: "Workflow",
     download: "Download",
   },
@@ -194,13 +216,31 @@ export const en: LandingMessages = {
     langHint: "中 / EN",
     hint: "Click a photo to try the culling flow.",
   },
-  screenshots: {
-    title: "Interface",
-    subtitle: "Every workspace is organized around the photographer's flow, from import to final export.",
-    caption: "Workflow · Creative · Imaging",
-    mainInterface: "Main interface - three-panel layout",
-    placeholder: "Screenshot coming soon",
-    placeholderSecondary: "截图待补充",
+  compare: {
+    title: "Compare",
+    subtitle: "Both handle photos — one import later, the gap shows.",
+    manual: "Manual",
+    manualCaption: "Folder-by-folder management",
+    imagefilter: "ImageFilter",
+    imagefilterCaption: "A complete culling workflow",
+    rows: [
+      {
+        manual: "Hunt through thousands of RAW files, stars from memory",
+        app: "Instant RAW previews; cull with a familiar star system",
+      },
+      {
+        manual: "Judge blur and overexposure by eye — misses are normal",
+        app: "AI flags blur, overexposure, and burst duplicates",
+      },
+      {
+        manual: "Rename and create folders by hand, half an hour per shoot",
+        app: "Template-based archiving; import straight from the card",
+      },
+      {
+        manual: "Copy-paste import, then forget — no way to verify",
+        app: "MD5 verification throughout, traceable and complete",
+      },
+    ],
   },
   features: {
     eyebrow: "Workflow · Creative · Imaging",

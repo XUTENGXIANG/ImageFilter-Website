@@ -48,7 +48,7 @@ export default function Screenshots({ lang }: ScreenshotsProps) {
     () =>
       buildPlaceholderImage(
         t.screenshots.placeholder,
-        t.screenshots.placeholderEnglish,
+        t.screenshots.placeholderSecondary,
       ),
     [t],
   );
@@ -61,11 +61,11 @@ export default function Screenshots({ lang }: ScreenshotsProps) {
     // 待补充截图位置：第二、三张使用渐变 SVG 占位卡片。
     {
       image: placeholder,
-      title: `${t.screenshots.placeholder} / ${t.screenshots.placeholderEnglish}`,
+      title: `${t.screenshots.placeholder} / ${t.screenshots.placeholderSecondary}`,
     },
     {
       image: placeholder,
-      title: `${t.screenshots.placeholder} / ${t.screenshots.placeholderEnglish}`,
+      title: `${t.screenshots.placeholder} / ${t.screenshots.placeholderSecondary}`,
     },
   ];
 

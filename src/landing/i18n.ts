@@ -24,7 +24,7 @@ export interface LandingMessages {
     caption: string;
     mainInterface: string;
     placeholder: string;
-    placeholderEnglish: string;
+    placeholderSecondary: string;
   };
   features: {
     eyebrow: string;
@@ -89,7 +89,7 @@ export const zh: LandingMessages = {
     caption: "工作流 · 创作 · 影像",
     mainInterface: "主界面 — 三栏布局",
     placeholder: "截图待补充",
-    placeholderEnglish: "Screenshot coming soon",
+    placeholderSecondary: "Screenshot coming soon",
   },
   features: {
     eyebrow: "工作流 · 创作 · 影像",
@@ -200,7 +200,7 @@ export const en: LandingMessages = {
     caption: "Workflow · Creative · Imaging",
     mainInterface: "Main interface - three-panel layout",
     placeholder: "Screenshot coming soon",
-    placeholderEnglish: "截图待补充",
+    placeholderSecondary: "截图待补充",
   },
   features: {
     eyebrow: "Workflow · Creative · Imaging",

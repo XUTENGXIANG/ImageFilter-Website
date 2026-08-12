@@ -254,3 +254,10 @@ img {
 [data-tauri-drag-region] .tooltip-wrap:nth-last-child(-n+3) {
   display: none;
 }
+
+/* ── 网页 demo: 软件 App 根容器是 w-screen/h-screen(全视口尺寸),
+   在 demo 容器内必须改为填满容器, 否则界面被裁剪 ── */
+.ifdemo-scope > div {
+  width: 100% !important;
+  height: 100% !important;
+}

@@ -73,7 +73,7 @@ export default function Features({ lang }: FeaturesProps) {
                 >
                   <div className="flex h-full flex-col p-6 backdrop-blur-xl">
                     <div className="flex h-12 w-12 items-center justify-center rounded-xl border border-white/10 bg-gradient-to-br from-violet-400/20 to-cyan-300/15 text-violet-100">
-                      <Icon size={22} strokeWidth={2} fill="currentColor" />
+                      <Icon size={22} strokeWidth={2} fill="currentColor" aria-hidden="true" />
                     </div>
                     <h3 className="mt-5 text-base font-semibold text-white">
                       {feature.title}

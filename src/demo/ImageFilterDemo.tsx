@@ -7,7 +7,10 @@ import App from "./ui/App";
 
 export default function ImageFilterDemo({ className }: { className?: string }) {
   return (
-    <div className={className} style={{ height: 560, overflow: "hidden", borderRadius: 12 }}>
+    <div
+      className={`ifdemo-scope ${className ?? ""}`}
+      style={{ height: 560, overflow: "hidden", borderRadius: 12 }}
+    >
       <App />
     </div>
   );

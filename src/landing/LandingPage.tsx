@@ -32,7 +32,7 @@ export default function LandingPage() {
   };
 
   return (
-    <div className="relative min-h-screen overflow-x-hidden bg-[#05060a] text-slate-50">
+    <div className="relative min-h-screen overflow-x-clip bg-[#05060a] text-slate-50">
       {/* 全局背景: DotField 交互点阵 + 三色光晕(整页可见, 随滚动自然铺开) */}
       <div className="pointer-events-none absolute inset-0" aria-hidden="true">
         <DotField

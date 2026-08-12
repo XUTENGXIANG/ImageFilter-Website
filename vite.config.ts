@@ -8,6 +8,8 @@ const uiBase = resolve(import.meta.dirname, "src/demo/ui");
 
 // https://vite.dev/config/
 export default defineConfig({
+  // GitHub Pages 项目页部署在 /ImageFilter-Website/ 子路径
+  base: "/ImageFilter-Website/",
   plugins: [react(), tailwindcss()],
   build: {
     // 单页含 THREE(流体)/React/软件 demo UI, 包体 >500KB 属预期, 调高阈值避免警告

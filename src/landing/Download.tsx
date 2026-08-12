@@ -80,7 +80,7 @@ export default function Download({ lang }: DownloadProps) {
                   fillOpacity={0.12}
                 >
                 <SpotlightCard
-                  className="h-full border-white/10 bg-transparent backdrop-blur-xl"
+                  className="h-full rounded-2xl bg-transparent"
                   spotlightColor="rgba(139, 92, 246, 0.18)"
                 >
                   <div className="flex h-full flex-col p-6">

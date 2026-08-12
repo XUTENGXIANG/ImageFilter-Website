@@ -35,6 +35,34 @@ export interface LandingMessages {
       description: string;
     }[];
   };
+  workflow: {
+    eyebrow: string;
+    title: string;
+    subtitle: string;
+    steps: {
+      title: string;
+      description: string;
+    }[];
+  };
+  download: {
+    eyebrow: string;
+    title: string;
+    version: string;
+    cards: {
+      platform: string;
+      badge: string;
+      description: string;
+      action: string;
+    }[];
+    releases: string;
+  };
+  footer: {
+    tagline: string;
+    github: string;
+    mit: string;
+    backToDemo: string;
+    copyright: string;
+  };
 }
 
 export const zh: LandingMessages = {
@@ -94,6 +122,58 @@ export const zh: LandingMessages = {
       },
     ],
   },
+  workflow: {
+    eyebrow: "工作流 · 创作 · 影像",
+    title: "工作流 / Workflow",
+    subtitle: "从插卡到归档，三步完成选片",
+    steps: [
+      {
+        title: "插卡识别",
+        description: "连接相机或 SD 卡，设备自动识别，RAW 素材即刻进入工作区。",
+      },
+      {
+        title: "预览筛选",
+        description: "秒级 RAW 预览，星级评分完成初筛，把判断留给创作。",
+      },
+      {
+        title: "一键归档",
+        description: "命名规则自动整理，MD5 校验导入，数据完整、路径清晰。",
+      },
+    ],
+  },
+  download: {
+    eyebrow: "安装包 / Installers",
+    title: "下载 / Download",
+    version: "v1.0.0",
+    cards: [
+      {
+        platform: "Windows 安装包",
+        badge: "推荐",
+        description: "NSIS 安装包，双击即装。",
+        action: "下载 Windows 安装包",
+      },
+      {
+        platform: "Windows MSI",
+        badge: "企业部署",
+        description: "面向企业部署与组策略安装。",
+        action: "下载 MSI 安装包",
+      },
+      {
+        platform: "macOS Universal",
+        badge: "通用",
+        description: "同时支持 Intel 与 Apple Silicon。",
+        action: "下载 macOS 安装包",
+      },
+    ],
+    releases: "查看 GitHub Releases →",
+  },
+  footer: {
+    tagline: "RAW 选片与归档工作流",
+    github: "GitHub 仓库",
+    mit: "MIT 许可",
+    backToDemo: "回到演示",
+    copyright: "© 2026 ImageFilter · MIT License",
+  },
 };
 
 export const en: LandingMessages = {
@@ -152,6 +232,61 @@ export const en: LandingMessages = {
         description: "Everything runs locally; photos never leave your machine.",
       },
     ],
+  },
+  workflow: {
+    eyebrow: "Workflow · Creative · Imaging",
+    title: "Workflow",
+    subtitle: "From card to archive, finish the first pass in three steps.",
+    steps: [
+      {
+        title: "Connect & Detect",
+        description:
+          "Connect your camera or SD card; the device is detected and RAW files enter the workspace.",
+      },
+      {
+        title: "Preview & Rate",
+        description:
+          "Fast RAW previews with star ratings turn the first pass into a clear creative decision.",
+      },
+      {
+        title: "Archive in One Step",
+        description:
+          "Apply naming rules automatically and verify imports with MD5 for a complete, traceable archive.",
+      },
+    ],
+  },
+  download: {
+    eyebrow: "Installers",
+    title: "Download",
+    version: "v1.0.0",
+    cards: [
+      {
+        platform: "Windows Installer",
+        badge: "Recommended",
+        description: "NSIS installer; double-click to set up.",
+        action: "Download Windows Installer",
+      },
+      {
+        platform: "Windows MSI",
+        badge: "Enterprise",
+        description: "Built for enterprise deployment and Group Policy installs.",
+        action: "Download MSI",
+      },
+      {
+        platform: "macOS Universal",
+        badge: "Universal",
+        description: "Supports both Intel and Apple Silicon.",
+        action: "Download for macOS",
+      },
+    ],
+    releases: "View GitHub Releases →",
+  },
+  footer: {
+    tagline: "A RAW culling and archiving workflow",
+    github: "GitHub Repository",
+    mit: "MIT License",
+    backToDemo: "Back to Demo",
+    copyright: "© 2026 ImageFilter · MIT License",
   },
 };
 

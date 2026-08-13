@@ -13,6 +13,9 @@ const ClickSpark = ({
   const canvasRef = useRef(null);
   const sparksRef = useRef([]);
   const startTimeRef = useRef(null);
+  // 跨 effect/handleClick 共享的 RAF 句柄与 draw 引用(空火花时停帧, 点击时重启)
+  const rafRef = useRef(null);
+  const drawRef = useRef(null);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -68,8 +71,6 @@ const ClickSpark = ({
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
 
-    let animationId;
-
     const draw = timestamp => {
       if (!startTimeRef.current) {
         startTimeRef.current = timestamp;
@@ -103,13 +104,19 @@ const ClickSpark = ({
         return true;
       });
 
-      animationId = requestAnimationFrame(draw);
+      if (sparksRef.current.length === 0) {
+        // 无活跃火花 → 停止循环, 避免全屏空转 60fps
+        rafRef.current = null;
+        return;
+      }
+      rafRef.current = requestAnimationFrame(draw);
     };
 
-    animationId = requestAnimationFrame(draw);
+    drawRef.current = draw;
+    rafRef.current = requestAnimationFrame(draw);
 
     return () => {
-      cancelAnimationFrame(animationId);
+      cancelAnimationFrame(rafRef.current);
     };
   }, [sparkColor, sparkSize, sparkRadius, sparkCount, duration, easeFunc, extraScale]);
 
@@ -129,6 +136,11 @@ const ClickSpark = ({
     }));
 
     sparksRef.current.push(...newSparks);
+
+    // 循环可能已停止 → 有新火花时重启
+    if (!rafRef.current && drawRef.current) {
+      rafRef.current = requestAnimationFrame(drawRef.current);
+    }
   };
 
   return (

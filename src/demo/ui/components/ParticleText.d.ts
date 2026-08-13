@@ -13,7 +13,7 @@ declare const ParticleText: (props: {
   repelRadius?: number;
   idleDrift?: number;
   trigger?: "mount" | "hover" | "click";
-  fontSize?: string;
+  fontSize?: string | number;
   fontWeight?: number;
   fontFamily?: string;
   glow?: boolean;

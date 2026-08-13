@@ -20,6 +20,10 @@ function getInitialLang(): Lang {
   }
 }
 
+// 模块级常量: LiquidEther 的 effect 依赖 colors 引用相等性,
+// 内联数组每次渲染都是新引用 → 语言切换会触发全屏 WebGL 重建
+const FLUID_COLORS = ["#7c3aed", "#8b5cf6", "#0ea5e9"];
+
 export default function LandingPage() {
   const [lang, setLang] = useState<Lang>(getInitialLang);
 
@@ -40,7 +44,7 @@ export default function LandingPage() {
       <div className="pointer-events-none fixed inset-0" aria-hidden="true">
         <div className="absolute inset-0 opacity-90">
           <LiquidEther
-            colors={["#7c3aed", "#8b5cf6", "#0ea5e9"]}
+            colors={FLUID_COLORS}
             autoDemo
             autoSpeed={0.8}
             autoIntensity={3}

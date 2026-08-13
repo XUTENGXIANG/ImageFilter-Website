@@ -1042,8 +1042,6 @@ export default function LiquidEther({
     };
     applyOptionsFromProps();
 
-    // [调试] 挂载状态
-    console.log('[LiquidEther] mount', !!webglRef.current, 'canvas', webglRef.current?.renderer?.domElement?.width, webglRef.current?.renderer?.domElement?.height);
     webgl.start();
 
     // IntersectionObserver to pause rendering when not visible

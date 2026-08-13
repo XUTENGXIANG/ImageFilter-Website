@@ -13,6 +13,13 @@ declare const SpecularButton: (props: {
   proximity?: number;
   followMouse?: boolean;
   autoAnimate?: boolean;
+  shineSize?: number;
+  shineFade?: number;
+  thickness?: number;
+  speed?: number;
+  disabled?: boolean;
+  onClick?: () => void;
+  type?: string;
   children?: React.ReactNode;
   className?: string;
 }) => React.ReactElement;

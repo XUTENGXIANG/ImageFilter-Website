@@ -134,6 +134,14 @@ const SpecularButton = ({
     fx.appendChild(gl.canvas);
 
     const sizeRef = { w: 1, h: 1 };
+    // 缓存的按钮矩形: pointermove 是全窗口高频事件, 逐次 getBoundingClientRect 会造成布局抖动
+    const rectRef = { left: 0, top: 0, right: 0, bottom: 0, width: 1, height: 1 };
+    const refreshRect = () => {
+      const r = btn.getBoundingClientRect();
+      rectRef.left = r.left; rectRef.top = r.top;
+      rectRef.right = r.right; rectRef.bottom = r.bottom;
+      rectRef.width = r.width; rectRef.height = r.height;
+    };
     const resize = () => {
       // Fractional size + explicit center keep the SDF pinned to the exact
       // CSS border, instead of drifting up to a pixel from offsetWidth rounding.
@@ -142,6 +150,7 @@ const SpecularButton = ({
       const h = rect.height;
       sizeRef.w = w;
       sizeRef.h = h;
+      refreshRect();
       renderer.setSize(w + PAD * 2, h + PAD * 2);
       program.uniforms.uCenter.value = [(PAD + w / 2) * dpr, (PAD + h / 2) * dpr];
       program.uniforms.uHalfSize.value = [(w / 2) * dpr, (h / 2) * dpr];
@@ -149,13 +158,15 @@ const SpecularButton = ({
     const ro = new ResizeObserver(resize);
     ro.observe(btn);
     resize();
+    const onScroll = () => refreshRect();
+    window.addEventListener('scroll', onScroll, { passive: true });
 
     // Light angle steers toward the pointer (anywhere on the page) and falls
     // back to a slow sweep when the pointer hasn't moved yet.
     let pointerAngle = null;
     let proximityT = 0;
     const onPointerMove = e => {
-      const rect = btn.getBoundingClientRect();
+      const rect = rectRef; // 缓存矩形, 滚动/缩放时经 onScroll/resize 刷新
       const cx = rect.left + rect.width / 2;
       const cy = rect.top + rect.height / 2;
       const dx = Math.max(rect.left - e.clientX, 0, e.clientX - rect.right);
@@ -184,7 +195,12 @@ const SpecularButton = ({
     const lineC = new Color();
     const baseC = new Color();
 
+    // 用户偏好减少动效 → 只渲染一帧静态图
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
     const update = now => {
+      // 标签页隐藏或减少动效 → 停止 60fps 循环, 恢复时经 onVisibility 重启
+      if (document.hidden || reducedMotion) { raf = 0; return; }
       raf = requestAnimationFrame(update);
       const dt = Math.min((now - last) / 1000, 0.05);
       last = now;
@@ -213,11 +229,18 @@ const SpecularButton = ({
       renderer.render({ scene: mesh });
     };
     raf = requestAnimationFrame(update);
+    // 标签页从隐藏恢复 → 重启渲染循环
+    const onVisibility = () => {
+      if (!document.hidden && !raf) raf = requestAnimationFrame(update);
+    };
+    document.addEventListener('visibilitychange', onVisibility);
 
     return () => {
       cancelAnimationFrame(raf);
       ro.disconnect();
+      window.removeEventListener('scroll', onScroll);
       window.removeEventListener('pointermove', onPointerMove);
+      document.removeEventListener('visibilitychange', onVisibility);
       if (gl.canvas.parentNode === fx) fx.removeChild(gl.canvas);
       gl.getExtension('WEBGL_lose_context')?.loseContext();
     };

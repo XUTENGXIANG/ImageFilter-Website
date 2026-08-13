@@ -161,8 +161,17 @@ const LineSidebar = ({
               itemRefs.current[index] = el;
             }}
             className="line-sidebar__item"
+            role="button"
+            tabIndex={0}
             aria-current={activeIndex === index ? 'true' : undefined}
             onClick={() => handleClick(index, label)}
+            onKeyDown={e => {
+              // 键盘可达性: Enter/Space 触发点击
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                handleClick(index, label);
+              }
+            }}
           >
             {showMarker && <span className="line-sidebar__marker" aria-hidden="true" />}
             <span className="line-sidebar__label">

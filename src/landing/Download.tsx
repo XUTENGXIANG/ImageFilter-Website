@@ -14,16 +14,18 @@ const RELEASES_PAGE = "https://github.com/XUTENGXIANG/ImageFilter/releases";
 // 手动添加直链的方法：
 //   1. 在蓝奏云上传新版本安装包，复制分享链接
 //   2. 在下面的数组中新增一条记录（建议按平台排序）：
-//      { name: "文件名（页面展示用，建议带版本号）", href: "蓝奏云分享链接" }
+//      { name: "文件名（页面展示用，建议带版本号）", href: "蓝奏云分享链接", password: "访问密码(无则省略)" }
 //   3. 列表会按数组顺序自动渲染，点击即在新标签页打开
 // 注意：name 会直接展示在页面上，版本升级后记得同步更新文件名。
 const CN_DOWNLOADS = [
   {
     name: "ImageFilter_1.0.0_x64-setup.exe",
+    password: "fih2",
     href: "https://wwbny.lanzoue.com/iO3ka420hdmj?webpage=AjMAYF47UjBVNlQ2BmECM1M9AjBScQU0AjVWZ1M7UmcDM1o_aCmQAbQgiUzQ_c",
   },
   {
     name: "ImageFilter_1.0.0_universal.dmg",
+    password: "hx0o",
     href: "https://wwbny.lanzoue.com/i6bKM420hclc?webpage=BDVSMghtDmxVNgJgBmFWZwFvU2ECIQc2ADdUZQJqWm9XZwJnDWBTNVJ4AmU_c",
   },
 ];
@@ -195,7 +197,9 @@ export default function Download({ lang }: DownloadProps) {
               >
                 <div className="mx-auto mt-6 max-w-lg rounded-2xl border border-white/10 bg-white/[0.03] p-6 backdrop-blur-sm">
                   <LineSidebar
-                    items={CN_DOWNLOADS.map((d) => d.name)}
+                    items={CN_DOWNLOADS.map((d) =>
+                      d.password ? `${d.name}  密码：${d.password}` : d.name
+                    )}
                     accentColor="#a78bfa"
                     textColor="rgba(255,255,255,0.72)"
                     markerColor="rgba(255,255,255,0.22)"

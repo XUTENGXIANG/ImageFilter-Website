@@ -149,6 +149,8 @@ const handlers: Record<string, Handler> = {
   // ---- misc ----
   set_glass_bg: async () => undefined,
 
+  allow_asset_dir: async () => undefined,
+
   eject_drive: async () => undefined,
 
   open_folder: async () => undefined,

@@ -13,7 +13,7 @@ export default function GitHubStarButton({ lang }: { lang: Lang }) {
     // 实时拉取 star 数; 失败则隐藏数字(不阻塞页面)
     let cancelled = false;
     fetch("https://api.github.com/repos/XUTENGXIANG/ImageFilter")
-      .then((r) => r.json())
+      .then((r) => (r.ok ? r.json() : Promise.reject(new Error(`HTTP ${r.status}`))))
       .then((data) => {
         if (!cancelled && typeof data.stargazers_count === "number") {
           setStars(data.stargazers_count);

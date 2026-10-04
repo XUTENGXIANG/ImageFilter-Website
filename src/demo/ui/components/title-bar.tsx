@@ -4,6 +4,7 @@ import { invoke } from "@tauri-apps/api/core";
 import { useTranslation } from "react-i18next";
 import { setLanguage, type Lang } from "../i18n";
 import { useLocalStorageNumber, useLocalStorageSetting } from "../hooks/use-local-storage-setting";
+import type { XmpMode, XmpStatus } from "../xmp";
 import { SettingsDialog } from "./settings-dialog";
 import { HelpDialog } from "./help-dialog";
 import { Setting, Sun, Moon, Close, Help } from "@icon-park/react";
@@ -15,6 +16,13 @@ import { Tip } from "./tip";
 export function TitleBar({
   preloadFull,
   onTogglePreloadFull,
+  autoAdvance,
+  onToggleAutoAdvance,
+  labelModifier,
+  onLabelModifierChange,
+  xmpMode,
+  onXmpModeChange,
+  xmpStatus,
   transparentBg,
   onToggleTransparentBg,
   backgroundOpacity,
@@ -22,6 +30,14 @@ export function TitleBar({
 }: {
   preloadFull: boolean;
   onTogglePreloadFull: () => void;
+  autoAdvance: boolean;
+  onToggleAutoAdvance: () => void;
+  labelModifier: "ctrl" | "alt";
+  onLabelModifierChange: (v: "ctrl" | "alt") => void;
+  /** Phase 5: XMP 边车档位与状态(只透传给设置对话框) */
+  xmpMode: XmpMode;
+  onXmpModeChange: (m: XmpMode) => void;
+  xmpStatus: XmpStatus | null;
   transparentBg: boolean;
   onToggleTransparentBg: () => void;
   backgroundOpacity: number;
@@ -124,6 +140,13 @@ export function TitleBar({
         onLangChange={changeLang}
         preloadFull={preloadFull}
         onTogglePreloadFull={onTogglePreloadFull}
+        autoAdvance={autoAdvance}
+        onToggleAutoAdvance={onToggleAutoAdvance}
+        labelModifier={labelModifier}
+        onLabelModifierChange={onLabelModifierChange}
+        xmpMode={xmpMode}
+        onXmpModeChange={onXmpModeChange}
+        xmpStatus={xmpStatus}
         transparentBg={transparentBg}
         onToggleTransparentBg={onToggleTransparentBg}
         glassOpacity={glassOpacity}

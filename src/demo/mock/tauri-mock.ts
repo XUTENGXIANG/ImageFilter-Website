@@ -146,6 +146,38 @@ const handlers: Record<string, Handler> = {
 
   stop_analysis: async () => undefined,
 
+  // ---- XMP sidecar (Phase 5) ----
+  // 这三个**必须有**: mock 对未知命令直接 throw(见下方 invoke), 而 loadFolder 里
+  // 的 read_decisions 一抛, 照片列表就出不来(官网演示白屏)。
+  // 三者都返回"没有值 / 可写 / no-op", 让 demo 保持零副作用又不报错:
+  //  · read_decisions 绝不能返回本地没有的值(否则会把 demo 的星级/色标覆盖成假数据);
+  //  · probe 必须 writable: true(返回 false 会触发"自动降级 off + 红色错误提示");
+  //  · write 只回形状正确的 Summary(demo 不落盘)。
+  read_decisions: async (a) =>
+    ((a.filePaths as string[]) ?? []).map((p) => ({
+      path: p,
+      rating: null,
+      label: null,
+      sidecar: null,
+    })),
+
+  probe_xmp_target: async (a) => ({
+    dir: (a.dirPath as string) ?? "",
+    writable: true,
+    code: null,
+    detail: null,
+    network: false,
+  }),
+
+  write_decisions: async (a) =>
+    delay(60, {
+      written: ((a.items as unknown[]) ?? []).length,
+      skipped: 0,
+      failed: 0,
+      failures: [],
+      degraded: false,
+    }),
+
   // ---- misc ----
   set_glass_bg: async () => undefined,
 

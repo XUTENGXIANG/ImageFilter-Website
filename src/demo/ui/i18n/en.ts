@@ -23,6 +23,21 @@ export default {
     languageDesc: "Interface language",
     preload: "Preload visible full images",
     preloadDesc: "Preload full images of currently visible photos for faster viewer; takes effect immediately",
+    autoAdvance: "Auto-advance after rating",
+    autoAdvanceDesc: "Jump to the next photo after J / X / 1-5 or a star click; closes the viewer after the last photo. Use ← to go back.",
+    labelKeys: "Color label shortcut",
+    labelKeysDesc: "Modifier for color labels: Ctrl+1-5 to label, Ctrl+0 to clear; pick Alt if Ctrl+digit is taken by the system",
+    // Phase 5 · XMP sidecar (three-step switch, default "Off" = local only, never touches the card)
+    // Status text shares this row's desc on purpose (adding a row means re-checking total height)
+    xmpMode: "Write ratings/labels to .xmp",
+    xmpModeDesc: "Off = local only (default, never touches the card); Ask = ask once on the first write; On = write a .xmp sidecar next to each photo after rating/tagging, readable by Lightroom/digiKam",
+    xmpModeOff: "Off",
+    xmpModeAsk: "Ask",
+    xmpModeOn: "On",
+    xmpStatusOff: "Not enabled",
+    xmpStatusWritable: "{dir} is writable",
+    xmpStatusUnwritable: "{dir} is not writable: {reason}",
+    xmpStatusDegraded: " (this location does not support atomic replace; writing directly)",
     transparentBg: "Transparent frosted background",
     transparentBgDesc: "Use Windows Mica glass that follows the dark/light theme; takes effect immediately",
     transparentBgOpacity: "Title bar glass opacity",
@@ -46,9 +61,15 @@ export default {
     keep: "Keep (3★)",
     trash: "Reject (0★)",
     star: "Rate 1-5★",
+    label: "Ctrl/Alt+1-5",
+    labelDesc: "Color label (grid & viewer)",
+    autoAdvance: "Auto-advance after rating",
     rotate: "Rotate (viewer)",
     nav: "Navigate (viewer)",
     reset: "Reset (viewer)",
+    actual: "1:1 actual pixels",
+    undo: "Ctrl+Z",
+    undoDesc: "Undo rating / selection (this session only; cleared when switching folder or device)",
     select: "Select (viewer)",
     space: "Space",
     ctrlClick: "Ctrl+Click",
@@ -91,8 +112,15 @@ export default {
     sortType: "Type",
     sortDate: "Date",
     all: "All",
+    starFilter: "{n}★+",
     stop: "Stop",
     ai: "AI Analyze",
+    aiCount: "AI Analyze ({n} selected)",
+    aiSelected: "Analyze only the {n} selected",
+    filter: "Filters",
+    flags: "Analysis",
+    sortDir: "Toggle sort direction",
+    clearFilters: "Clear filters",
     cols: "{n} cols",
     empty: "Open a photo folder to show toolbar",
   },
@@ -108,6 +136,9 @@ export default {
     underexposed: "Underexposed",
     duplicate: "Duplicate",
     best: "Best",
+    pendingAnalysis: "{n} photos not analyzed yet",
+    analyzePending: "Analyze these {n}",
+    noMatch: "No photos match the current filters",
   },
 
   import: {
@@ -131,6 +162,18 @@ export default {
     seqRenameEx: "e.g. 0001.ARW",
     subFolder: "Import into subfolder",
     subFolderPlaceholder: "Enter folder name",
+  },
+
+  // ── Color labels (Phase 4) ──
+  label: {
+    title: "Color labels",
+    red: "Red",
+    yellow: "Yellow",
+    green: "Green",
+    blue: "Blue",
+    purple: "Purple",
+    clear: "Clear label",
+    none: "None",
   },
 
   menu: {
@@ -180,6 +223,7 @@ export default {
     next: "Next (→)",
     nav: "← → navigate",
     zoom: "Wheel zoom",
+    actual: "1:1 actual pixels (Z)",
     pan: "Drag pan",
     reset: "0 reset",
     rotate: "R rotate",
@@ -197,6 +241,42 @@ export default {
   panel: {
     expandLeft: "Expand devices panel",
     expandRight: "Expand details panel",
+  },
+
+  // ── Toast ──
+  toast: {
+    // 单括号插值: 见 i18n/index.ts 的 prefix/suffix 设置(不是 i18next 默认的 {{}})
+    undo: "Undid",
+    undoRedo: "Redid",
+    ratingChange: "{prev}★ → {next}★",
+    labelChange: "{prev} → {next}",
+    selectionChange: "{n} selected",
+  },
+
+  // ── Phase 5 · XMP sidecar ──
+  // Error codes mirror XmpError::code() in src-tauri/src/xmp.rs (whitelisted on the
+  // front end, then used as the dynamic prefix `xmp.err.<code>`; unknown falls back).
+  xmp: {
+    askTitle: "Write ratings/labels into .xmp?",
+    askBody: "A sidecar file with the same name will be created next to each photo (e.g. IMG_1234.xmp) so Lightroom / digiKam can read these decisions. Only .xmp files are added or updated — your photos are never modified or deleted.",
+    askYes: "Write .xmp",
+    askNo: "Local only",
+    toastFailed: "Failed to write .xmp: {reason}",
+    toastDowngraded: "This location is not writable; switched back to \"Local only\": {reason}",
+    toastQueueOverflow: "Too many changes — only the latest {n} were synced",
+    err: {
+      writeProtect: "the card is write-protected (read-only)",
+      readOnly: "the file or folder is marked read-only",
+      permission: "permission denied",
+      diskFull: "not enough disk space",
+      busy: "the file is in use by another program",
+      notXmp: "the existing .xmp is not recognizable XMP (left untouched)",
+      unsupportedForm: "the .xmp uses an unsupported form (left untouched)",
+      tooLarge: "the .xmp exceeds the 1 MB limit (left untouched)",
+      encoding: "the .xmp is not UTF-8 encoded (left untouched)",
+      pathTooLong: "the path is too long",
+      unknown: "unknown error",
+    },
   },
 
 };

@@ -5,6 +5,7 @@ import {
 } from "@/components/ui/dialog";
 import { Toggle } from "@/components/ui/toggle";
 import type { Lang } from "../i18n";
+import { xmpErrKey, type XmpMode, type XmpStatus } from "../xmp";
 
 interface Props {
   open: boolean;
@@ -15,6 +16,15 @@ interface Props {
   onLangChange: (l: Lang) => void;
   preloadFull: boolean;
   onTogglePreloadFull: () => void;
+  autoAdvance: boolean;
+  onToggleAutoAdvance: () => void;
+  /** Phase 4: 颜色标签用哪个修饰键(Ctrl / Alt)。见 docs 4.1 */
+  labelModifier: "ctrl" | "alt";
+  onLabelModifierChange: (v: "ctrl" | "alt") => void;
+  /** Phase 5: XMP 边车三档开关 + 常驻状态行(见 docs §5.2/§5.3) */
+  xmpMode: XmpMode;
+  onXmpModeChange: (m: XmpMode) => void;
+  xmpStatus: XmpStatus | null;
   transparentBg: boolean;
   onToggleTransparentBg: () => void;
   glassOpacity: number;
@@ -61,17 +71,39 @@ function OpacitySlider({
 export function SettingsDialog({
   open, onOpenChange, theme, onThemeChange, lang, onLangChange,
   preloadFull, onTogglePreloadFull, transparentBg, onToggleTransparentBg,
+  autoAdvance, onToggleAutoAdvance,
+  labelModifier, onLabelModifierChange,
+  xmpMode, onXmpModeChange, xmpStatus,
   glassOpacity, onGlassOpacityChange, backgroundOpacity, onBackgroundOpacityChange,
 }: Props) {
   const { t } = useTranslation();
+
+  // 边车状态: 拼进上面那一行的 desc, **不新增整行** —— 加行要让对话框重新算总高(会话 ③ 第 28 项)。
+  // 注意顺序: "不可写"的判断必须排在档位判断**之前** —— 自动降级会把档位改回 off,
+  // 若先看档位, 用户就再也看不到"为什么被降级"了。
+  const xmpStatusText = (() => {
+    if (xmpStatus && !xmpStatus.writable) {
+      return t("settings.xmpStatusUnwritable", {
+        dir: xmpStatus.dir,
+        reason: t(`xmp.err.${xmpErrKey(xmpStatus.code)}`),
+      });
+    }
+    if (xmpMode !== "on") return t("settings.xmpStatusOff");
+    if (!xmpStatus) return "";
+    return t("settings.xmpStatusWritable", { dir: xmpStatus.dir }) + (xmpStatus.degraded ? t("settings.xmpStatusDegraded") : "");
+  })();
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="w-[420px] max-h-[80vh] overflow-auto">
+      {/* max-h 从 80vh 抬到 88vh + 行距 4→3: 让 9 行设置尽量一屏放下(会话 ③ 加了
+          "颜色标签快捷键"那一行后, 内容超过 80vh → 右侧滚动条回来了)。
+          no-scrollbar 兜底: 万一窗口太矮还是要滚, 滚轮/触控板照旧可用, 但不显示侧边滚动条。 */}
+      <DialogContent className="w-[420px] max-h-[88vh] overflow-auto no-scrollbar">
         <DialogHeader>
           <DialogTitle>{t("settings.title")}</DialogTitle>
           <DialogDescription>{t("settings.subtitle")}</DialogDescription>
         </DialogHeader>
-        <div className="space-y-4 py-2">
+        <div className="space-y-3 py-2">
           <SettingRow title={t("settings.language")} desc={t("settings.languageDesc")}>
             <div className="flex rounded-md border border-border overflow-hidden text-sm">
               {(["zh", "en"] as Lang[]).map((l) => (
@@ -102,6 +134,50 @@ export function SettingsDialog({
 
           <SettingRow title={t("settings.preload")} desc={t("settings.preloadDesc")}>
             <Toggle checked={preloadFull} onChange={onTogglePreloadFull} />
+          </SettingRow>
+
+          <SettingRow title={t("settings.autoAdvance")} desc={t("settings.autoAdvanceDesc")}>
+            <Toggle checked={autoAdvance} onChange={onToggleAutoAdvance} />
+          </SettingRow>
+
+          {/* Phase 4: 颜色标签的修饰键。分段按钮与上面的"语言"同一套写法。
+              之所以让用户选: Tauri 的 WebView2 可能把 Ctrl+数字当浏览器加速键吃掉 */}
+          <SettingRow title={t("settings.labelKeys")} desc={t("settings.labelKeysDesc")}>
+            <div className="flex rounded-md border border-border overflow-hidden text-sm">
+              {(["ctrl", "alt"] as const).map((m) => (
+                <button
+                  key={m}
+                  type="button"
+                  onClick={() => onLabelModifierChange(m)}
+                  className={`px-3 py-1.5 transition-colors ${labelModifier === m ? "bg-foreground text-background" : "hover:bg-muted text-muted-foreground"}`}
+                >
+                  {m === "ctrl" ? "Ctrl" : "Alt"}
+                </button>
+              ))}
+            </div>
+          </SettingRow>
+
+          {/* Phase 5: XMP 边车三档。默认"关闭" = 只写本机、完全不碰卡(docs §5.2) */}
+          <SettingRow
+            title={t("settings.xmpMode")}
+            desc={`${t("settings.xmpModeDesc")}${xmpStatusText ? ` · ${xmpStatusText}` : ""}`}
+          >
+            <div className="flex rounded-md border border-border overflow-hidden text-sm">
+              {([
+                ["off", t("settings.xmpModeOff")],
+                ["ask", t("settings.xmpModeAsk")],
+                ["on", t("settings.xmpModeOn")],
+              ] as [XmpMode, string][]).map(([m, label]) => (
+                <button
+                  key={m}
+                  type="button"
+                  onClick={() => onXmpModeChange(m)}
+                  className={`px-3 py-1.5 transition-colors ${xmpMode === m ? "bg-foreground text-background" : "hover:bg-muted text-muted-foreground"}`}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
           </SettingRow>
 
           <SettingRow title={t("settings.transparentBg")} desc={t("settings.transparentBgDesc")}>

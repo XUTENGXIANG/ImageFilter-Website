@@ -61,6 +61,9 @@ export class Channel<T = unknown> {
 
 type Handler = (args: Record<string, unknown>) => Promise<unknown>;
 
+/** Phase 6 / 6.2: demo 会话内的命名方案副本(初始值 = 真机 init_db 播种的内容) */
+const demoRules = fakeData.getRules();
+
 const handlers: Record<string, Handler> = {
   // ---- drives & browsing ----
   detect_drives: async () => fakeData.getDrives(),
@@ -135,6 +138,27 @@ const handlers: Record<string, Handler> = {
     ),
 
   count_import_history: async () => fakeData.getImportHistory().length,
+
+  // Phase 6 / 6.2: 命名方案。用**模块级可变副本**(= 模拟 upsert 之后的库), 这样 demo 里
+  // "另存为"能真的在下拉里出现一个方案; 拿 fakeData.getRules() 直接改会把"初始内容"污染掉。
+  // 与修好后的真机语义一致: 同名 = 原地更新(**不**碰 isDefault)。
+  get_rules: async () => demoRules,
+
+  save_rule: async (a) => {
+    const name = String(a.name ?? "").trim();
+    if (!name) throw new Error("[mock] 方案名不能为空");
+    const folderTemplate = String(a.folderTemplate ?? "");
+    const fileTemplate = String(a.fileTemplate ?? "");
+    const hit = demoRules.find((r) => r.name === name);
+    if (hit) {
+      hit.folderTemplate = folderTemplate;
+      hit.fileTemplate = fileTemplate;
+      return hit.id;
+    }
+    const id = demoRules.reduce((m, r) => Math.max(m, r.id), 0) + 1;
+    demoRules.push({ id, name, folderTemplate, fileTemplate, isDefault: 0 });
+    return id;
+  },
 
   // ---- analysis ----
   analyze_photos: async (a) => {

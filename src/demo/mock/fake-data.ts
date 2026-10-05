@@ -70,6 +70,16 @@ export interface ImportHistoryItem {
   importedAt: string;
 }
 
+/** Phase 6 / 6.2: 一条命名方案(与主仓库 src/types.ts 的 ImportRule 对齐) */
+export interface ImportRule {
+  id: number;
+  name: string;
+  folderTemplate: string;
+  fileTemplate: string;
+  /** 1 = 播种的"默认"方案(前端**不**自动套用它) */
+  isDefault: number;
+}
+
 // ---------------------------------------------------------------------------
 // Deterministic hash / PRNG (seed = hash of a string)
 // Every call with the same path/suffix MUST produce the same stream.
@@ -364,5 +374,17 @@ export function getImportHistory(): ImportHistoryItem[] {
     });
   }
   return items;
+}
+
+/**
+ * 命名方案 —— "数据库初始内容"(与主仓库 db.rs 的 init_db 播种一致: 默认 {date}/{original}).
+ * demo 里的增改由 tauri-mock.ts 的模块级副本负责(它模拟 upsert 之后的库)。
+ */
+export function getRules(): ImportRule[] {
+  return [
+    { id: 1, name: "默认", folderTemplate: "{date}", fileTemplate: "{original}", isDefault: 1 },
+    { id: 2, name: "日期+相机", folderTemplate: "{date}/{camera}", fileTemplate: "{original}", isDefault: 0 },
+    { id: 3, name: "编号+原名", folderTemplate: "{date}", fileTemplate: "{seq}_{original}.{ext}", isDefault: 0 },
+  ];
 }
 

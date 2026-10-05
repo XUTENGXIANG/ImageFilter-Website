@@ -111,21 +111,31 @@ const handlers: Record<string, Handler> = {
   get_exif: async (a) => fakeData.getExif(a.filePath as string),
 
   // ---- import ----
+  // Phase 6 / 6.3: 返回值是 **ImportSummary**(契约变更, 原来是数字)。
+  // 假进度刻意走一遍真机存在的状态(含 renamed/verifying/sidecar), 让 demo 能演练
+  // import-bar 的四行明细与状态配色; 数字与进度条数自洽(imported 含 renamed)。
   import_photos: async (a) => {
     const onProgress = a.onProgress;
     const steps = [
-      { fileName: "IMG_0001.CR2", status: "copying", message: "正在复制...", percent: 25 },
-      { fileName: "IMG_0002.CR2", status: "copying", message: "正在复制...", percent: 50 },
-      { fileName: "IMG_0003.ARW", status: "renaming", message: "正在重命名...", percent: 75 },
-      { fileName: "IMG_0004.JPG", status: "done", message: "完成", percent: 100 },
+      { fileName: "IMG_0001.CR2", status: "checking", message: "检查中...", percent: 0 },
+      { fileName: "IMG_0001.CR2", status: "copying", message: "复制中 → 0001_IMG_0001.cr2", percent: 10 },
+      { fileName: "IMG_0001.CR2", status: "verifying", message: "校验中...", percent: 0 },
+      { fileName: "IMG_0001.CR2", status: "sidecar", message: "边车 → 0001_IMG_0001.xmp", percent: 0 },
+      { fileName: "IMG_0001.CR2", status: "done", message: "完成", percent: 100 },
+      { fileName: "IMG_0002.CR2", status: "copying", message: "复制中 → 0002_IMG_0002.cr2", percent: 20 },
+      { fileName: "IMG_0002.CR2", status: "renamed", message: "重名, 改名 → 0002_IMG_0002_1.cr2", percent: 0 },
+      { fileName: "IMG_0002.CR2", status: "verifying", message: "校验中...", percent: 0 },
+      { fileName: "IMG_0002.CR2", status: "done", message: "完成", percent: 100 },
+      { fileName: "IMG_0003.ARW", status: "skipped", message: "已存在且相同", percent: 0 },
     ];
     for (const step of steps) {
       if (isChannel(onProgress)) {
-        await delay(250, null);
+        await delay(180, null);
         (onProgress as Channel<ImportProgress>).post(step);
       }
     }
-    return delay(1200 - steps.length * 250, steps.length);
+    // imported 含 renamed(子集关系); skipped 与 failed 各自独立
+    return delay(200, { imported: 2, skipped: 1, renamed: 1, failed: 0 });
   },
 
   // Phase 6 / 6.1: 导入历史(列表 + 总数)。**必须有** —— mock 对未知命令直接 throw,

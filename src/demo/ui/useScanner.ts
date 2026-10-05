@@ -2,15 +2,16 @@ import { useState, useCallback, useRef, useMemo } from "react";
 import { invoke, convertFileSrc, Channel } from "@tauri-apps/api/core";
 import { open } from "@tauri-apps/plugin-dialog";
 import i18n from "./i18n";
-import type { DriveInfo, ScannedPhoto, FolderEntry, FolderNode, ImportProgress, AnalysisResult, FlagFilter, DecisionRead, DecisionWrite, WriteSummary, XmpProbe } from "./types";
+import type { DriveInfo, ScannedPhoto, FolderEntry, FolderNode, ImportProgress, AnalysisResult, FlagFilter, DecisionRead, DecisionWrite, WriteSummary, XmpProbe, ImportHistoryItem } from "./types";
 import {
   EMPTY_HISTORY, applyLabelPatch, applyRatingPatch, applySelectionPatch, patchPath,
   popRedo, popUndo, pushPatch,
   type History, type Patch,
 } from "./undo";
 import { LABELS_STORAGE_KEY, readLabels, type Label } from "./labels";
+import { HISTORY_MAX, DEFAULT_HISTORY_LIMIT } from "./import-history";
 import {
-  XMP_MODE_STORAGE_KEY, XMP_QUEUE_LIMIT, buildDecisionWrite, isVolumeFatal,
+  XMP_MODE_STORAGE_KEY, XMP_QUEUE_LIMIT, buildDecisionWrite, dirOfPath, isDowngradeCandidate,
   mergeRemoteLabels, mergeRemoteRatings, readXmpMode,
   type XmpField, type XmpMode, type XmpNotice, type XmpStatus,
 } from "./xmp";
@@ -176,6 +177,23 @@ export function useScanner() {
     setXmpStatus((prev) => (prev ? { ...prev, pending: 0 } : prev));
   }, []);
 
+  /**
+   * 原始探测(无副作用), 结果进缓存。抽出来是为了两个用途:
+   * ① 档位切到 on / 打开文件夹时先确认可写; ② **写入失败后重新探测** ——
+   * 单文件只读与整卷写保护是同一个错误码, 只能靠"目录现在还可写吗"来区分。
+   */
+  const probeXmpTargetRaw = useCallback(async (dir: string): Promise<XmpProbe | null> => {
+    if (!dir) return null;
+    try {
+      const p = await invoke<XmpProbe>("probe_xmp_target", { dirPath: dir });
+      xmpProbedRef.current.set(dir, p);
+      return p;
+    } catch (err) {
+      console.error("probe_xmp_target:", err);
+      return null;
+    }
+  }, []);
+
   /** 防抖调度(600ms)。已有定时器就复用 —— 连续操作只落一次盘 */
   const scheduleXmpFlush = useCallback((delay = 600) => {
     if (xmpModeRef.current !== "on") return;
@@ -234,13 +252,22 @@ export function useScanner() {
       const failures = summary?.failures ?? [];
       for (const f of failures) xmpFailedRef.current.add(f.path);
       if (failures.length > 0) notifyXmp("failed", failures[0].code, failures.length);
-      const fatal = failures.find((f) => isVolumeFatal(f.code));
+      const fatal = failures.find((f) => isDowngradeCandidate(f.code));
       if (fatal) {
-        // 只读卡/写保护/权限不足 → 自动降级为 off + 一次提示(docs §5.3 红线),
-        // 绝不"每次评分都弹错"。
-        dropXmpQueue();
-        applyXmpMode("off");
-        notifyXmp("downgraded", fatal.code, 0);
+        // ⚠️ **不能凭一次写入失败就降级**: 单个文件只读 / 单文件 ACL 与"整卷写保护"
+        // 是同一个错误码(实机踩过: 把一个 .xmp 设成只读, 整个 on 档被关掉了, 而按
+        // docs §6 的规矩"单文件问题不降级")。所以重新探测它所在的目录:
+        // 探测说可写 → 只是那个文件的问题, 提示一次、档位不动;
+        // 探测也说不可写 → 才是真的整目录不可写, 降级 off, 并把原因记进状态行
+        // (否则用户只能在 4 秒的 toast 里瞥一眼原因)。
+        const dir = dirOfPath(fatal.path);
+        const p = await probeXmpTargetRaw(dir);
+        if (p && !p.writable) {
+          dropXmpQueue();
+          applyXmpMode("off");
+          setXmpStatus({ dir, writable: false, code: p.code ?? fatal.code, pending: 0, network: p.network, degraded: false });
+          notifyXmp("downgraded", p.code ?? fatal.code, 0);
+        }
       }
       setXmpStatus((prev) =>
         prev
@@ -254,30 +281,22 @@ export function useScanner() {
       xmpInFlightRef.current = false;
       if (xmpModeRef.current === "on" && xmpQueueRef.current.size > 0) scheduleXmpFlush(0);
     }
-  }, [applyXmpMode, dropXmpQueue, notifyXmp, scheduleXmpFlush]);
+  }, [applyXmpMode, dropXmpQueue, notifyXmp, probeXmpTargetRaw, scheduleXmpFlush]);
   xmpFlushRef.current = flushXmpQueue;
 
-  /** 探测目录可写性(每个目录每会话只探一次)。不可写 → 立刻降级 off + 一次性提示 */
+  /** 探测目录可写性(每个目录每会话只真探一次)。不可写 → 立刻降级 off + 一次性提示 */
   const probeXmpTarget = useCallback(async (dir: string) => {
     if (!dir) return;
     const cached = xmpProbedRef.current.get(dir);
-    if (cached) {
-      setXmpStatus({ dir, writable: cached.writable, code: cached.code, pending: xmpQueueRef.current.size, network: cached.network, degraded: false });
-      return;
+    const p = cached ?? (await probeXmpTargetRaw(dir));
+    if (!p) return;
+    setXmpStatus({ dir, writable: p.writable, code: p.code, pending: xmpQueueRef.current.size, network: p.network, degraded: false });
+    if (!p.writable) {
+      dropXmpQueue();
+      applyXmpMode("off");
+      notifyXmp("downgraded", p.code, 0);
     }
-    try {
-      const p = await invoke<XmpProbe>("probe_xmp_target", { dirPath: dir });
-      xmpProbedRef.current.set(dir, p);
-      setXmpStatus({ dir, writable: p.writable, code: p.code, pending: xmpQueueRef.current.size, network: p.network, degraded: false });
-      if (!p.writable) {
-        dropXmpQueue();
-        applyXmpMode("off");
-        notifyXmp("downgraded", p.code, 0);
-      }
-    } catch (err) {
-      console.error("probe_xmp_target:", err);
-    }
-  }, [applyXmpMode, dropXmpQueue, notifyXmp]);
+  }, [applyXmpMode, dropXmpQueue, notifyXmp, probeXmpTargetRaw]);
 
   /** 用户在设置里改档位 */
   const setXmpMode = useCallback((m: XmpMode) => {
@@ -475,6 +494,36 @@ export function useScanner() {
   const [importProgress, setImportProgress] = useState<ImportProgress[]>([]);
   const [importDone, setImportDone] = useState(0);
   const [importError, setImportError] = useState<string | null>(null);
+
+  // ── Phase 6 / 6.1 · 导入历史 ────────────────────────────────────────
+  // 状态放 hook 里(不是对话框里): 组件不许直接 invoke(会话 ④ 纪律), 且关掉对话框
+  // 不该把已读到的数据丢掉 —— 重开要能立刻显示, 而不是再白等一次 IPC。
+  // 只读列表, **不进撤销栈**(它反映磁盘既成事实, 不是用户操作)。
+  const [historyItems, setHistoryItems] = useState<ImportHistoryItem[]>([]);
+  const [historyTotal, setHistoryTotal] = useState(0);
+  const [historyLoading, setHistoryLoading] = useState(false);
+  const [historyError, setHistoryError] = useState<string | null>(null);
+
+  /** 读导入历史: 列表与总数两条命令并排发。失败只记 error, 绝不抛进调用方。 */
+  const loadImportHistory = useCallback(async (limit: number) => {
+    const lim = Math.max(1, Math.min(HISTORY_MAX, Math.floor(limit) || DEFAULT_HISTORY_LIMIT));
+    setHistoryLoading(true);
+    try {
+      const [items, total] = await Promise.all([
+        invoke<ImportHistoryItem[]>("get_import_history", { limit: lim }),
+        invoke<number>("count_import_history"),
+      ]);
+      setHistoryItems(items);
+      setHistoryTotal(total);
+      setHistoryError(null);
+    } catch (err) {
+      console.error("loadImportHistory failed:", err);
+      setHistoryError(String(err));
+    } finally {
+      setHistoryLoading(false);
+    }
+  }, []);
+
   // AI analysis
   const [analyzing, setAnalyzing] = useState(false);
   const [analysis, setAnalysis] = useState<Record<string, AnalysisResult>>({});
@@ -927,6 +976,8 @@ export function useScanner() {
     selectedPhoto, thumbnails, browsing, loadingFolder, counting,
     detectDrives, browseDrive, loadFolder, loadThumbnail, loadExif, setSelectedPhoto,
     importing, importProgress, importDone, importError, importResult, destDir,
+    // Phase 6 / 6.1: 导入历史(列表 + 总数 + 加载入口)。组件只读它, 不许自己 invoke。
+    importHistory: { items: historyItems, total: historyTotal, loading: historyLoading, error: historyError, load: loadImportHistory },
     selectedPaths, handlePhotoClick, selectAll, clearSelection,
     folderRule, fileRule, setFolderRule, setFileRule,
     customFolder, setCustomFolder, useCustomFolder, setUseCustomFolder,

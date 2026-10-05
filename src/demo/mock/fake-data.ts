@@ -59,6 +59,17 @@ export interface ImportProgress {
   percent: number;
 }
 
+/** Phase 6 / 6.1: 导入历史一条(与主仓库 src/types.ts 的 ImportHistoryItem 对齐) */
+export interface ImportHistoryItem {
+  id: number;
+  sourcePath: string;
+  destPath: string;
+  fileHash: string;
+  fileSize: number;
+  /** SQLite CURRENT_TIMESTAMP 风格(UTC, "YYYY-MM-DD HH:MM:SS") —— 前端要按 UTC 解析 */
+  importedAt: string;
+}
+
 // ---------------------------------------------------------------------------
 // Deterministic hash / PRNG (seed = hash of a string)
 // Every call with the same path/suffix MUST produce the same stream.
@@ -314,3 +325,44 @@ export function getAnalysis(filePaths: string[]): AnalysisResult[] {
   }
   return result;
 }
+
+// ---------------------------------------------------------------------------
+// getImportHistory / getRules  (Phase 6)
+// ---------------------------------------------------------------------------
+
+/** 固定的归档目录: 让"原文件 → 归档"两列看起来像真的一次导入 */
+const FAKE_ARCHIVE = "FAKE:/Archive/2026-06-15";
+
+/**
+ * 导入历史 —— 确定性假数据(刷新/重跑结果一致)。
+ *
+ * 刻意让归档名与源名**不同**(带 4 位序号): demo 里才能演示 6.1 的存在理由 ——
+ * `{seq}` 改名之后, 原文件名只能在"原文件"这一列找回。
+ * 顺序与真机一致: `imported_at DESC, id DESC`(新的在前)。
+ */
+export function getImportHistory(): ImportHistoryItem[] {
+  const photos = getPhotos("FAKE:/DCIM/100CANON");
+  const count = Math.min(14, photos.length);
+  const items: ImportHistoryItem[] = [];
+
+  for (let i = 0; i < count; i++) {
+    const src = photos[i];
+    const seq = String(count - i).padStart(4, "0");
+    const stem = src.fileName.replace(/\.[^.]+$/, "");
+    const ext = (src.fileName.split(".").pop() ?? "JPG").toLowerCase();
+    items.push({
+      id: count - i,
+      sourcePath: src.path,
+      destPath: `${FAKE_ARCHIVE}/${seq}_${stem}.${ext}`,
+      fileHash: hashStr(src.path).toString(16).padStart(8, "0"),
+      fileSize: src.fileSize,
+      // 每条间隔 7 分钟; 秒位不同也能顺手验证"按时间倒序"
+      importedAt: new Date(FIXED_NOW - i * 7 * 60 * 1000)
+        .toISOString()
+        .slice(0, 19)
+        .replace("T", " "),
+    });
+  }
+  return items;
+}
+

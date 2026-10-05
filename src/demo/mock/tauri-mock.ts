@@ -125,6 +125,17 @@ const handlers: Record<string, Handler> = {
     return delay(1200 - steps.length * 250, steps.length);
   },
 
+  // Phase 6 / 6.1: 导入历史(列表 + 总数)。**必须有** —— mock 对未知命令直接 throw,
+  // 而这两个命令由导入栏的历史对话框触发(官网演示里点一下"导入历史"就会走到)。
+  // limit 在真机是**必传**参数(u32), 这里照做(不再有默认 100 的兜底)。
+  get_import_history: async (a) =>
+    delay(
+      80,
+      fakeData.getImportHistory().slice(0, Math.max(1, Number(a.limit) || 100)),
+    ),
+
+  count_import_history: async () => fakeData.getImportHistory().length,
+
   // ---- analysis ----
   analyze_photos: async (a) => {
     const paths = a.filePaths as string[];

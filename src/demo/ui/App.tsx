@@ -12,8 +12,14 @@ import { WelcomeGuide } from "./components/welcome-guide";
 import { ScrollFadeZone } from "./components/scroll-fade-zone";
 import { FolderTreeItem } from "./components/folder-tree-item";
 import { PhotoCard } from "./components/photo-card";
+import {
+  osDefaultGlass,
+  micaUnsupported as isMicaUnsupported,
+  type OsCapabilities,
+} from "./os-capability";
 import { PhotoToolbar } from "./components/photo-toolbar";
 import { ImportBar } from "./components/import-bar";
+import { LrcProgressDialog } from "./components/lrc-progress-dialog";
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter,
 } from "./components/ui/dialog";
@@ -29,6 +35,7 @@ import type { ScannedPhoto, AnalysisResult, FlagFilter } from "./types";
 import type { Patch } from "./undo";
 import { LABEL_ORDER, isLabelChord, type Label } from "./labels";
 import { xmpErrKey, type XmpNotice } from "./xmp";
+import { lrcErrKey, type LrcNotice } from "./lightroom";
 
 /**
  * 撤销/重做的 toast 文案。
@@ -64,6 +71,15 @@ function xmpNoticeText(t: TFunction, n: XmpNotice): string {
 }
 
 /**
+ * Phase 7 · Lightroom 发送失败的一次性提示文案(同 xmpNoticeText 的纪律:
+ * 在 App 里用 i18n 拼, hook 只给闭集错误码)。
+ */
+function lrcNoticeText(t: TFunction, n: LrcNotice): string {
+  const reason = t(`lrc.err.${lrcErrKey(n.code)}`, { n: n.n });
+  return t("lrc.toastFailed", { reason });
+}
+
+/**
  * ③ 分析结果筛选: **没分析过的照片一律不算命中**(docs 4.2) ——
  * 所以"只看模糊"在还没分析时会得到空网格, 必须靠网格顶部的"还有 N 张未分析"提示兜底。
  * duplicate 用 `duplicateGroup !== undefined`: **包含"最佳"那张**
@@ -89,6 +105,9 @@ function matchesFlag(a: AnalysisResult | undefined, flag: FlagFilter): boolean {
  * props 就等于"任何一次勾选都让所有卡片换 props" → 双层 memo 全废。
  * 现在整块网格共用一个菜单, 右键时由 onCtx(photo) 记下目标(见 App 里那层 PixelMenu)。
  */
+/** "扫描目录结构..." 的延迟阈值(ms)。见 App 里 showScanning 那段注释的实测依据。 */
+const SCAN_HINT_DELAY_MS = 150;
+
 const PhotoGridItem = memo(function PhotoGridItem({
   photo, thumbnail, isSelected, isChecked, analysis, rating, label,
   onToggle, onRate, onOpenViewer, onSelect, onCtx, loadThumb,
@@ -144,7 +163,7 @@ const PhotoGridItem = memo(function PhotoGridItem({
   );
 });
 
-function App() {
+function App({ osCapabilities }: { osCapabilities: OsCapabilities }) {
   const { t } = useTranslation();
   const {
     drives,
@@ -221,6 +240,19 @@ function App() {
     resolveXmpAsk,
     xmpStatus,
     xmpNotice,
+    // Phase 7: Lightroom 衔接
+    lrcProbe,
+    probeLightroom,
+    lrcMode,
+    setLrcMode,
+    lrcSending,
+    lrcSent,
+    lrcNotice,
+    importToLightroom,
+    lrcAlreadyRunning,
+    setLrcAlreadyRunning,
+    forceCloseLightroomAndRetry,
+    lrcPhase,
   } = useScanner();
 
   // 图片查看器: viewerIndex=null 关闭, 数字=打开第N张
@@ -235,6 +267,15 @@ function App() {
   }, [activeFolder]);
 
   // 弹出提示浮窗
+  //
+  // Phase 7 · 「导入到 LrC」的模态进度框是否显示。
+  // 链一开始就自动弹出(chains 进入 importing/launching); 用户点"在后台继续"或按 Esc
+  // 只把这一层的 open 关掉 —— 下一次 phase 变化时 effect 会按当前 phase 重新算,
+  // 所以**手动关闭不会被这个 effect 又弹回来**(它只依赖 lrcPhase, 关闭不改变 lrcPhase)。
+  const [lrcProgressOpen, setLrcProgressOpen] = useState(false);
+  useEffect(() => {
+    setLrcProgressOpen(lrcPhase !== "idle");
+  }, [lrcPhase]);
   // (位置在 Ctrl+Z effect 之前: 那个 effect 的依赖数组会被急切求值, showToast 若是
   //  const 声明在后面就触发 TDZ — 与 viewerIndex 是同一条纪律)
   const [toast, setToast] = useState<string | null>(null);
@@ -254,6 +295,13 @@ function App() {
     showToast(xmpNoticeText(t, xmpNotice), 4000);
     // 只依赖 notice 本身: seq 变了就是一次新提示
   }, [xmpNotice]);
+
+  // Phase 7: Lightroom 发送失败提示(成功提示走 ImportBar 里的常驻行, 不用 toast ——
+  // 它需要同时说明"发的是哪个文件夹"和"还有 N 个文件夹没发", 一句话 toast 装不下)。
+  useEffect(() => {
+    if (!lrcNotice) return;
+    showToast(lrcNoticeText(t, lrcNotice), 4000);
+  }, [lrcNotice]);
 
   // Disable browser default context menu
   useEffect(() => {
@@ -454,8 +502,15 @@ function App() {
     [handlePhotoClick]
   );
 
-  // 透明毛玻璃背景: 默认开启, 深色/浅色随主题切换
-  const [transparentBg, setTransparentBg] = useState<boolean>(() => localStorage.getItem("imagefilter-glass") !== "0");
+  // 透明毛玻璃背景: 默认值由系统能力决定(Win11 开 / Win10 关 / 非 Windows 或探测失败保持开),
+  // 但**用户存过就永远听用户的**。判据见 os-capability.ts 的 osDefaultGlass。
+  const [transparentBg, setTransparentBg] = useState<boolean>(() =>
+    osDefaultGlass(osCapabilities, localStorage.getItem("imagefilter-glass")),
+  );
+
+  // 置灰只对「确认是 Windows 且确认读到了构建号且不支持」生效。
+  // 不能只看 platform —— 否则一次注册表读取失败就会把 Win11 用户的开关置灰。
+  const micaUnsupported = isMicaUnsupported(osCapabilities);
 
   useEffect(() => {
     localStorage.setItem("imagefilter-glass", transparentBg ? "1" : "0");
@@ -466,6 +521,21 @@ function App() {
     const v = Number(localStorage.getItem("imagefilter-background-opacity"));
     return Number.isFinite(v) ? Math.min(100, Math.max(0, v)) : 0;
   });
+
+  // "扫描目录结构..." 只在真的等了一会儿之后才出现。
+  //
+  // 为什么要这个: 实测(桩模拟 browse_directory 的往返延迟)这行字的可见帧数 ——
+  //   0ms 档 1 帧、32ms 档 2 帧  → 那不是"提示", 是闪一下
+  //   250ms 档 42 帧(233ms)、600ms 档 105 帧(585ms) → 那时它是必要的反馈
+  // 所以是**延迟出现**, 不是删掉: 等 SCAN_HINT_DELAY_MS 还没回来才显示。
+  // 不删的理由: 真实存储卡上 browse.rs 的 has_subdirectories 要对每个子目录各探一次,
+  // 等几秒是可能的 —— 那种时候面板不能一片空白什么反馈都没有。
+  const [showScanning, setShowScanning] = useState(false);
+  useEffect(() => {
+    if (!browsing) { setShowScanning(false); return; }
+    const timer = window.setTimeout(() => setShowScanning(true), SCAN_HINT_DELAY_MS);
+    return () => window.clearTimeout(timer);
+  }, [browsing]);
 
   useEffect(() => {
     document.documentElement.style.setProperty("--background-opacity", `${backgroundOpacity}%`);
@@ -582,7 +652,12 @@ function App() {
         xmpMode={xmpMode}
         onXmpModeChange={setXmpMode}
         xmpStatus={xmpStatus}
+        lrcProbe={lrcProbe}
+        lrcMode={lrcMode}
+        onLrcModeChange={setLrcMode}
+        onReprobeLightroom={probeLightroom}
         transparentBg={transparentBg}
+        micaUnsupported={micaUnsupported}
         onToggleTransparentBg={() => setTransparentBg((v) => !v)}
         backgroundOpacity={backgroundOpacity}
         onBackgroundOpacityChange={setBackgroundOpacity}
@@ -596,7 +671,7 @@ function App() {
           //{ label: "刷新设备列表", action: detectDrives },
         ]}>
         <div className="px-3 pt-2 pb-1 flex items-center">
-          <button onClick={() => selectedDrive && browseDrive(selectedDrive!)} className="text-[10px] px-3 py-0.5 rounded bg-zinc-800 hover:bg-zinc-700 text-zinc-400 transition-colors">{t("devices.refresh")}</button>
+          <button onClick={() => selectedDrive && browseDrive(selectedDrive!)} className="press-solid text-[10px] leading-4 px-3 py-1 rounded bg-zinc-800 hover:bg-zinc-700 text-zinc-400 transition-colors">{t("devices.refresh")}</button>
         </div>
         {/* 设备列表 — 每个设备独立右键菜单, 可移动设备含"弹出设备" */}
         <div className="px-2.5 pb-1 space-y-0.5 max-h-36 overflow-auto no-scrollbar">
@@ -615,7 +690,8 @@ function App() {
             ].filter(Boolean) as MenuItem[]}>
             <button
               onClick={() => browseDrive(d.mountPoint)}
-              className={`w-full text-left px-1.5 py-1.5 rounded text-xs flex items-center gap-1.5 ${
+              data-selected={selectedDrive === d.mountPoint}
+              className={`press-row w-full text-left px-1.5 py-1.5 rounded text-xs flex items-center gap-1.5 ${
                 selectedDrive === d.mountPoint
                   ? "bg-emerald-900/30 text-emerald-300"
                   : "hover:bg-zinc-800/50 text-zinc-400"
@@ -635,16 +711,24 @@ function App() {
         </div>
 
         <div className="flex-1 overflow-auto px-1.5 py-1.5 no-scrollbar">
+          {/* 整个区域由 browsing 把门：正在扫描时, 除了"等久了才出现"的提示, 什么都不显示。
+              为什么必须这么写: 这条链是 扫描中 → 树 → 未扫描/选择设备。如果把"扫描中"改成
+              延迟出现却不把门, 那 150ms 里链子就会掉到最后一段 —— 而 browseDrive 已经设上了
+              selectedDrive, 于是闪的不再是"扫描目录结构"而是"未扫描"(实测 0ms 档 1 帧)。
+              门内留空, 外面就永远看不到中间态。 */}
           {browsing ? (
-            <p className="text-[11px] text-emerald-500 px-1 animate-pulse">
-              {t("devices.scanning")}
-            </p>
+            showScanning ? (
+              <p className="text-[11px] text-emerald-500 px-1 animate-pulse">
+                {t("devices.scanning")}
+              </p>
+            ) : null
           ) : folderTree ? (
-            <div>
+            <div className="tree-enter">
               <div className="border-t border-zinc-800/50 mb-1.5" />
               <button
                 onClick={() => loadFolder(folderTree.path)}
-                className={`w-full text-left px-2 py-1 rounded border text-[11px] mb-1 ${
+                data-selected={activeFolder === folderTree.path}
+                className={`press-row w-full text-left px-2 py-1 rounded border text-[11px] mb-1 ${
                   activeFolder === folderTree.path
                     ? "bg-emerald-900/30 border-emerald-800/50 text-emerald-300"
                     : "bg-zinc-800/20 border-zinc-800/30 text-zinc-400 hover:bg-zinc-800/40"
@@ -677,8 +761,14 @@ function App() {
       </FloatingPanel>
 
       {/* === Center === */}
-      <main className="flex-1 flex flex-col min-w-0 bg-grid">
+      {/* 这两条栏长得像浮窗, 那就让它真的浮起来: 网格铺满整个高度、照片从它们底下滚过去。
+          之前它们是正常占位的兄弟节点 —— 实测工具栏吃掉 70px、导入栏吃掉 97px,
+          766px 的内容高度里有 167px 是被两条实心带子占掉的。
+          内边距由 CollapsibleBar 写的 --top-bar-h / --bottom-bar-h 决定, 所以展开/收起
+          时网格的可滚动范围会跟着变, 首行末行始终滚得出来。 */}
+      <main className="relative flex-1 min-w-0 bg-grid">
         {/* 顶部工具栏 — 可折叠圆角浮窗 */}
+        <div className="absolute left-0 right-0 top-0 z-40">
         <PhotoToolbar
           selectedDrive={selectedDrive}
           photosCount={photos.length}
@@ -703,11 +793,12 @@ function App() {
           expanded={toolbarOpen}
           onToggle={() => setToolbarOpen((v) => !v)}
         />
+        </div>
 
         <PixelMenu items={emptyMenuItems}>
         {/* 中心主区域 — 照片网格/空状态/加载中 */}
-        <ScrollFadeZone glass={transparentBg}>
-<div className="h-full overflow-auto p-3 no-scrollbar">
+        <ScrollFadeZone glass={transparentBg} className="absolute inset-0">
+<div className="h-full overflow-auto px-3 pt-[calc(var(--top-bar-h,0px)+0.75rem)] pb-[calc(var(--bottom-bar-h,0px)+0.75rem)] no-scrollbar">
           {browsing || loadingFolder ? (
             <div className="flex items-center justify-center h-full">
               <div className="flex flex-col items-center gap-3">
@@ -793,6 +884,7 @@ function App() {
         </PixelMenu>
 
         {/* ═══ 底部导入栏 — 可折叠圆角浮窗 ═══ */}
+        <div className="absolute left-0 right-0 bottom-0 z-40">
         <ImportBar
           destDir={destDir}
           folderRule={folderRule}
@@ -811,12 +903,18 @@ function App() {
           history={importHistory}
           scheme={importScheme}
           selectedCount={selectedPaths.size}
+          lrcProbe={lrcProbe}
+          lrcSending={lrcSending}
+          lrcSent={lrcSent}
+          lrcPhase={lrcPhase}
+          onSendToLightroom={importToLightroom}
           onPickDestDir={pickDestDir}
           onOpenFolder={(dir) => invoke("open_folder", { path: dir })}
           onImport={() => startImport([...selectedPaths])}
           expanded={importBarOpen}
           onToggle={() => setImportBarOpen((v) => !v)}
         />
+        </div>
       </main>
 
       {/* ═══ 右侧面板 — EXIF详细信息浮窗 ═══ */}
@@ -882,6 +980,50 @@ function App() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Phase 7 · "Lightroom 已在运行"。
+          实测(本机 LrC 15.2.1) + FastRawViewer 作者的说明: Lightroom 已经在运行时,
+          Adobe 会**忽略**命令行传进去的路径, 导入对话框停在它上一次的源上 —— 也就是说
+          "跳转到这批照片"不会发生。唯一可靠的办法是**冷启动**(先关掉 LrC 再带路径启动)。
+          LrC 15.2.1 不接受任何"礼貌"的关闭请求(实测 CloseMainWindow / taskkill 不带 /F /
+          WM_CLOSE 三种都无效), 所以"强制关闭"会丢掉未保存的调整 ——
+          这个决定只能由用户做, 因此这里给两个按钮, 而不是程序擅自杀进程。 */}
+      <Dialog open={lrcAlreadyRunning} onOpenChange={(o) => { if (!o) setLrcAlreadyRunning(false); }}>
+        <DialogContent className="w-[460px]">
+          <DialogHeader>
+            <DialogTitle>{t("lrc.runningTitle")}</DialogTitle>
+            <DialogDescription>{t("lrc.runningBody")}</DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <button
+              type="button"
+              onClick={() => setLrcAlreadyRunning(false)}
+              className="px-3 py-1.5 rounded-md border border-border text-sm hover:bg-muted"
+            >
+              {t("lrc.runningRetry")}
+            </button>
+            <button
+              type="button"
+              disabled={lrcSending}
+              onClick={forceCloseLightroomAndRetry}
+              className="px-3 py-1.5 rounded-md bg-red-600 hover:bg-red-500 disabled:bg-zinc-700 text-white text-sm font-medium"
+            >
+              {lrcSending ? t("lrc.sending") : t("lrc.runningForce")}
+            </button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Phase 7 · 「导入到 LrC」这条链的模态进度提示。
+          导入与启动 Lightroom 各自可能要几十秒, 期间必须有明确的"在干什么"。
+          用户关掉它(或按 Esc)之后, 导入栏那行脉冲文字照旧显示 —— 反馈只是从模态降级为常驻。 */}
+      <LrcProgressDialog
+        phase={lrcPhase}
+        imported={importDone}
+        total={selectedPaths.size}
+        open={lrcProgressOpen}
+        onOpenChange={setLrcProgressOpen}
+      />
 
       {/* 弹出提示浮窗 — 渐变出现停留1秒后消失 */}
       <div

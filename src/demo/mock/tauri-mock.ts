@@ -1,12 +1,13 @@
 // ---------------------------------------------------------------------------
 // Tauri mock layer
-// Replaces @tauri-apps/api / @tauri-apps/plugin-dialog so the UI runs on
-// deterministic fake data without a Rust backend.
+// Replaces @tauri-apps/api / @tauri-apps/plugin-dialog / @tauri-apps/plugin-opener
+// so the UI runs on deterministic fake data without a Rust backend.
 // ---------------------------------------------------------------------------
 
 import * as fakeData from "./fake-data";
 import type { ImportProgress } from "./fake-data";
 import * as placeholder from "./placeholder";
+import { APP_VERSION } from "../app-version";
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -223,6 +224,31 @@ const handlers: Record<string, Handler> = {
       degraded: false,
     }),
 
+  // ---- Phase 7 · Lightroom 衔接 ----
+  // 这五个是同步 1.1.1/1.1.2 时补的(命令表漂移, 之前 mock 少这几个 → 走到就抛):
+  //  · get_os_capabilities  App 启动时就调(决定毛玻璃开关默认值与置灰), 演示里按本机
+  //    Win11 报(与真机一致), 少它设置面板会有一行是空的;
+  //  · probe_lightroom      演示机器上当然没有 LrC → found: false, 设置里显示"未检测到";
+  //  · send_to_lightroom    演示里没有 LrC 可发 —— 照实抛错, 让 App 弹它自己的失败提示
+  //    (假装成功会骗人: 界面上会写"已发送");
+  //  · force_close_lightroom 是发完之后"确保 LrC 关掉"的收尾, 演示里从来没起来过 → no-op;
+  //  · is_dir_empty         导入前判断目标目录是否为空(不能抛, 抛了导入流程直接断)。
+  get_os_capabilities: async () => ({
+    platform: "windows",
+    windowsBuild: 26200,
+    supportsMica: true,
+  }),
+
+  probe_lightroom: async () => ({ found: false }),
+
+  send_to_lightroom: async () => {
+    throw new Error("[mock] 官网演示里没有 Lightroom");
+  },
+
+  force_close_lightroom: async () => undefined,
+
+  is_dir_empty: async () => true,
+
   // ---- misc ----
   set_glass_bg: async () => undefined,
 
@@ -270,7 +296,26 @@ export function getCurrentWindow() {
 }
 
 // ---------------------------------------------------------------------------
+// @tauri-apps/api/app
+// ---------------------------------------------------------------------------
+
+/** 演示里"本机版本"就是这份 demo/ui 同步自哪个版本(见 src/demo/app-version.ts)。 */
+export const getVersion = async (): Promise<string> => APP_VERSION;
+
+// ---------------------------------------------------------------------------
 // @tauri-apps/plugin-dialog
 // ---------------------------------------------------------------------------
 
 export const open = async (): Promise<null> => null;
+
+// ---------------------------------------------------------------------------
+// @tauri-apps/plugin-opener
+// ---------------------------------------------------------------------------
+
+/**
+ * 设置面板里「有新版本 x.y.z」那一下: 真机交给系统默认浏览器, 网页里就是开新标签页。
+ * 注意别做成"什么都不干" —— 那样点上去毫无反应, 比报错更像坏了。
+ */
+export const openUrl = async (url: string | URL): Promise<void> => {
+  window.open(String(url), "_blank", "noreferrer");
+};

@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
+import { Collapse } from "./collapse";
+import { Dropdown } from "./ui/select";
 import {
   isSeqRule, keepsOriginalWithSeq, schemeOptions, toggleKeepOriginalRule, toggleSeqRule,
   type ImportSchemeApi,
@@ -71,25 +73,34 @@ export function AdvancedOptions({
           if (!open) scheme.load();
           setOpen(!open);
         }}
-        className="text-[10px] text-zinc-600 hover:text-zinc-400"
+        className="text-[10px] leading-4 py-1 inline-flex items-center gap-1 text-zinc-600 hover:text-zinc-400"
       >
-        {open ? `▾ ${t("import.advanced")}` : `▸ ${t("import.advanced")}`}
+        {/* 箭头用同一个 ▸ 旋转, 而不是 ▸/▾ 换字形 —— 换字形是文本内容变化,
+            CSS 过渡无从插值(与文件夹树的箭头同一个理由)。 */}
+        <i
+          aria-hidden="true"
+          className="not-italic inline-block transition-transform duration-[160ms]"
+          style={{ transform: open ? "rotate(90deg)" : "none" }}
+        >
+          ▸
+        </i>
+        {t("import.advanced")}
       </button>
-      {open && (
+      <Collapse open={open}>
         <div className="mt-1 pb-1.5 space-y-1">
           {/* ── 命名方案(Phase 6 / 6.2) ── */}
           <div className="flex items-center gap-1.5 flex-wrap">
             <span className="text-[10px] text-zinc-400 shrink-0">{t("import.scheme")}</span>
-            <select
+            <Dropdown
               value={scheme.name ?? ""}
-              onChange={(e) => scheme.pick(e.target.value || null)}
-              className="bg-zinc-800 text-[10px] text-zinc-400 px-1 py-0.5 rounded border border-zinc-700 max-w-[150px]"
-            >
-              <option value="">{t("import.schemeCustom")}</option>
-              {schemeOptions(scheme.rules, scheme.name).map((n) => (
-                <option key={n} value={n}>{n}</option>
-              ))}
-            </select>
+              onValueChange={(v) => scheme.pick(v || null)}
+              ariaLabel={t("import.scheme")}
+              options={[
+                { value: "", label: t("import.schemeCustom") },
+                ...schemeOptions(scheme.rules, scheme.name).map((n) => ({ value: n, label: n })),
+              ]}
+              className="bg-zinc-800 text-[10px] leading-none text-zinc-400 border-zinc-700 px-1.5 max-w-[150px]"
+            />
             <button
               onClick={() => setSaveAsOpen((v) => !v)}
               className="text-[10px] px-1.5 py-0.5 rounded bg-zinc-800 hover:bg-zinc-700 text-zinc-500 shrink-0"
@@ -107,7 +118,7 @@ export function AdvancedOptions({
                 <button
                   disabled={!newName.trim()}
                   onClick={saveAs}
-                  className="text-[10px] px-1.5 py-0.5 rounded bg-emerald-700 hover:bg-emerald-600 disabled:bg-zinc-800 disabled:text-zinc-600 text-white shrink-0"
+                  className="text-[10px] leading-4 px-1.5 py-1 rounded bg-emerald-700 hover:bg-emerald-600 disabled:bg-zinc-800 disabled:text-zinc-600 text-white shrink-0"
                 >
                   {t("import.schemeSave")}
                 </button>
@@ -164,7 +175,7 @@ export function AdvancedOptions({
             )}
           </label>
         </div>
-      )}
+      </Collapse>
     </div>
   );
 }

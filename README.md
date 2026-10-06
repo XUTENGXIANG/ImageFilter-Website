@@ -70,3 +70,7 @@ Remove-Item "$dst\hooks\use-mobile.ts" -ErrorAction SilentlyContinue
 ## 动效组件说明
 
 `src/demo/ui/components/` 下的 BorderGlow/ClickSpark/LiquidEther/ParticleText/SpecularButton 等为 React Bits 风格动效（JS/JSX 变体 + `.d.ts` 声明）。改 GL 生命周期相关代码（LiquidEther）时注意：`main.tsx` 为兼容其 WebGL 双挂载行为禁用了 StrictMode，除非同时修好 dispose 路径，不要重新启用。
+
+## 许可
+
+MIT 许可证，见 [LICENSE](LICENSE)（与主仓库同一份文本、同一版权所有者）。页脚的「MIT 许可」指向主仓库的 `LICENSE`。

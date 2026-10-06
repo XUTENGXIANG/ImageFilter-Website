@@ -76,7 +76,14 @@ export default function Footer({ lang }: FooterProps) {
               <EmailPush size={17} fill="currentColor" />
               {t.footer.email}
             </a>
-            <span className="text-xs text-white/45">{t.footer.mit}</span>
+            <a
+              href={`${REPOSITORY_URL}/blob/master/LICENSE`}
+              target="_blank"
+              rel="noreferrer"
+              className="text-xs font-medium text-white/45 underline-offset-2 transition hover:text-white/75 hover:underline"
+            >
+              {t.footer.mit}
+            </a>
           </div>
         </div>
 

@@ -52,7 +52,10 @@ export interface LandingMessages {
   download: {
     eyebrow: string;
     title: string;
-    version: string;
+    /** 版本号徽章：正在问 GitHub 最新正式版时显示 */
+    loading: string;
+    /** 版本号徽章：问不到时显示（此时三张卡片的按钮退到 Releases 页） */
+    fetchFailed: string;
     cards: {
       platform: string;
       badge: string;
@@ -172,7 +175,8 @@ export const zh: LandingMessages = {
   download: {
     eyebrow: "安装包 / Installers",
     title: "下载 / Download",
-    version: "v1.0.0",
+    loading: "获取最新版…",
+    fetchFailed: "版本获取失败",
     cards: [
       {
         platform: "Windows 安装包",
@@ -309,7 +313,8 @@ export const en: LandingMessages = {
   download: {
     eyebrow: "Installers",
     title: "Download",
-    version: "v1.0.0",
+    loading: "Fetching latest…",
+    fetchFailed: "Version unavailable",
     cards: [
       {
         platform: "Windows Installer",

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import BorderGlow from "@/components/BorderGlow";
 import LineSidebar from "@/components/LineSidebar";
 import SpecularButton from "@/components/SpecularButton";
@@ -8,7 +8,9 @@ import { Apple, ChevronDown, DownloadCloud, Monitor } from "lucide-react";
 import type { Lang } from "./i18n";
 import { translations } from "./i18n";
 
-const RELEASES_PAGE = "https://github.com/XUTENGXIANG/ImageFilter/releases";
+const REPOSITORY = "XUTENGXIANG/ImageFilter";
+const RELEASES_PAGE = `https://github.com/${REPOSITORY}/releases`;
+const LATEST_RELEASE_API = `https://api.github.com/repos/${REPOSITORY}/releases/latest`;
 
 // ─── 国内直链（蓝奏云）────────────────────────────────────────
 // 手动添加直链的方法：
@@ -16,7 +18,8 @@ const RELEASES_PAGE = "https://github.com/XUTENGXIANG/ImageFilter/releases";
 //   2. 在下面的数组中新增一条记录（建议按平台排序）：
 //      { name: "文件名（页面展示用，建议带版本号）", href: "蓝奏云分享链接", password: "访问密码(无则省略)" }
 //   3. 列表会按数组顺序自动渲染，点击即在新标签页打开
-// 注意：name 会直接展示在页面上，版本升级后记得同步更新文件名。
+// 注意：这一份是**手动**的 —— 走 GitHub 的三张卡片已经自动取最新版了，这里不会跟着变。
+// 换了新安装包就得自己重传蓝奏云、把 name 里的版本号与 password 一起改掉。
 const CN_DOWNLOADS = [
   {
     name: "ImageFilter_1.0.0_x64-setup.exe",
@@ -30,17 +33,23 @@ const CN_DOWNLOADS = [
   },
 ];
 
-const fileNames = [
-  "ImageFilter_1.0.0_x64-setup.exe",
-  "ImageFilter_1.0.0_x64_zh-CN.msi",
-  "ImageFilter_1.0.0_universal.dmg",
+/** 三张卡片（= t.download.cards 的顺序）各自从 release 附件里挑哪一个 */
+const ASSET_MATCHERS: ((name: string) => boolean)[] = [
+  (n) => /-setup\.exe$/i.test(n), // NSIS 安装包
+  (n) => /\.msi$/i.test(n), // MSI
+  (n) => /\.dmg$/i.test(n), // macOS
 ];
 
-const downloadLinks = [
-  "https://github.com/XUTENGXIANG/ImageFilter/releases/download/v1.0/ImageFilter_1.0.0_x64-setup.exe",
-  "https://github.com/XUTENGXIANG/ImageFilter/releases/download/v1.0/ImageFilter_1.0.0_x64_zh-CN.msi",
-  "https://github.com/XUTENGXIANG/ImageFilter/releases/download/v1.0/ImageFilter_1.0.0_universal.dmg",
-];
+interface ReleaseAsset {
+  name: string;
+  url: string;
+}
+
+interface LatestRelease {
+  tag: string;
+  /** 与 ASSET_MATCHERS / cards 同序；某个平台没发布就是 undefined */
+  assets: (ReleaseAsset | undefined)[];
+}
 
 const platformIcons = [Monitor, Monitor, Apple];
 
@@ -51,6 +60,41 @@ interface DownloadProps {
 export default function Download({ lang }: DownloadProps) {
   const t = translations[lang];
   const [cnOpen, setCnOpen] = useState(false);
+  // 版本号不再写死在页面里：打开页面时去问一次 GitHub 的最新正式版，附件直链也从那里取。
+  // 这样发新版不用再回来改这 3 行 —— 之前那三条写死的链接停在 v1.0.0 上，落后了三个版本。
+  const [latest, setLatest] = useState<LatestRelease | null>(null);
+  const [failed, setFailed] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    fetch(LATEST_RELEASE_API, { headers: { Accept: "application/vnd.github+json" } })
+      .then((r) => (r.ok ? r.json() : Promise.reject(new Error(`HTTP ${r.status}`))))
+      .then((data) => {
+        if (cancelled) return;
+        const raw: { name?: unknown; browser_download_url?: unknown }[] = Array.isArray(data?.assets)
+          ? data.assets
+          : [];
+        const pick = (test: (name: string) => boolean): ReleaseAsset | undefined => {
+          const hit = raw.find((a) => typeof a?.name === "string" && test(a.name));
+          if (!hit || typeof hit.name !== "string") return undefined;
+          return { name: hit.name, url: String(hit.browser_download_url ?? "") };
+        };
+        setLatest({
+          tag: typeof data?.tag_name === "string" ? data.tag_name : "",
+          assets: ASSET_MATCHERS.map(pick),
+        });
+      })
+      .catch(() => {
+        // 取不到就照实说，并把三张卡片的按钮退回 Releases 页（不留死链，也不假装有版本号）
+        if (!cancelled) setFailed(true);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const versionLabel = latest?.tag ? latest.tag : failed ? t.download.fetchFailed : t.download.loading;
+
 
   return (
     <section
@@ -70,8 +114,11 @@ export default function Download({ lang }: DownloadProps) {
           </p>
           <h2 className="mt-4 text-3xl font-semibold text-white sm:text-5xl">
             {t.download.title}
-            <span className="ml-3 inline-block translate-y-[-0.35rem] rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-medium tabular-nums text-white/55">
-              {t.download.version}
+            <span
+              aria-live="polite"
+              className="ml-3 inline-block translate-y-[-0.35rem] rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-medium tabular-nums text-white/55"
+            >
+              {versionLabel}
             </span>
           </h2>
         </motion.div>
@@ -79,8 +126,10 @@ export default function Download({ lang }: DownloadProps) {
         <div className="mt-14 grid gap-5 lg:grid-cols-3">
           {t.download.cards.map((card, index) => {
             const Icon = platformIcons[index];
-            const fileName = fileNames[index];
-            const href = downloadLinks[index];
+            const asset = latest?.assets[index];
+            // 附件还没到 / 取失败 → 按钮落到 Releases 页: 不假装有直链, 也不留死链
+            const href = asset?.url || RELEASES_PAGE;
+            const fileName = asset?.name ?? "—";
 
             return (
               <motion.article

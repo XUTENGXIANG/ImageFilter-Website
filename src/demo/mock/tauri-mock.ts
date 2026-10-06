@@ -1,3 +1,5 @@
+// Copyright (c) 2026 XUTENGXIANG
+// SPDX-License-Identifier: MIT
 // ---------------------------------------------------------------------------
 // Tauri mock layer
 // Replaces @tauri-apps/api / @tauri-apps/plugin-dialog / @tauri-apps/plugin-opener

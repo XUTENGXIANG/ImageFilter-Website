@@ -1,3 +1,5 @@
+// Copyright (c) 2026 XUTENGXIANG
+// SPDX-License-Identifier: MIT
 import { describe, it, expect } from "vitest";
 import { getDrives, getPhotos, getExif } from "./fake-data";
 

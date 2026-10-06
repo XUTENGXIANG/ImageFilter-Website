@@ -1,3 +1,5 @@
+// Copyright (c) 2026 XUTENGXIANG
+// SPDX-License-Identifier: MIT
 // Type declarations for @tauri-apps/* modules (aliased to mock layer)
 // This file satisfies TypeScript's module resolution so `tsc -b` passes
 // without Vite's bundler aliases.

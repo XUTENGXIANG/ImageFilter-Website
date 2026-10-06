@@ -1,3 +1,5 @@
+// Copyright (c) 2026 XUTENGXIANG
+// SPDX-License-Identifier: MIT
 // ---------------------------------------------------------------------------
 // SVG placeholder data-URL generator — deterministic per path
 // Gradient tone selected by hash + camera icon in center + noise overlay

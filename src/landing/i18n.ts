@@ -1,3 +1,5 @@
+// Copyright (c) 2026 XUTENGXIANG
+// SPDX-License-Identifier: MIT
 export type Lang = "zh" | "en";
 
 export interface LandingMessages {
@@ -208,7 +210,7 @@ export const zh: LandingMessages = {
     email: "mail@tensyn.online",
     mit: "MIT 许可",
     backToDemo: "回到演示",
-    copyright: "© 2026 ImageFilter · MIT License",
+    copyright: "© 2026 XUTENGXIANG · MIT License",
   },
 };
 
@@ -346,7 +348,7 @@ export const en: LandingMessages = {
     email: "mail@tensyn.online",
     mit: "MIT License",
     backToDemo: "Back to Demo",
-    copyright: "© 2026 ImageFilter · MIT License",
+    copyright: "© 2026 XUTENGXIANG · MIT License",
   },
 };
 

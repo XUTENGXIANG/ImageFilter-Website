@@ -1,3 +1,5 @@
+// Copyright (c) 2026 XUTENGXIANG
+// SPDX-License-Identifier: MIT
 import { FolderOpen, SdCard, Star } from "@icon-park/react";
 import { motion } from "motion/react";
 import type { Lang } from "./i18n";

@@ -1,3 +1,5 @@
+// Copyright (c) 2026 XUTENGXIANG
+// SPDX-License-Identifier: MIT
 import { motion } from "motion/react";
 import { Close, Check } from "@icon-park/react";
 import type { Lang } from "./i18n";

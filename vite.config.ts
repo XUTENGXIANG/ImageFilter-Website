@@ -1,3 +1,5 @@
+// Copyright (c) 2026 XUTENGXIANG
+// SPDX-License-Identifier: MIT
 import { resolve } from "path";
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'

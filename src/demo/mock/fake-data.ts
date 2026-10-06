@@ -1,3 +1,5 @@
+// Copyright (c) 2026 XUTENGXIANG
+// SPDX-License-Identifier: MIT
 // ---------------------------------------------------------------------------
 // Types (mirror main-project types so mock is fully self-contained)
 // ---------------------------------------------------------------------------

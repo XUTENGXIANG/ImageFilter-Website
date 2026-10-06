@@ -1,3 +1,5 @@
+// Copyright (c) 2026 XUTENGXIANG
+// SPDX-License-Identifier: MIT
 // ═══════════════════════════════════════════════════════════════════════
 // ImageFilterDemo — wrapper that renders the real software UI inside the demo
 // No modifications to the copied UI files; data flows through the mock layer.

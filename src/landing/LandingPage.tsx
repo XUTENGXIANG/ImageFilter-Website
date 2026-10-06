@@ -1,3 +1,5 @@
+// Copyright (c) 2026 XUTENGXIANG
+// SPDX-License-Identifier: MIT
 import { useState } from "react";
 import ClickSpark from "@/components/ClickSpark";
 import LiquidEther from "@/components/LiquidEther";

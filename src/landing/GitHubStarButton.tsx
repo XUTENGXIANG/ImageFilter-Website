@@ -1,3 +1,5 @@
+// Copyright (c) 2026 XUTENGXIANG
+// SPDX-License-Identifier: MIT
 import { useEffect, useState } from "react";
 import type { Lang } from "./i18n";
 import { translations } from "./i18n";

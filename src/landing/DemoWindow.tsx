@@ -1,3 +1,5 @@
+// Copyright (c) 2026 XUTENGXIANG
+// SPDX-License-Identifier: MIT
 import BorderGlow from "@/components/BorderGlow";
 import { MousePointerClick } from "lucide-react";
 import ImageFilterDemo from "../demo/ImageFilterDemo";

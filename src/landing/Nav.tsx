@@ -1,3 +1,5 @@
+// Copyright (c) 2026 XUTENGXIANG
+// SPDX-License-Identifier: MIT
 import logo from "../assets/logo.png";
 import GitHubStarButton from "./GitHubStarButton";
 import type { Lang } from "./i18n";

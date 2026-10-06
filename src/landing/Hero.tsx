@@ -1,3 +1,5 @@
+// Copyright (c) 2026 XUTENGXIANG
+// SPDX-License-Identifier: MIT
 import ParticleText from "@/components/ParticleText";
 import SpecularButton from "@/components/SpecularButton";
 import { Apple, Monitor } from "lucide-react";

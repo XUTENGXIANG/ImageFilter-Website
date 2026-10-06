@@ -1,3 +1,5 @@
+// Copyright (c) 2026 XUTENGXIANG
+// SPDX-License-Identifier: MIT
 import { EmailPush, Github } from "@icon-park/react";
 import logo from "../assets/logo.png";
 import type { Lang } from "./i18n";

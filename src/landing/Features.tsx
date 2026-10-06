@@ -1,3 +1,5 @@
+// Copyright (c) 2026 XUTENGXIANG
+// SPDX-License-Identifier: MIT
 import BorderGlow from "@/components/BorderGlow";
 import SpotlightCard from "@/components/SpotlightCard";
 import {

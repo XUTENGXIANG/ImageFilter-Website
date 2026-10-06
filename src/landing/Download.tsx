@@ -1,3 +1,5 @@
+// Copyright (c) 2026 XUTENGXIANG
+// SPDX-License-Identifier: MIT
 import { useEffect, useState } from "react";
 import BorderGlow from "@/components/BorderGlow";
 import LineSidebar from "@/components/LineSidebar";

@@ -22,3 +22,8 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# 本地工作产物（审计截图、原型构建中间物）
+.scratch/
+.design-audit/
+

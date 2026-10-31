@@ -2,6 +2,15 @@
 
 [ImageFilter](https://github.com/XUTENGXIANG/ImageFilter) 桌面应用的落地页与在线演示。线上地址：[https://xutengxiang.github.io/ImageFilter-Website/](https://xutengxiang.github.io/ImageFilter-Website/)（别名 [tensyn.online/imagefilter](https://tensyn.online/imagefilter/)）。
 
+## 改版进行中（2026-11）
+
+官网正按 [pryzm.design](https://pryzm.design/) 的视觉方向改版：纯黑单色 + emerald 数据色、Poppins / Inter / Geist Mono 自托管、首屏可拖拽照片拼贴。**目前只完成首屏原型，正式页面尚未改动。**
+
+- 状态、决策与实施计划：[docs/官网改版-交接.md](docs/官网改版-交接.md)
+- 首屏原型（自包含 HTML）：[docs/prototype/hero.html](docs/prototype/hero.html)
+
+> 注意：`src/demo/ui/` 仍是主仓库 **1.1.2** 的副本，尚未同步到 1.3.0。
+
 ## 结构
 
 ```
@@ -74,3 +83,5 @@ Remove-Item "$dst\hooks\use-mobile.ts" -ErrorAction SilentlyContinue
 ## 许可
 
 MIT 许可证，见 [LICENSE](LICENSE)（与主仓库同一份文本、同一版权所有者）。页脚的「MIT 许可」指向主仓库的 `LICENSE`。
+
+

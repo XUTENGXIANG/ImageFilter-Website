@@ -14,7 +14,8 @@ interface HeroProps {
 export default function Hero({ lang }: HeroProps) {
   const t = translations[lang];
   const [usedHint, setUsedHint] = useState(false);
-  const title = `${t.hero.title.line1} ${t.hero.title.line2}${t.hero.title.emphasis}`;
+  const titleGap = lang === "en" ? " " : "";
+  const title = `${t.hero.title.line1} ${t.hero.title.line2}${titleGap}${t.hero.title.emphasis}`;
 
   return (
     <section id="top" className="relative flex min-h-svh items-end overflow-hidden">
@@ -48,6 +49,7 @@ export default function Hero({ lang }: HeroProps) {
               <span className="block">{t.hero.title.line1}</span>
               <span className="block">
                 {t.hero.title.line2}
+                {titleGap}
                 <em className="not-italic">{t.hero.title.emphasis}</em>
               </span>
             </h1>

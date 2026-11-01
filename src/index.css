@@ -124,3 +124,26 @@ body {
     transition-duration: 0.01ms !important;
   }
 }
+
+/* React Bits SplitFlapText：中文单字需要占满 1em 的翻页块，否则会被裁切。
+   使用落地页的 mono 字体，英文仍是 Geist Mono，中文回退系统黑体。 */
+.split-flap-text.download-flap {
+  font-family: var(--font-landing-mono);
+  letter-spacing: 0;
+}
+
+.download-flap .split-flap-text__tile {
+  width: 1em;
+}
+
+@media (max-width: 640px) {
+  .split-flap-text.download-flap {
+    font-size: 30px;
+  }
+}
+
+@media (max-width: 380px) {
+  .split-flap-text.download-flap {
+    font-size: 26px;
+  }
+}

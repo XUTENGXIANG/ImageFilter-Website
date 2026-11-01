@@ -5,6 +5,7 @@ import { Apple, ChevronDown, DownloadCloud, Monitor } from "lucide-react";
 import Card from "./components/Card";
 import Reveal from "./components/Reveal";
 import SectionHead from "./components/SectionHead";
+import SplitFlapText from "./components/SplitFlapText";
 import { buttonStyles } from "./components/buttonStyles";
 import type { Lang } from "./i18n";
 import { translations } from "./i18n";
@@ -108,18 +109,44 @@ export default function Download({ lang }: DownloadProps) {
     >
       <div className="mx-auto max-w-6xl">
         <Reveal>
-          <SectionHead
-            eyebrow={t.download.eyebrow}
-            title={t.download.title}
-            actions={
-              <span
-                aria-live="polite"
-                className="mb-1 rounded-full border border-line bg-white/[0.03] px-3 py-1 font-landing-mono text-[10.5px] tabular-nums text-ink-faint"
-              >
-                {versionLabel}
-              </span>
-            }
-          />
+          <div className="flex flex-wrap items-end justify-between gap-x-8 gap-y-6">
+            <SectionHead
+              eyebrow={t.download.eyebrow}
+              title={t.download.title}
+              actions={
+                <span
+                  aria-live="polite"
+                  className="mb-1 rounded-full border border-line bg-white/[0.03] px-3 py-1 font-landing-mono text-[10.5px] tabular-nums text-ink-faint"
+                >
+                  {versionLabel}
+                </span>
+              }
+            />
+            <div className="shrink-0 pb-1" aria-hidden="true">
+              <SplitFlapText
+                words={lang === "zh" ? ["下载", "即刻使用"] : ["DOWNLOAD", "USE NOW"]}
+                flipDuration={0.12}
+                stagger={0.05}
+                cycleDelay={2600}
+                charset="alphanumeric"
+                flipsPerChar={6}
+                order="left"
+                align="center"
+                tileStyle="board"
+                tileColor="#141414"
+                textColor="#fafafa"
+                glare={0}
+                depth={0.5}
+                tileRadius={9}
+                gap={5}
+                fontSize={34}
+                loop
+                padTo={lang === "zh" ? 4 : 8}
+                intro
+                className="download-flap"
+              />
+            </div>
+          </div>
         </Reveal>
 
         <div className="mt-10 grid gap-4 lg:grid-cols-3">

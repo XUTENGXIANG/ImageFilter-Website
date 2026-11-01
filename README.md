@@ -99,6 +99,12 @@ Remove-Item "$dst\hooks\use-mobile.ts" -ErrorAction SilentlyContinue
 
 安装包按钮与版本页的资产行都用 **隐藏 iframe** 触发浏览器原生下载（`src/landing/lib/download.ts`）：GitHub 资源带 `Content-Disposition: attachment`，下载时当前页面保持不变，不会开新标签页；按钮的 2.2s 进度环只是视觉反馈，真实进度看浏览器下载栏。失败时错误页只会出现在隐藏 iframe 里，不会顶掉落地页。
 
+下载区/版本页有「下载线路」切换（`src/landing/lib/downloadMirror.ts`）：
+
+- 默认 **GitHub**；切到「国内加速」后，所有 GitHub 安装包 URL 会加 `https://ghfast.top/` 前缀，不需要上传任何文件。
+- 选择写入 `localStorage`，首页和版本页共享；第三方前缀可能失效或改写内容，页面会显示风险提示，安装前请核对文件大小。
+- 要换加速服务只改 `MIRROR_PREFIX`；要换成自建 Worker 就改成自建前缀（见 `workers/`）。
+
 `src/landing/downloadData.ts` 的 `CN_DOWNLOADS`（蓝奏云国内直链）仍是手动的：换了安装包得自己重传、并把 `name` 里的版本号与 `password` 一起改掉（版本全览页不会跟着变）。
 
 

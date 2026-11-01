@@ -210,6 +210,7 @@
 - 卡片内容：平台名 16px、文件名 Geist Mono 11px 截断、说明 14px、按钮。
 - 按钮：三张卡使用 rewampui `NeumorphicDownloadButton`（全宽、72px 高，下载中/已完成文案）；点击时通过隐藏 iframe 触发浏览器原生下载，当前页面不跳转、不开新标签页；2.2s 进度环为视觉反馈，不是真实字节进度。
 - 国内直链入口：改成「更多版本」→ `#/versions`；蓝奏云链接/密码移到版本全览页。
+- **下载线路**：卡片上方提供 GitHub / 国内加速两档；默认 GitHub，国内加速给 GitHub 资源加 `ghfast.top` 前缀，选择存 localStorage；显示第三方加速风险提示。
 - 保留：`GitHub Releases →` 链接、加载/失败态；MSI 说明不再放在折叠区（版本页直接列 MSI 资产）。
 - 已知内容问题（记录，不在本次改数据）：`CN_DOWNLOADS` 仍是 1.0.0，需用户重传后手动更新。
 
@@ -260,6 +261,7 @@
 - **hash 路由**：首页 `LandingPage` 监听 `hashchange`；`#/versions` 渲染 `VersionsPage`，其他 hash 保持首页。静态托管无需 404 回退。
 - **页头**：品牌 +「返回首页」+ 语言切换（复用 `LanguageToggle`），不渲染首页 Nav。
 - **数据**：打开页面时取 `https://api.github.com/repos/XUTENGXIANG/ImageFilter/releases?per_page=100`；失败显示错误 + Releases 链接；空列表显示空态。
+- **下载线路**：页头下复用与首页一致的 GitHub / 国内加速切换；加速时资产行 href 与 iframe 都走 `ghfast.top` 前缀。
 - **版本卡**：按 GitHub 顺序列出 tag、名称、发布日期、预发布标记；首条标「最新」。每条只列安装包资产（`-setup.exe` / `.msi` / `.dmg` / `.apk` / `.zip`），过滤 updater 的 `.tar.gz` / `.sig`；资产行显示文件名、类型、大小，点击用隐藏 iframe 下载（当前页不跳；Ctrl/Cmd/中键保留新标签页语义）；底部「发布说明」。
 - **国内直链**：页面末尾列出 `CN_DOWNLOADS`（蓝奏云）+ 密码 + 「手动维护，可能不是最新版」说明。
 - **页脚**：版权 + GitHub Releases 链接。
@@ -413,5 +415,6 @@ mock 形状（按主仓库类型）：
 11. **安装包下载按钮**：接入 rewampui registry 的 `neumorphic-download-button`，三张卡全宽使用；点击用隐藏 iframe 触发浏览器原生下载（当前页不跳、不开新标签页），2.2s emerald 进度环只是视觉反馈，进度/完成文案中英双语。CLI 因 `components.json` 缺 `registryUrl` 失败，按同一份 registry 源码落在 `src/landing/components/`，用项目已有的 `motion/react` 替代 `framer-motion`。
 12. **更多版本 / 版本全览**：原「国内直链下载」折叠区改为「更多版本」→ `#/versions`；`VersionsPage` 读取全部 releases，过滤 updater 资产，资产行同样用隐藏 iframe 下载，保留蓝奏云直链；hash 路由，带返回首页、语言切换、页面标题。
 13. **FlapLabel 指针穿透**：`.flap-button-label { pointer-events:none }` 修复 hover 重挂载导致快速点击丢失；按钮标签仍保留 `aria-hidden` tile + SR 原文。
-14. **首屏截图拼贴**：按用户选择，6 张图库占位照片替换为「用户浅色 demo 截图 + 重新截取的修复后设备树 + 彩色 DEMO 网格」；图注改为界面说明，`src/assets/photos/` 已移除，新增 `src/assets/screens/`。
-15. **仍未完成**：`CN_DOWNLOADS` 仍是 1.0.0、`vite base` 仍为 `/`（可选）。
+14. **首屏截图拼贴**：按用户选择，6 张图库占位照片替换为「按用户浅色 demo 状态重截的修复后整窗图 + 重新截取的设备树 + 彩色 DEMO 网格」；图注改为界面说明，`src/assets/photos/` 已移除，新增 `src/assets/screens/`。
+15. **下载线路切换**：默认 GitHub；「国内加速」给安装包 URL 加 `ghfast.top` 前缀，不需要逐个上传；选择存 localStorage，首页/版本页共享，并显示第三方风险提示。
+16. **仍未完成**：`CN_DOWNLOADS` 仍是 1.0.0（可选/可移除）、`vite base` 仍为 `/`（可选）。

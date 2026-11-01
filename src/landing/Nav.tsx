@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import logo from "../assets/logo.png";
 import { ButtonLink } from "./components/Button";
+import RubberSegment from "./components/RubberSegment";
 import GitHubStarButton from "./GitHubStarButton";
 import type { Lang } from "./i18n";
 import { translations } from "./i18n";
@@ -70,26 +71,29 @@ export default function Nav({ lang, onLangChange }: NavProps) {
         <div className="ml-auto flex items-center gap-1.5">
           <GitHubStarButton lang={lang} />
 
-          <div
-            className="flex items-center gap-0.5 rounded-full border border-line bg-white/[0.03] p-0.5"
-            role="group"
+          <RubberSegment
+            items={[
+              { value: "zh", label: "中" },
+              { value: "en", label: "EN" },
+            ]}
+            value={lang}
+            onChange={(next) => onLangChange(next as Lang)}
+            trackColor="rgba(255,255,255,0.03)"
+            thumbColor="#fafafa"
+            textColor="rgba(255,255,255,0.90)"
+            activeTextColor="#18181b"
+            size="sm"
+            radius={999}
+            inset={2}
+            equalSlots
+            stretch={80}
+            squash={2}
+            speed={1}
+            glide={60}
+            draggable
             aria-label="Language"
-          >
-            {(["zh", "en"] as Lang[]).map((item) => (
-              <button
-                key={item}
-                type="button"
-                onClick={() => onLangChange(item)}
-                aria-pressed={lang === item}
-                className={cn(
-                  "rounded-full px-2.5 py-1.5 text-[11.5px] font-medium transition-colors duration-200",
-                  lang === item ? "bg-white/10 text-white" : "text-white/50 hover:text-white/80",
-                )}
-              >
-                {item === "zh" ? "中" : "EN"}
-              </button>
-            ))}
-          </div>
+            className="border border-line"
+          />
 
           <ButtonLink href="#download" variant="solid" size="sm">
             {t.nav.download}

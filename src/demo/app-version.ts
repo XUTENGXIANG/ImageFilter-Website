@@ -7,4 +7,4 @@
  *
  * 为什么不能拿本仓库的 package.json：它是 0.0.0（网站自己的版本），拿它当软件版本会显示成 0.0.0。
  */
-export const APP_VERSION = "1.1.2";
+export const APP_VERSION = "1.3.0";

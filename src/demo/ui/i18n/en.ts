@@ -41,6 +41,8 @@ export default {
     preloadDesc: "Preload visible photos for a faster viewer",
     autoAdvance: "Auto-advance after rating",
     autoAdvanceDesc: "Auto-next after rating (← back)",
+    showCounts: "Show folder counts",
+    showCountsDesc: "Show counts in the left sidebar",
     labelKeys: "Color label shortcut",
     labelKeysDesc: "Label modifier (Alt if taken)",
     // Phase 5 · XMP sidecar (three-step switch, default "Ask" — changed from "Off" in session 6,
@@ -59,8 +61,8 @@ export default {
     // Phase 7 · Lightroom handoff (send mode in Settings; status text is appended to desc)
     lrcMode: "Lightroom handoff",
     lrcModeDialog: "Open import",
-    lrcModeSilent: "Silent import",
-    lrcModeSilentWhy: "Requires a watched folder configured in Lightroom's Auto Import; not supported yet",
+    lrcModeSilent: "Silent import (unsupported)",
+    lrcModeSilentWhy: "Requires Lightroom Auto Import (not supported yet)",
     lrcReprobe: "Re-detect",
     lrcProbing: "Detecting…",
     lrcNotFound: "Lightroom Classic not detected",
@@ -68,6 +70,13 @@ export default {
     lrcNotRunning: "not running",
     transparentBg: "Transparent frosted background",
     transparentBgDesc: "Windows Mica glass background",
+  transparentBgDescMac: "macOS transparent glass background",
+  lrcUnsupportedMac: "Lightroom handoff is not supported on macOS (Windows only)",
+  macPermTitle: "macOS needs file access permission",
+  macPermBody: "Reading photos and writing .xmp triggers permission prompts. Grant Full Disk Access once to stop them.",
+  macPermPath: "System Settings → Privacy & Security → Full Disk Access → enable ImageFilter",
+  macPermOpen: "Open System Settings",
+  macPermLater: "Later",
     transparentBgUnsupported: "Not available on this system (requires Windows 11)",
     transparentBgOpacity: "Title bar glass opacity",
     transparentBgOpacityDesc: "Title bar only",
@@ -114,6 +123,7 @@ export default {
 
   devices: {
     panel: "Devices",
+    disks: "Disks",
     refresh: "Refresh",
     open: "Open",
     eject: "Eject",
@@ -130,6 +140,8 @@ export default {
     loading: "Loading...",
     counting: "Counting photos...",
     photos: "{n} photos",
+    folders: "{n} folders",
+    videos: "{n} videos",
     ready: "Ready",
   },
 
@@ -369,6 +381,130 @@ export default {
       noNewPhotos: "all {n} selected photo(s) already exist at the destination with identical content — nothing new to import",
       unknown: "unknown error",
     },
+  },
+
+  // ── Phase 8 · Gallery service (phone access) ──
+  // The panel lives inside the settings dialog (ServerPanel in settings-dialog.tsx):
+  // switch / listening state / pairing code / shared folders / troubleshooting list.
+  // Status shape: ServerStatus in src-tauri/src/server/mod.rs (camelCase).
+  server: {
+    title: "LAN remote browsing",
+    switchDesc: "Remote service switch, off by default",
+    on: "On",
+    off: "Off",
+    listening: "Listening on {url}",
+    // Deliberately NOT rolling the switch back on a failed start (Task 8): "you asked for on,
+    // it is not running" is a legal state — shown next to lastError, or the user just thinks
+    // the click missed.
+    wantedNotRunning: "Service is not running",
+    // "Off" is not instantaneous: after stop() the port still has a *bounded* settling window
+    // (worst measured 63ms) during which a handshake can complete. Never promise more than that.
+    offNote: "Off",
+    lastError: "Last error",
+    tokenLabel: "Pairing code",
+    tokenDesc: "Pair again after resetting",
+    tokenEmpty: "Generated when the service starts",
+    copy: "Copy",
+    copied: "Copied",
+    copyFailed: "Copy failed — copy manually",
+    rotate: "Reset",
+    rotateConfirm: "Confirm reset",
+    sharesLabel: "Shared folders",
+    sharesDesc: "Allowed folders",
+    shareEmpty: "No shared folders — the phone has no access",
+    pathPlaceholder: "Enter a folder path",
+    browse: "Browse…",
+    add: "Add",
+    remove: "Remove",
+    unavailable: "Cannot get service status: {reason}",
+    actionFailed: "Action failed: {reason}",
+    tipsTitle: "Cannot connect?",
+    sleepTip: "Disable sleep (set it to “Never” in system power settings)",
+    firewallTip: "Allow “Private networks” in Windows Firewall on first launch",
+    // M4′ Task 2: after the LAN-only decision (2026-10-07) there is **no tunnel option any more**
+    // — the old “or both joined the same EasyTier/Tailscale network” wording is gone by decision.
+    appRunningTip: "Check: PC sleep, app running, service started, same LAN",
+
+    // ── M4′ Task 2 · LAN addresses / firewall / Public-network guard (LAN-only) ──
+    // Rendered by ServerPanel; the data comes from `get_server_network_hints`
+    // (NetHints, camelCase). Same rule as the Chinese side: no entry point for
+    // tunnels / port forwarding / public exposure — this design only warns.
+    lanTitle: "LAN address",
+    lanDesc: "Phone and PC must be on the same LAN",
+    lanEmpty: "No LAN address detected",
+    rescan: "Scan again",
+    firewallHintTitle: "Firewall issue",
+    firewallHint: "Windows Security → Firewall & network protection → Allow an app through firewall → ImageFilter → tick “Private”.",
+    firewallHintGeneric: "Allow ImageFilter through Windows Firewall on the “Private” profile.",
+    publicTitle: "Windows marks the current network as “Public”",
+    publicWarn: "“Public” is an untrusted network — there is some risk",
+    publicOffer: "Use a private network instead",
+    publicConfirm: "I understand the risk — turn it on anyway",
+    publicAck: "Risk accepted at {time}",
+    publicAckNoTime: "Risk accepted for this run",
+    publicIpTitle: "Wrong LAN address",
+    publicIpWarn: "{list} may be exposed; risk acknowledged.",
+    profileUnknown: "Unknown network; risk acknowledged.",
+
+    // ── M4′ Task 1 · pairing QR code (generated on the desktop) ──
+    // Data comes from `get_server_pairing_qr` (PairingQr, camelCase); null = no QR code this time.
+    // The backend never falls back to a public address or 127.0.0.1 when there is no private
+    // address, so the reason must be spelled out here: an empty LAN list is explained by
+    // lanEmpty above, and only "address present, pairing code missing" lands on qrNoToken.
+    // Fix 1: a QR code exists only while the service is actually listening (the backend
+    // returns null otherwise). qrNotRunning explains that state and keeps the manual path —
+    // a code for the configured port would point the phone at a port nobody is listening on.
+    qrShow: "Connect with QR code",
+    qrHide: "Hide QR code",
+    qrScanHint: "Scan with ImageFilter on the phone",
+    qrNoToken: "A pairing code and QR code are generated when the service starts.",
+    qrNotRunning: "Service error — check the service status, or pair manually below.",
+    // Scanning is an enhancement, not the only path (M4′ Task 1 Step 4, item 3: refusing the
+    // camera permission must still allow pairing by hand).
+    qrFallback: "Cannot use it? Try manual pairing.",
+
+    // ── M4′ Task 3 · read-only mode ──
+    // On = every write endpoint answers 403 forbiddenPath (the existing code, not a new one);
+    // read endpoints keep working.
+    readOnly: "Read-only mode",
+    readOnlyDesc: "Browse only on the phone",
+
+    // ── M4′ Task 3 · who is connecting ──
+    // Discipline: only what the HTTP layer really knows. Never invent a device name or location.
+  },
+
+  // ── 2026-10-25 · mDNS pairing (desktop) ──
+  // Pairing window / pending requests / paired devices. Commands and events live in
+  // src/lib/pairing.ts (frozen contract §0.3). Discipline: in v1 "Forget" only drops the
+  // record — it does not revoke the pairing code; forgetNote must say so plainly, or users
+  // will think removing a device has kicked it offline (only Rotate does that).
+  pairing: {
+    sectionTitle: "Pair a new device",
+    windowHint: "Click this button before pairing to receive pairing requests",
+    openWindow: "Pair a new device",
+    closeWindow: "Close pairing window",
+    windowOpen: "Pairing window is open",
+    windowClosed: "Pairing window is closed",
+    serviceOff: "Turn on the remote service first",
+    remaining: "{time} left",
+    pendingTitle: "Pending requests",
+    pendingDesc: "Requests expire in 60 seconds",
+    morePending: "{n} more pending request(s)",
+    pairedDevices: "Paired devices",
+    noDevices: "No paired devices",
+    forget: "Forget",
+    lastSeen: "last seen {time}",
+    requestTitle: "Pairing request",
+    requestBody: "This device wants to connect. Confirm it is yours and on the same LAN.",
+    deviceOn: "Device: {name} ({ip})",
+    requestedAt: "Requested at {time}",
+    expiresIn: "This request expires in {seconds}s",
+    expired: "This request has expired",
+    allow: "Allow",
+    deny: "Deny",
+    advanced: "Advanced / manual pairing",
+    actionFailed: "Action failed: {reason}",
+    unavailable: "Unknown pairing status: {reason}",
   },
 
 };

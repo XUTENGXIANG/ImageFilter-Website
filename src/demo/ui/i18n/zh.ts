@@ -43,6 +43,8 @@ export default {
     preloadDesc: "预载可见区域原图，打开查看器更快",
     autoAdvance: "评分后自动前进",
     autoAdvanceDesc: "评分后自动下一张（← 回退）",
+    showCounts: "显示目录数量",
+    showCountsDesc: "在左侧目录树显示数量",
     labelKeys: "颜色标签快捷键",
     labelKeysDesc: "打标修饰键（被占用换 Alt）",
     // Phase 5 · XMP 边车(三档开关, 默认"询问" —— 会话 ⑥ 由"关闭"改来, 见 src/xmp.ts)
@@ -60,8 +62,8 @@ export default {
     // Phase 7 · Lightroom 衔接(设置里的发送模式; 状态文案同样拼进 desc, 不新增行)
     lrcMode: "Lightroom 衔接",
     lrcModeDialog: "打开导入",
-    lrcModeSilent: "静默导入",
-    lrcModeSilentWhy: "需先在 Lightroom 里配置“自动导入”的监听文件夹，尚未支持",
+    lrcModeSilent: "静默导入（未支持）",
+    lrcModeSilentWhy: "需先在 Lightroom 配置“自动导入”（尚未支持）",
     lrcReprobe: "重新检测",
     lrcProbing: "检测中…",
     lrcNotFound: "未检测到 Lightroom Classic",
@@ -69,6 +71,13 @@ export default {
     lrcNotRunning: "未运行",
     transparentBg: "透明毛玻璃背景",
     transparentBgDesc: "用 Windows Mica 玻璃背景",
+  transparentBgDescMac: "macOS 的透明玻璃背景",
+  lrcUnsupportedMac: "macOS 版暂不支持 Lightroom 衔接（仅 Windows）",
+  macPermTitle: "macOS 需要文件访问权限",
+  macPermBody: "读取照片和写 .xmp 会触发权限询问；授予一次「完全磁盘访问权限」即可避免反复弹窗。",
+  macPermPath: "系统设置 → 隐私与安全性 → 完全磁盘访问权限 → 勾选 ImageFilter",
+  macPermOpen: "打开系统设置",
+  macPermLater: "稍后再说",
     transparentBgUnsupported: "当前系统不支持（需要 Windows 11）",
     transparentBgOpacity: "标题栏玻璃透明度",
     transparentBgOpacityDesc: "只影响标题栏",
@@ -117,6 +126,7 @@ export default {
   // ── 设备面板 ──
   devices: {
     panel: "设备",
+    disks: "磁盘",
     refresh: "刷新",
     open: "打开",
     eject: "弹出设备",
@@ -133,6 +143,8 @@ export default {
     loading: "加载中...",
     counting: "正在读取照片...",
     photos: "{n} 张",
+    folders: "{n} 文件夹",
+    videos: "{n} 视频",
     ready: "就绪",
   },
 
@@ -384,6 +396,125 @@ export default {
       noNewPhotos: "选中的 {n} 张在目标里都已经有了（内容相同），没有新照片可导入",
       unknown: "未知错误",
     },
+  },
+
+  // ── Phase 8 · 图库服务(手机端) ──
+  // 面板长在设置对话框里(见 src/components/settings-dialog.tsx 的 ServerPanel): 开关/监听状态/
+  // 配对码/共享目录/排查清单。状态形状见 src-tauri/src/server/mod.rs 的 ServerStatus(camelCase)。
+  server: {
+    title: "局域网远程浏览",
+    switchDesc: "远程服务开关，默认关闭",
+    on: "已开启",
+    off: "已关闭",
+    listening: "正在监听 {url}",
+    // 开启失败时的那一句: 后端刻意**不**回滚开关(Task 8), 所以"你要它开、它没在跑"是合法状态,
+    // 界面必须如实说, 并把 lastError 摆在旁边 —— 否则用户只会以为自己没点中。
+    wantedNotRunning: "服务未运行",
+    // 关闭不是"瞬间断开所有连接": stop() 之后端口还有一个**有界**的收敛窗口(实测最坏 63ms),
+    // 期间仍可能完成握手。界面不许把"关"说成比实际更强(这条措辞就是那个边界)。
+    offNote: "已关闭",
+    lastError: "上次的错误",
+    tokenLabel: "配对码",
+    tokenDesc: "重置后需重新配对",
+    tokenEmpty: "服务启动时自动生成",
+    copy: "复制",
+    copied: "已复制",
+    copyFailed: "复制失败，请手动复制",
+    rotate: "重置",
+    rotateConfirm: "确认重置",
+    sharesLabel: "共享目录",
+    sharesDesc: "允许访问目录",
+    shareEmpty: "尚未共享目录：手机端无法访问",
+    pathPlaceholder: "输入文件夹路径",
+    browse: "浏览…",
+    add: "添加",
+    remove: "移除",
+    unavailable: "无法获取服务状态：{reason}",
+    actionFailed: "操作失败：{reason}",
+    tipsTitle: "无法连接？",
+    sleepTip: "睡眠模式关闭（系统电源设置中更改为“从不”）",
+    firewallTip: "首次开启时在 Windows 防火墙允许“专用网络”",
+    // M4′ Task 2：LAN-only 决策（2026-10-07）之后**不再有“隧道”这个选项** ——
+    // 原文案里的“或都加入了同一个 EasyTier/Tailscale 网络”已按决策删除。
+    appRunningTip: "检查：电脑是否睡眠、应用运行状态、服务正常启动、相同局域网环境",
+
+    // ── M4′ Task 2 · 局域网地址 / 防火墙 / 公用网络防护（LAN-only） ──
+    // 面板长在 ServerPanel 里；数据来自 `get_server_network_hints`（NetHints, camelCase）。
+    // 纪律：面板里**不许**出现“隧道 / EasyTier / Tailscale / 端口转发 / 公网暴露”的入口 ——
+    // 本设计明确不做公网暴露，只警告（规格 §4.3）。
+    lanTitle: "局域网地址",
+    lanDesc: "手机与电脑需在同一局域网环境",
+    lanEmpty: "未检测到局域网地址",
+    rescan: "重新检测",
+    firewallHintTitle: "防火墙问题",
+    firewallHint: "Windows 安全中心 → 防火墙和网络保护 → 允许应用通过防火墙 → ImageFilter → 勾选“专用”。",
+    firewallHintGeneric: "在 Windows 防火墙允许 ImageFilter 通过“专用网络”。",
+    publicTitle: "当前网络被 Windows 标为“公用”",
+    publicWarn: "“公用”是不可信网络，存在一定风险",
+    publicOffer: "建议使用专用网络",
+    publicConfirm: "我了解风险，仍要开启",
+    publicAck: "已在 {time} 确认风险",
+    publicAckNoTime: "本次运行已确认风险",
+    publicIpTitle: "局域网地址错误",
+    publicIpWarn: "{list} 存在暴露风险；已了解风险确认开启。",
+    profileUnknown: "当前为未知网络；已了解风险确认开启。",
+
+    // ── M4′ Task 1 · 配对二维码（桌面端生成） ──
+    // 数据来自 `get_server_pairing_qr`（PairingQr, camelCase）；返回 null = 这次没有二维码。
+    // 后端**不会**在没有私有地址时回落到公网地址或 127.0.0.1，所以这里必须把原因说出来，
+    // 而不是画一个空框：没有局域网地址时原因由上面的 lanEmpty 负责，只有"有地址、没配对码"
+    // 这一种才由 qrNoToken 负责。
+    // Fix 1：二维码只在服务**真的在监听**时才有（后端没在监听就返回 null）。没在监听时
+    // 由 qrNotRunning 说清原因并保留手输那条路 —— 一张装在配置端口上的码会把手机指向
+    // 一个没人听的端口，而它看上去比一句话更权威。
+    qrShow: "用手机扫码连接",
+    qrHide: "收起二维码",
+    qrScanHint: "使用手机 ImageFilter 扫码",
+    qrNoToken: "服务启动后生成配对码与二维码。",
+    qrNotRunning: "服务异常；请先检查服务状态，或手动填写下方信息。",
+    // 扫码是增强，不是唯一路径（M4′ Task 1 Step 4 第 3 条：拒绝相机权限也要能配对）。
+    qrFallback: "无法使用？尝试手动配对？",
+
+    // ── M4′ Task 3 · 只读模式 ──
+    // 「开」= 所有写端点回 403 forbiddenPath（复用既有码，不新造）；读端点照常。
+    readOnly: "只读模式",
+    readOnlyDesc: "手机端仅浏览",
+
+    // ── M4′ Task 3 · 谁在连我 ──
+    // 纪律：这里只有 HTTP 这一层真的知道的东西。**不许**编设备名或位置。
+  },
+
+  // ── 2026-10-25 · mDNS 配对（桌面端） ──
+  // 配对窗口 / 待确认请求 / 已连接设备。命令与事件见 src/lib/pairing.ts（冻结契约 §0.3）。
+  // 纪律：v1 的「移除」只是忘记这台设备，**不吊销**配对码 —— forgetNote 必须把这件事写清楚，
+  // 否则用户会以为移除 = 已经踢下线（真正吊销只能轮换配对码，所有设备重连）。
+  pairing: {
+    sectionTitle: "配对新设备",
+    windowHint: "配对前请点击此按钮接收配对请求",
+    openWindow: "配对新设备",
+    closeWindow: "关闭配对窗口",
+    windowOpen: "配对窗口已打开",
+    windowClosed: "配对窗口未打开",
+    serviceOff: "先开启远程服务",
+    remaining: "剩余 {time}",
+    pendingTitle: "待确认的请求",
+    pendingDesc: "请求 60 秒后自动过期",
+    morePending: "还有 {n} 个待确认请求",
+    pairedDevices: "已连接设备",
+    noDevices: "暂无已配对设备",
+    forget: "移除",
+    lastSeen: "最近连接 {time}",
+    requestTitle: "配对请求",
+    requestBody: "这台设备想连接图库服务。请确认它是你自己的设备，且在同一局域网环境。",
+    deviceOn: "设备：{name}（{ip}）",
+    requestedAt: "请求时间 {time}",
+    expiresIn: "请求将在 {seconds} 秒后自动过期",
+    expired: "请求已过期",
+    allow: "允许",
+    deny: "拒绝",
+    advanced: "高级 / 手动配对",
+    actionFailed: "操作失败：{reason}",
+    unavailable: "未知配对状态：{reason}",
   },
 
 };

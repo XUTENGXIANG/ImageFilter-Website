@@ -1,6 +1,7 @@
 // Copyright (c) 2026 XUTENGXIANG
 // SPDX-License-Identifier: MIT
 import { useEffect, useState, useMemo, useRef, useCallback, memo } from "react";
+import { createPortal } from "react-dom";
 import { invoke, convertFileSrc } from "@tauri-apps/api/core";
 import { useTranslation } from "react-i18next";
 import type { TFunction } from "i18next";
@@ -8,11 +9,15 @@ import { PixelMenu, SEPARATOR, type MenuItem } from "./contextmenu";
 import { FloatingPanel } from "./panel";
 import { PhotoViewer } from "./viewer";
 import { useScanner } from "./useScanner";
+import { useLocalStorageBoolean } from "./hooks/use-local-storage-setting";
 import { TitleBar } from "./components/title-bar";
+import { MacPermissionGuide } from "./components/macos-permission-guide";
+import { PairingDialogHost } from "./components/pairing-dialog";
 import { ExifPanel } from "./components/exif-panel";
 import { WelcomeGuide } from "./components/welcome-guide";
 import { ScrollFadeZone } from "./components/scroll-fade-zone";
 import { FolderTreeItem } from "./components/folder-tree-item";
+import { Tip } from "./components/tip";
 import { PhotoCard } from "./components/photo-card";
 import {
   osDefaultGlass,
@@ -32,8 +37,8 @@ import {
 //    支持 theme="outline|filled|two-tone|multi-color" size fill 等
 //    请不要混用 emoji/文字符号 等其他图标方案
 // ═══════════════════════════════════════════════════════════════════
-import { Disk, DiskOne } from "@icon-park/react";
-import type { ScannedPhoto, AnalysisResult, FlagFilter } from "./types";
+import { Disk, DiskOne, FolderClose, Movie, Rotate } from "@icon-park/react";
+import type { ScannedPhoto, AnalysisResult, FlagFilter, FolderNode } from "./types";
 import type { Patch } from "./undo";
 import { LABEL_ORDER, isLabelChord, type Label } from "./labels";
 import { xmpErrKey, type XmpNotice } from "./xmp";
@@ -59,6 +64,17 @@ function patchToast(t: TFunction, p: Patch, kind: "undo" | "redo"): string {
     what = t("toast.selectionChange", { n: p.next.length });
   }
   return `${verb}：${what}`;
+}
+
+/** 在已加载的目录树里找当前文件夹节点；找不到 = 不是叶子/还没加载。 */
+function findFolderNode(root: FolderNode | null, path: string): FolderNode | null {
+  if (!root) return null;
+  if (root.path === path) return root;
+  for (const child of root.children) {
+    const hit = findFolderNode(child, path);
+    if (hit) return hit;
+  }
+  return null;
 }
 
 /**
@@ -167,6 +183,8 @@ const PhotoGridItem = memo(function PhotoGridItem({
 
 function App({ osCapabilities }: { osCapabilities: OsCapabilities }) {
   const { t } = useTranslation();
+  // 目录树里的数量显示开关。默认开; 只影响显示, 不影响扫描/计数。
+  const [showCounts, setShowCounts] = useLocalStorageBoolean("imagefilter-show-counts", true);
   const {
     drives,
     selectedDrive,
@@ -177,7 +195,6 @@ function App({ osCapabilities }: { osCapabilities: OsCapabilities }) {
     thumbnails,
     browsing,
     loadingFolder,
-    counting,
     detectDrives,
     browseDrive,
     loadFolder,
@@ -280,12 +297,13 @@ function App({ osCapabilities }: { osCapabilities: OsCapabilities }) {
   }, [lrcPhase]);
   // (位置在 Ctrl+Z effect 之前: 那个 effect 的依赖数组会被急切求值, showToast 若是
   //  const 声明在后面就触发 TDZ — 与 viewerIndex 是同一条纪律)
-  const [toast, setToast] = useState<string | null>(null);
+  type ToastTone = "success" | "error" | "info";
+  const [toast, setToast] = useState<{ text: string; tone: ToastTone } | null>(null);
   const toastTimer = useRef<number | undefined>(undefined);
-  // ms 默认 1200(既有手感不变); Phase 5 的边车失败提示传 4000 ——
-  // "写入 .xmp 失败：存储卡处于写保护（只读）" 这类长文案 1.2s 读不完(会话 ② 已记录)。
-  const showToast = (msg: string, ms = 1200) => {
-    setToast(msg);
+  // ms 默认 1200(既有手感不变); 失败提示传 4000 —— "写入 .xmp 失败：存储卡处于写保护（只读）"
+  // 这类长文案 1.2s 读不完(会话 ② 已记录)。tone 只影响配色；文案本身仍要说清成功/失败。
+  const showToast = (msg: string, ms = 1200, tone: ToastTone = "info") => {
+    setToast({ text: msg, tone });
     window.clearTimeout(toastTimer.current);
     toastTimer.current = window.setTimeout(() => setToast(null), ms);
   };
@@ -294,7 +312,7 @@ function App({ osCapabilities }: { osCapabilities: OsCapabilities }) {
   // hook 只给"发生了什么"(notice.seq 保证每次都重新触发), 文案在这里用 i18n 拼。
   useEffect(() => {
     if (!xmpNotice) return;
-    showToast(xmpNoticeText(t, xmpNotice), 4000);
+    showToast(xmpNoticeText(t, xmpNotice), 4000, xmpNotice.kind === "failed" ? "error" : "info");
     // 只依赖 notice 本身: seq 变了就是一次新提示
   }, [xmpNotice]);
 
@@ -302,7 +320,7 @@ function App({ osCapabilities }: { osCapabilities: OsCapabilities }) {
   // 它需要同时说明"发的是哪个文件夹"和"还有 N 个文件夹没发", 一句话 toast 装不下)。
   useEffect(() => {
     if (!lrcNotice) return;
-    showToast(lrcNoticeText(t, lrcNotice), 4000);
+    showToast(lrcNoticeText(t, lrcNotice), 4000, "error");
   }, [lrcNotice]);
 
   // Disable browser default context menu
@@ -514,14 +532,29 @@ function App({ osCapabilities }: { osCapabilities: OsCapabilities }) {
   // 不能只看 platform —— 否则一次注册表读取失败就会把 Win11 用户的开关置灰。
   const micaUnsupported = isMicaUnsupported(osCapabilities);
 
+  // ── macOS 的窗口外观必须单独处理 ────────────────────────────────────────────
+  // Windows 11 的 DWM 会给无边框窗口**自动**加圆角, 所以这套自绘窗口在 Windows 上
+  // 看起来是有圆角的; macOS 不会给无边框(且透明)窗口任何圆角, 于是四角是方的。
+  // 因此: 确认是 macOS 时, 由外壳自己把窗口裁成圆角(窗口本身透明, 见 tauri.conf.json
+  // 的 macOSPrivateApi —— 没有它 macOS 上 transparent 不生效, 圆角裁了也看不见)。
+  // 探测失败("unknown")一律走 Windows 路径, 不改动未知平台的行为。
+  const isMac = osCapabilities.platform === "macos";
+
   useEffect(() => {
     localStorage.setItem("imagefilter-glass", transparentBg ? "1" : "0");
   }, [transparentBg]);
 
   // 浮窗后面整块背景毛玻璃的透明度: 默认 0% 完全透明
   const [backgroundOpacity, setBackgroundOpacity] = useState<number>(() => {
-    const v = Number(localStorage.getItem("imagefilter-background-opacity"));
-    return Number.isFinite(v) ? Math.min(100, Math.max(0, v)) : 0;
+    const raw = localStorage.getItem("imagefilter-background-opacity");
+    if (raw !== null) {
+      const v = Number(raw);
+      return Number.isFinite(v) ? Math.min(100, Math.max(0, v)) : 0;
+    }
+    // macOS 默认 70(用户要求): 那边窗口是透明的, 纯透明会显得空。Windows 保持 0。
+    // 注意 Number(null) === 0 且是有限数 —— "没存过"必须先用 raw !== null 判掉,
+    // 否则这个按平台分支的默认值永远走不到。
+    return osCapabilities.platform === "macos" ? 70 : 0;
   });
 
   // "扫描目录结构..." 只在真的等了一会儿之后才出现。
@@ -638,17 +671,31 @@ function App({ osCapabilities }: { osCapabilities: OsCapabilities }) {
         : convertFileSrc(selectedPhoto.path))
     : null;
 
+  const activeNode = activeFolder ? findFolderNode(folderTree, activeFolder) : null;
+  // 只有"数量显示开着 + 选了叶子文件夹 + 真的有照片"才显示张数。
+  // 未选目录、选中有子目录的文件夹、数量显示关闭、空目录 —— 一律显示状态。
+  // 视频不算进"张"; 它们的数量在目录树的视频角标上单独显示。
+  const activePhotoCount = photos.filter((p) => !p.isVideo).length;
+  const footerPhotoCount =
+    showCounts && activeNode !== null && !activeNode.hasSubdirs && activePhotoCount > 0
+      ? activePhotoCount
+      : null;
+
   return (
     <div
-      className={`flex flex-col h-screen w-screen overflow-hidden text-zinc-100 transition-colors duration-200 ${transparentBg ? "" : "bg-zinc-950"}`}
+      className={`flex flex-col h-screen w-screen overflow-hidden text-zinc-100 transition-colors duration-200 ${isMac ? "rounded-xl" : ""} ${transparentBg ? "" : "bg-zinc-950"}`}
       style={transparentBg ? { backgroundColor: backgroundOpacity > 0 ? "var(--background-bg)" : "transparent" } : undefined}
     >
+      <MacPermissionGuide isMac={isMac} />
       {/* Custom title bar */}
       <TitleBar
+        platform={osCapabilities.platform}
         preloadFull={preloadFull}
         onTogglePreloadFull={togglePreloadFull}
         autoAdvance={autoAdvance}
         onToggleAutoAdvance={toggleAutoAdvance}
+        showCounts={showCounts}
+        onToggleShowCounts={() => setShowCounts(!showCounts)}
         labelModifier={labelModifier}
         onLabelModifierChange={setLabelModifier}
         xmpMode={xmpMode}
@@ -672,47 +719,62 @@ function App({ osCapabilities }: { osCapabilities: OsCapabilities }) {
           { label: t("devices.refresh"), action: () => selectedDrive && browseDrive(selectedDrive!) },
           //{ label: "刷新设备列表", action: detectDrives },
         ]}>
-        <div className="px-3 pt-2 pb-1 flex items-center">
-          <button onClick={() => selectedDrive && browseDrive(selectedDrive!)} className="press-solid text-[10px] leading-4 px-3 py-1 rounded bg-zinc-800 hover:bg-zinc-700 text-zinc-400 transition-colors">{t("devices.refresh")}</button>
+        <div className="flex items-center justify-between px-2.5 pt-2 pb-1">
+          <span className="text-[10px] font-medium tracking-[0.12em] text-zinc-600">
+            {t("devices.disks")}
+          </span>
+          <Tip label={t("devices.refresh")}>
+            <button
+              onClick={() => selectedDrive && browseDrive(selectedDrive!)}
+              disabled={!selectedDrive}
+              className="w-5 h-5 flex items-center justify-center rounded text-zinc-600 hover:text-zinc-300 hover:bg-zinc-800 disabled:opacity-30 disabled:pointer-events-none transition-colors"
+            >
+              <Rotate theme="outline" size={12} strokeWidth={3} />
+            </button>
+          </Tip>
         </div>
         {/* 设备列表 — 每个设备独立右键菜单, 可移动设备含"弹出设备" */}
-        <div className="px-2.5 pb-1 space-y-0.5 max-h-36 overflow-auto no-scrollbar">
+        <div className="px-2.5 pb-1.5 space-y-0.5 max-h-40 overflow-auto no-scrollbar">
             {drives.map((d) => (
             <PixelMenu key={d.mountPoint} items={[
               { label: t("devices.open"), action: () => browseDrive(d.mountPoint) },
               d.driveType === "removable" ? { label: t("devices.eject"), action: () => {
                 invoke("eject_drive", { mountPoint: d.mountPoint })
                   .then(() => {
-                    showToast(t("devices.ejectOk", { dir: d.mountPoint }));
+                    showToast(t("devices.ejectOk", { dir: d.mountPoint }), 1500, "success");
                     setTimeout(detectDrives, 800); // 弹出后刷新设备列表
                   })
-                  .catch((e) => { console.error("eject failed:", e); showToast(t("devices.ejectFail")); });
+                  .catch((e) => { console.error("eject failed:", e); showToast(t("devices.ejectFail"), 4000, "error"); });
               } } : { label: t("devices.fixedDisk"), disabled: true },
               { label: t("devices.refreshList"), action: () => selectedDrive && browseDrive(selectedDrive!)  },
             ].filter(Boolean) as MenuItem[]}>
             <button
               onClick={() => browseDrive(d.mountPoint)}
               data-selected={selectedDrive === d.mountPoint}
-              className={`press-row w-full text-left px-1.5 py-1.5 rounded text-xs flex items-center gap-1.5 ${
+              className={`press-row relative w-full text-left pl-2 pr-1.5 py-1.5 rounded-2xl text-[12px] flex items-center gap-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/50 focus-visible:ring-offset-1 focus-visible:ring-offset-zinc-900 ${
                 selectedDrive === d.mountPoint
-                  ? "bg-emerald-900/30 text-emerald-300"
-                  : "hover:bg-zinc-800/50 text-zinc-400"
+                  ? "bg-emerald-500/10 text-emerald-300"
+                  : "hover:bg-zinc-800/60 text-zinc-400"
               }`}
             >
+              {selectedDrive === d.mountPoint && (
+                <span className="absolute left-0 top-1/2 -translate-y-1/2 h-3.5 w-[2px] rounded-full bg-emerald-400" aria-hidden="true" />
+              )}
               {/* 可移动设备=U盘图标, 固定磁盘=磁盘图标 (IconPark) */}
               {d.driveType === "removable"
-                ? <DiskOne theme="filled" size="15" strokeWidth={3} className="text-emerald-500 flex-shrink-0" />
-                : <Disk theme="filled" size="15" strokeWidth={3} className="text-zinc-500 flex-shrink-0" />}
+                ? <DiskOne theme="filled" size={14} strokeWidth={3} className="text-brand flex-shrink-0" />
+                : <Disk theme="filled" size={14} strokeWidth={3} className="text-zinc-500 flex-shrink-0" />}
               <span className="truncate">{d.label}</span>
+              <span className="ml-auto max-w-[56px] shrink-0 truncate text-[10px] tabular-nums text-zinc-600">{d.mountPoint}</span>
             </button>
             </PixelMenu>
           ))}
           {drives.length === 0 && (
-            <p className="text-zinc-600 text-[11px] px-2">{t("devices.noDevices")}</p>
+            <p className="text-zinc-600 text-[11px] px-2 py-2">{t("devices.noDevices")}</p>
           )}
         </div>
 
-        <div className="flex-1 overflow-auto px-1.5 py-1.5 no-scrollbar">
+        <div className="flex-1 overflow-auto px-2 py-1.5 no-scrollbar">
           {/* 整个区域由 browsing 把门：正在扫描时, 除了"等久了才出现"的提示, 什么都不显示。
               为什么必须这么写: 这条链是 扫描中 → 树 → 未扫描/选择设备。如果把"扫描中"改成
               延迟出现却不把门, 那 150ms 里链子就会掉到最后一段 —— 而 browseDrive 已经设上了
@@ -720,23 +782,44 @@ function App({ osCapabilities }: { osCapabilities: OsCapabilities }) {
               门内留空, 外面就永远看不到中间态。 */}
           {browsing ? (
             showScanning ? (
-              <p className="text-[11px] text-emerald-500 px-1 animate-pulse">
+              <p className="text-[11px] text-brand px-1 animate-pulse">
                 {t("devices.scanning")}
               </p>
             ) : null
           ) : folderTree ? (
             <div className="tree-enter">
-              <div className="border-t border-zinc-800/50 mb-1.5" />
+              <div className="border-t border-zinc-800/60 dark:border-white/[0.06] my-1.5" />
               <button
                 onClick={() => loadFolder(folderTree.path)}
                 data-selected={activeFolder === folderTree.path}
-                className={`press-row w-full text-left px-2 py-1 rounded border text-[11px] mb-1 ${
+                className={`press-row relative w-full text-left pl-2 pr-2 py-1.5 rounded-2xl text-[12px] flex items-center gap-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/50 focus-visible:ring-offset-1 focus-visible:ring-offset-zinc-900 ${
                   activeFolder === folderTree.path
-                    ? "bg-emerald-900/30 border-emerald-800/50 text-emerald-300"
-                    : "bg-zinc-800/20 border-zinc-800/30 text-zinc-400 hover:bg-zinc-800/40"
+                    ? "bg-emerald-500/10 text-emerald-300"
+                    : "text-zinc-400 hover:bg-zinc-800/60"
                 }`}
               >
-                {t("devices.root")}
+                {activeFolder === folderTree.path && (
+                  <span className="absolute left-0 top-1/2 -translate-y-1/2 h-3.5 w-[2px] rounded-full bg-emerald-400" aria-hidden="true" />
+                )}
+                <FolderClose theme="filled" size={12} className="flex-shrink-0 text-zinc-500" />
+                <span className="truncate">{t("devices.root")}</span>
+                {showCounts && (
+                  <span className="ml-auto flex items-center gap-1.5 flex-shrink-0 whitespace-nowrap">
+                    {folderTree.videoCount > 0 && (
+                      <span className="flex items-center gap-0.5" title={t("devices.videos", { n: folderTree.videoCount })}>
+                        <Movie theme="filled" size={10} className={activeFolder === folderTree.path ? "text-brand-hover/70" : "text-zinc-600"} />
+                        <span className={`text-[10px] tabular-nums ${activeFolder === folderTree.path ? "text-brand-hover/70" : "text-zinc-600"}`}>
+                          {folderTree.videoCount}
+                        </span>
+                      </span>
+                    )}
+                    <span className={`text-[10px] tabular-nums ${activeFolder === folderTree.path ? "text-brand-hover/70" : "text-zinc-600"}`}>
+                      {folderTree.hasSubdirs
+                        ? t("devices.folders", { n: folderTree.subfolderCount })
+                        : t("devices.photos", { n: folderTree.photoCount })}
+                    </span>
+                  </span>
+                )}
               </button>
               {folderTree.children.map((child) => (
                 <FolderTreeItem
@@ -745,19 +828,37 @@ function App({ osCapabilities }: { osCapabilities: OsCapabilities }) {
                   activeFolder={activeFolder}
                   onSelect={loadFolder}
                   depth={1}
-                  counting={counting}
+                  showCounts={showCounts}
                 />
               ))}
             </div>
           ) : (
-            <p className="text-zinc-600 text-[11px] px-1">
+            <p className="text-zinc-600 text-[11px] px-2 py-2">
               {selectedDrive ? t("devices.notScanned") : t("devices.selectDevice")}
             </p>
           )}
         </div>
 
-        <div className="p-2 border-t border-zinc-800 text-[10px] text-zinc-600">
-          {browsing ? t("devices.browsing") : loadingFolder ? t("devices.loading") : counting ? t("devices.counting") : selectedDrive ? t("devices.photos", { n: photos.length }) : t("devices.ready")}
+        <div className="px-3 py-2 border-t border-zinc-800/60 dark:border-white/[0.06] flex items-center gap-2 text-[10px] text-zinc-500">
+          <span
+            className={`w-1.5 h-1.5 rounded-full shrink-0 ${
+              browsing || loadingFolder
+                ? "bg-amber-400"
+                : selectedDrive
+                  ? "bg-emerald-500"
+                  : "bg-zinc-600"
+            }`}
+            aria-hidden="true"
+          />
+          <span className="truncate tabular-nums">
+            {browsing
+              ? t("devices.browsing")
+              : loadingFolder
+                ? t("devices.loading")
+                : footerPhotoCount !== null
+                  ? t("devices.photos", { n: footerPhotoCount })
+                  : t("devices.ready")}
+          </span>
         </div>
         </PixelMenu>
       </FloatingPanel>
@@ -835,7 +936,7 @@ function App({ osCapabilities }: { osCapabilities: OsCapabilities }) {
             >
               {/* 维度③ 的提示: 只看分析结果、还有没分析过的照片时才出现(docs 4.2) */}
               {showPendingHint && (
-                <div className="mb-2 flex items-center gap-2 text-[11px] text-amber-200/90 bg-amber-500/10 border border-amber-500/20 rounded-lg px-3 py-1.5">
+                <div className="mb-2 flex items-center gap-2 text-[11px] text-amber-200/90 bg-amber-500/10 border border-amber-500/20 rounded-2xl px-3 py-1.5">
                   <span>{t("grid.pendingAnalysis", { n: pendingAnalysis.length })}</span>
                   <button
                     onClick={() => runAnalysis(pendingAnalysis)}
@@ -846,7 +947,7 @@ function App({ osCapabilities }: { osCapabilities: OsCapabilities }) {
               )}
               {/* 三维筛到 0 张的兜底: "未分析"提示盖不住"全分析完但没命中"这一支 */}
               {showNoMatch && (
-                <div className="mb-2 flex items-center gap-2 text-[11px] text-zinc-400 bg-zinc-800/40 border border-zinc-700/40 rounded-lg px-3 py-1.5">
+                <div className="mb-2 flex items-center gap-2 text-[11px] text-zinc-400 bg-zinc-800/40 border border-zinc-700/40 rounded-2xl px-3 py-1.5">
                   <span>{t("grid.noMatch")}</span>
                   <button
                     onClick={clearFilters}
@@ -968,14 +1069,14 @@ function App({ osCapabilities }: { osCapabilities: OsCapabilities }) {
             <button
               type="button"
               onClick={() => resolveXmpAsk("off")}
-              className="px-3 py-1.5 rounded-md border border-border text-sm hover:bg-muted"
+              className="px-3 py-1.5 rounded-2xl border border-border text-sm hover:bg-muted"
             >
               {t("xmp.askNo")}
             </button>
             <button
               type="button"
               onClick={() => resolveXmpAsk("on")}
-              className="px-3 py-1.5 rounded-md bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-medium"
+              className="px-3 py-1.5 rounded-2xl bg-brand-strong hover:bg-brand text-white text-sm font-medium"
             >
               {t("xmp.askYes")}
             </button>
@@ -1000,7 +1101,7 @@ function App({ osCapabilities }: { osCapabilities: OsCapabilities }) {
             <button
               type="button"
               onClick={() => setLrcAlreadyRunning(false)}
-              className="px-3 py-1.5 rounded-md border border-border text-sm hover:bg-muted"
+              className="px-3 py-1.5 rounded-2xl border border-border text-sm hover:bg-muted"
             >
               {t("lrc.runningRetry")}
             </button>
@@ -1008,7 +1109,7 @@ function App({ osCapabilities }: { osCapabilities: OsCapabilities }) {
               type="button"
               disabled={lrcSending}
               onClick={forceCloseLightroomAndRetry}
-              className="px-3 py-1.5 rounded-md bg-red-600 hover:bg-red-500 disabled:bg-zinc-700 text-white text-sm font-medium"
+              className="px-3 py-1.5 rounded-2xl bg-danger-strong hover:bg-danger-strong/90 disabled:bg-zinc-700 text-white text-sm font-medium"
             >
               {lrcSending ? t("lrc.sending") : t("lrc.runningForce")}
             </button>
@@ -1027,14 +1128,33 @@ function App({ osCapabilities }: { osCapabilities: OsCapabilities }) {
         onOpenChange={setLrcProgressOpen}
       />
 
-      {/* 弹出提示浮窗 — 渐变出现停留1秒后消失 */}
-      <div
-        className={`fixed top-16 left-1/2 -translate-x-1/2 px-4 py-2 rounded-lg bg-emerald-600/90 text-white text-sm shadow-2xl z-[200] transition-all duration-300 ${
-          toast ? "opacity-100 scale-100" : "opacity-0 scale-95 pointer-events-none"
-        }`}
-      >
-        {toast}
-      </div>
+      {/* mDNS 配对确认框(计划 2026-10-25 Task B2)。
+          挂在应用根: 无论设置对话框开着哪一页、甚至完全没开, 手机发起的配对请求都要能
+          被看到 —— 请求只活 60 秒, 藏在任何面板里都等于错过。 */}
+      <PairingDialogHost />
+
+      {/* 轻提示 — 短暂出现、自动消失；失败红色 / 成功 emerald / 普通信息 zinc。
+          通过 portal 挂到 body 顶层：对话框 / 菜单 / 面板各建各的 stacking context，
+          留在应用根节点里时 z-index 再高也可能被盖住或被 overflow 裁掉。 */}
+      {createPortal(
+        <div
+          role="status"
+          aria-live="polite"
+          aria-atomic="true"
+          className={`fixed top-16 left-1/2 -translate-x-1/2 px-4 py-2 rounded-2xl text-white text-sm shadow-2xl z-[9999] transition-[opacity,transform] duration-300 ${
+            toast ? "opacity-100 scale-100" : "opacity-0 scale-95 pointer-events-none"
+          } ${
+            toast?.tone === "error"
+              ? "bg-danger-strong/90"
+              : toast?.tone === "success"
+                ? "bg-brand-strong/90"
+                : "bg-zinc-700/95"
+          }`}
+        >
+          {toast?.text}
+        </div>,
+        document.body,
+      )}
     </div>
   );
 }

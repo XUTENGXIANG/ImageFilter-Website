@@ -67,6 +67,20 @@ type Handler = (args: Record<string, unknown>) => Promise<unknown>;
 /** Phase 6 / 6.2: demo 会话内的命名方案副本(初始值 = 真机 init_db 播种的内容) */
 const demoRules = fakeData.getRules();
 
+/** 1.3.0 · 图库服务面板的演示状态. 真机默认关闭, 这里也默认关闭. */
+let demoServerStatus = {
+  running: false,
+  port: 0,
+  url: "",
+  token: "demo-token",
+  shares: [] as string[],
+  enabled: false,
+  lastError: null as string | null,
+  publicAckAt: null as number | null,
+  readOnly: false,
+};
+let demoPairingOpen = false;
+
 const handlers: Record<string, Handler> = {
   // ---- drives & browsing ----
   detect_drives: async () => fakeData.getDrives(),
@@ -251,6 +265,75 @@ const handlers: Record<string, Handler> = {
 
   is_dir_empty: async () => true,
 
+  // ---- Phase 8 · 图库服务 / mDNS 配对（1.3.0）----
+  // 设置面板打开就会读这几项；mock 对未知命令直接 throw，缺一个面板就报错。
+  get_server_status: async () => ({
+    ...demoServerStatus,
+    shares: [...demoServerStatus.shares],
+  }),
+
+  get_server_network_hints: async () => ({
+    lan: [{ address: "192.168.1.10", interface: "Wi-Fi" }],
+    publicIpv4: [],
+    profile: "private",
+    firewallHint: "",
+  }),
+
+  get_server_pairing_qr: async () => null,
+
+  rotate_server_token: async () => {
+    demoServerStatus.token = `demo-${Date.now().toString(36)}`;
+  },
+
+  add_share: async (a) => {
+    const path = String(a.path ?? "");
+    if (path && !demoServerStatus.shares.includes(path)) demoServerStatus.shares.push(path);
+    return [...demoServerStatus.shares];
+  },
+
+  remove_share: async (a) => {
+    const path = String(a.path ?? "");
+    demoServerStatus.shares = demoServerStatus.shares.filter((item) => item !== path);
+    return [...demoServerStatus.shares];
+  },
+
+  set_server_enabled: async (a) => {
+    const enabled = Boolean(a.enabled);
+    demoServerStatus.enabled = enabled;
+    demoServerStatus.running = enabled;
+    demoServerStatus.port = enabled ? 47832 : 0;
+    demoServerStatus.url = enabled ? "http://192.168.1.10:47832" : "";
+    demoServerStatus.lastError = null;
+  },
+
+  set_server_read_only: async (a) => {
+    demoServerStatus.readOnly = Boolean(a.readOnly);
+  },
+
+  get_server_clients: async () => [],
+
+  open_pairing_window: async () => {
+    demoPairingOpen = true;
+    return { expiresAt: Date.now() + 300_000 };
+  },
+
+  close_pairing_window: async () => {
+    demoPairingOpen = false;
+  },
+
+  pairing_status: async () => ({
+    open: demoPairingOpen,
+    pending: [],
+    paired: [],
+  }),
+
+  approve_pairing: async () => undefined,
+  deny_pairing: async () => undefined,
+  forget_paired_device: async () => undefined,
+
+  // macOS 权限引导（demo 里平台是 Windows，正常不会显示；兜底 no-op）
+  open_macos_privacy_settings: async () => undefined,
+
   // ---- misc ----
   set_glass_bg: async () => undefined,
 
@@ -295,6 +378,18 @@ export function getCurrentWindow() {
     isMaximized: async () => false,
     onResized: () => {},
   };
+}
+
+// ---------------------------------------------------------------------------
+// @tauri-apps/api/event（1.3.0 起配对事件走动态 import）
+// ---------------------------------------------------------------------------
+
+/** 演示里没有真实的配对事件源；返回一个可退订的空监听，避免调用方 reject。 */
+export async function listen<T>(
+  _event: string,
+  _handler: (event: { payload: T }) => void,
+): Promise<() => void> {
+  return () => {};
 }
 
 // ---------------------------------------------------------------------------

@@ -37,3 +37,15 @@ declare module "@tauri-apps/plugin-opener" {
 declare module "@tauri-apps/plugin-dialog" {
   export const open: (options?: { directory?: boolean; title?: string }) => Promise<string | null>;
 }
+
+// 1.3.0 起配对事件走动态 import("@tauri-apps/api/event")。
+// alias 已把该子路径映射到 tauri-mock.ts，这里补类型声明让 tsc 通过。
+declare module "@tauri-apps/api/event" {
+  export interface Event<T> {
+    payload: T;
+  }
+  export function listen<T>(
+    event: string,
+    handler: (event: Event<T>) => void,
+  ): Promise<() => void>;
+}

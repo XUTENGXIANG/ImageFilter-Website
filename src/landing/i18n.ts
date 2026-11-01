@@ -34,6 +34,11 @@ export interface LandingMessages {
   demo: {
     langHint: string;
     hint: string;
+    eyebrow: string;
+    title: string;
+    windowLabel: string;
+    caption: string;
+    swipeHint: string;
   };
   compare: {
     title: string;
@@ -125,6 +130,11 @@ export const zh: LandingMessages = {
   demo: {
     langHint: "中 / EN",
     hint: "点击照片体验选片流程",
+    eyebrow: "LIVE DEMO",
+    title: "不用安装，先筛几张。",
+    windowLabel: "ImageFilter / demo",
+    caption: "真实界面 · 可交互",
+    swipeHint: "窄屏可左右滑动",
   },
   compare: {
     title: "对比",
@@ -275,6 +285,11 @@ export const en: LandingMessages = {
   demo: {
     langHint: "中 / EN",
     hint: "Click a photo to try the culling flow.",
+    eyebrow: "LIVE DEMO",
+    title: "Try it before you install.",
+    windowLabel: "ImageFilter / demo",
+    caption: "Real UI · interactive",
+    swipeHint: "Swipe horizontally on narrow screens",
   },
   compare: {
     title: "Compare",

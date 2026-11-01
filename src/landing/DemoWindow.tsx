@@ -1,8 +1,8 @@
 // Copyright (c) 2026 XUTENGXIANG
 // SPDX-License-Identifier: MIT
-import BorderGlow from "@/components/BorderGlow";
-import { MousePointerClick } from "lucide-react";
 import ImageFilterDemo from "../demo/ImageFilterDemo";
+import Reveal from "./components/Reveal";
+import SectionHead from "./components/SectionHead";
 import type { Lang } from "./i18n";
 import { translations } from "./i18n";
 
@@ -16,45 +16,40 @@ export default function DemoWindow({ lang }: DemoWindowProps) {
   return (
     <section
       id="demo"
-      className="relative scroll-mt-28 px-4 pb-32 sm:px-6 lg:px-8"
+      className="relative scroll-mt-24 px-6 py-20 lg:py-28 max-hero:px-[18px]"
     >
-      <div className="mx-auto max-w-5xl">
-        <BorderGlow
-          className="rounded-[28px]"
-          animated
-          colors={["#8b5cf6", "#38bdf8", "#22d3ee"]}
-          glowColor="250 90 78"
-          backgroundColor="#090b12"
-          borderRadius={28}
-          glowRadius={48}
-          glowIntensity={0.9}
-          fillOpacity={0.16}
-          edgeSensitivity={18}
-        >
-          <div className="overflow-hidden rounded-[28px] border border-white/10 bg-[#0a0d15]/95">
-            <div className="flex h-12 items-center justify-between border-b border-white/10 px-4 sm:px-5">
-              <div className="flex items-center gap-2" aria-hidden="true">
-                <span className="h-3 w-3 rounded-full bg-[#ff5f57]" />
-                <span className="h-3 w-3 rounded-full bg-[#febc2e]" />
-                <span className="h-3 w-3 rounded-full bg-[#28c840]" />
+      <div className="mx-auto max-w-6xl">
+        <Reveal>
+          <SectionHead eyebrow={t.demo.eyebrow} title={t.demo.title} />
+        </Reveal>
+
+        <Reveal delay={0.06} className="mt-10">
+          <div className="overflow-hidden rounded-window border border-line bg-surface">
+            <div className="flex h-11 items-center justify-between border-b border-line px-4">
+              <div className="flex items-center gap-1.5" aria-hidden="true">
+                <span className="size-2 rounded-full bg-[#3a3a3a]" />
+                <span className="size-2 rounded-full bg-[#3a3a3a]" />
+                <span className="size-2 rounded-full bg-[#3a3a3a]" />
               </div>
-              <span className="text-sm font-semibold text-white/80">
-                ImageFilter
+              <span className="font-landing-mono text-[10.5px] uppercase tracking-[0.1em] text-ink-faint">
+                {t.demo.windowLabel}
               </span>
-              <span className="w-16 text-right text-xs text-white/40">
+              <span className="font-landing-mono text-[10.5px] text-ink-faint">
                 {t.demo.langHint}
               </span>
             </div>
-            <div className="p-2 sm:p-3">
-              <ImageFilterDemo className="w-full" />
+            <div className="p-2">
+              <div className="overflow-x-auto">
+                <ImageFilterDemo className="w-full max-hero:min-w-[720px]" />
+              </div>
             </div>
           </div>
-        </BorderGlow>
+        </Reveal>
 
-        <div className="mt-5 flex items-center justify-center gap-2 text-sm text-white/50">
-          <MousePointerClick className="h-4 w-4 text-cyan-200/70" />
-          <span>{t.demo.hint}</span>
-        </div>
+        <p className="mt-4 font-landing-mono text-[10.5px] uppercase tracking-[0.08em] text-ink-faint">
+          {t.demo.caption}
+          <span className="ml-2 hidden max-hero:inline">{t.demo.swipeHint}</span>
+        </p>
       </div>
     </section>
   );

@@ -17,6 +17,7 @@
 ```
 src/
   landing/       落地页组件(Hero/DemoWindow/Compare/Features/Workflow/Download/Footer/Nav)
+                  components/  基础组件；RubberSegment 来自 React Bits，用于导航语言切换
   demo/          软件迷你演示(真实 UI + mock 数据层)
     ui/          ← 从主仓库 src/ 同步的副本(见下方"demo/ui 同步")
     mock/        Tauri 命令 mock(fake-data/tauri-mock/placeholder)

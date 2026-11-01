@@ -98,7 +98,7 @@ export default function Nav({ lang, onLangChange }: NavProps) {
       </div>
 
       <nav
-        className="no-scrollbar flex items-center gap-1 overflow-x-auto border-t border-line/60 bg-black/60 px-[18px] py-2 backdrop-blur-xl hero:hidden"
+        className="no-scrollbar flex items-center gap-1 overflow-x-auto border-t border-line/60 bg-black/75 px-[18px] py-2 backdrop-blur-xl hero:hidden"
         aria-label="Primary mobile"
       >
         {links.map((link) => (

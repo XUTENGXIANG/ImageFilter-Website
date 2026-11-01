@@ -23,7 +23,7 @@ export default function Hero({ lang }: HeroProps) {
 
       <p
         className={cn(
-          "absolute right-6 top-[88px] z-[3] hidden items-center gap-1.5 rounded-full bg-black/45 px-2.5 py-1 font-landing-mono text-[10px] uppercase tracking-[0.1em] text-white/60 backdrop-blur-sm transition-opacity duration-500 hero:flex",
+          "absolute right-6 top-[88px] z-[3] hidden items-center gap-1.5 rounded-full bg-black/80 px-2.5 py-1 font-landing-mono text-[10px] uppercase tracking-[0.1em] text-white/70 backdrop-blur-sm transition-opacity duration-500 hero:flex",
           usedHint && "opacity-0",
         )}
       >

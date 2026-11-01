@@ -10,7 +10,7 @@
 - 设计规格与实施计划：[docs/superpowers/specs/2026-11-01-website-redesign.md](docs/superpowers/specs/2026-11-01-website-redesign.md) · [docs/superpowers/plans/2026-11-01-website-redesign.md](docs/superpowers/plans/2026-11-01-website-redesign.md)
 - 首屏原型（自包含 HTML，保留作参考）：[docs/prototype/hero.html](docs/prototype/hero.html)
 
-> 注意：首屏 6 张照片仍是**图库占位图**，上线前必须替换为用户自有作品（清单见 `src/assets/photos/README.md`）。
+> 首屏拼贴现在是**截图拼贴**：按用户提供的浅色 demo 状态重截的修复后截图 + 重新截取的设备树 + 彩色 DEMO 卡片，素材清单见 `src/assets/screens/README.md`。
 
 ## 结构
 

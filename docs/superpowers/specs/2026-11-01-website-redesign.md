@@ -300,9 +300,15 @@
 - `pointerup/cancel` → 结束拖拽，恢复 `cursor:grab`。
 - 不使用惯性、不做吸附、不改 DOM 顺序。
 
-### 5.4 素材要求（给用户）
+### 5.4 素材要求（实际采用：截图拼贴）
 
-需要 6 张自有照片：**4 张竖构图 3:4 + 2 张横构图 3:2**，长边 ≥1200px，sRGB，JPEG/WebP；单张构建后 ≤200KB。内容建议覆盖人像、风景、动物、旅行，避免隐私信息。收到后替换 `src/assets/photos/` 下 6 个文件；卡片说明里的文件名与拍摄信息同步改成你的实际文件名。主窗口截图用主仓库 `assets/screenshot-light-clean.jpg`（自有作品），若 1.3.0 界面有变化，P3 后重新截取。
+首屏 6 张不再使用图库占位照片，改为**截图拼贴**：
+
+- `src/assets/screens/light-demo.png`：按用户提供的浅色 demo 状态重新截取的修复后整窗图（2268×1122），用于主界面、网格、详细信息三张裁切卡；用户原图中间黑底是旧 bug，未直接采用。
+- `src/assets/screens/device-tree-light.png`：从当前 1.3.0 demo 重新截取的浅色设备树（480×640，修复树行重叠后），用于左上角竖卡。
+- `src/assets/app-grid.jpg`：主仓库 `screenshot-light-clean.jpg` 的彩色 DEMO 网格，用于主窗口和「演示数据」卡。
+- 图注改为界面说明（设备树 / 目录 / 网格 / 主界面 / 详细信息 / 演示数据），不再使用虚构文件名与星级。
+- 若以后换回真实照片，替换 `HeroCollage.tsx` 的 `shots` 数据及对应资源即可；不再阻塞上线。
 
 ## 6. i18n 变更
 
@@ -382,7 +388,7 @@ mock 形状（按主仓库类型）：
 - 新增/修改只允许：
   - `src/landing/**`（含新建 `src/landing/components/`、`HeroCollage.tsx`、`FAQ.tsx`）
   - `src/index.css`、`src/main.tsx`
-  - `src/assets/photos/**`（新增）
+  - `src/assets/screens/**`（新增截图素材）
   - `src/demo/mock/**`、`src/demo/app-version.ts`、`src/demo/ImageFilterDemo.tsx`（仅 P3 同步所需）
   - `src/demo/index.css`（仅补 1.3.0 语义色 token）
   - `src/demo/ui/**`（**只由同步脚本覆盖**，不手改）
@@ -407,4 +413,5 @@ mock 形状（按主仓库类型）：
 11. **安装包下载按钮**：接入 rewampui registry 的 `neumorphic-download-button`，三张卡全宽使用；点击用隐藏 iframe 触发浏览器原生下载（当前页不跳、不开新标签页），2.2s emerald 进度环只是视觉反馈，进度/完成文案中英双语。CLI 因 `components.json` 缺 `registryUrl` 失败，按同一份 registry 源码落在 `src/landing/components/`，用项目已有的 `motion/react` 替代 `framer-motion`。
 12. **更多版本 / 版本全览**：原「国内直链下载」折叠区改为「更多版本」→ `#/versions`；`VersionsPage` 读取全部 releases，过滤 updater 资产，资产行同样用隐藏 iframe 下载，保留蓝奏云直链；hash 路由，带返回首页、语言切换、页面标题。
 13. **FlapLabel 指针穿透**：`.flap-button-label { pointer-events:none }` 修复 hover 重挂载导致快速点击丢失；按钮标签仍保留 `aria-hidden` tile + SR 原文。
-14. **仍未完成**：6 张真实照片（当前为图库占位图）、`CN_DOWNLOADS` 仍是 1.0.0、`vite base` 仍为 `/`（可选）。
+14. **首屏截图拼贴**：按用户选择，6 张图库占位照片替换为「用户浅色 demo 截图 + 重新截取的修复后设备树 + 彩色 DEMO 网格」；图注改为界面说明，`src/assets/photos/` 已移除，新增 `src/assets/screens/`。
+15. **仍未完成**：`CN_DOWNLOADS` 仍是 1.0.0、`vite base` 仍为 `/`（可选）。

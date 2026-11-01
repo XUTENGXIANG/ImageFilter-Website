@@ -390,4 +390,5 @@ mock 形状（按主仓库类型）：
 5. **i18n 补充**：新增 `download.password`（蓝奏云密码标签），避免英文界面出现中文「密码」。
 6. **demo 同步**：按 README 五项 + 本规格第 6 项（语义色 token）完成。实测设置面板可打开，开启局域网服务后显示 `http://192.168.1.10:47832`，配对按钮显示「配对窗口已打开」，无控制台异常。
 7. **`buttonStyles`** 拆到 `src/landing/components/buttonStyles.ts`，避免同一文件既导出组件又导出函数触发 fast-refresh 警告。
-8. **仍未完成**：6 张真实照片（当前为图库占位图）、`CN_DOWNLOADS` 仍是 1.0.0、`vite base` 仍为 `/`（可选）。
+8. **装饰编号对比度**：compare / features / FAQ 的 10.5px 编号统一到 `ink-faint`（5.3:1），workflow 的 40px 大编号到 `white/40`（3.6:1），避免低对比度审计 blocker；视觉上仍保留「幽灵编号」的层次。
+9. **仍未完成**：6 张真实照片（当前为图库占位图）、`CN_DOWNLOADS` 仍是 1.0.0、`vite base` 仍为 `/`（可选）。

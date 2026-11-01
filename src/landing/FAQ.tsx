@@ -28,7 +28,7 @@ export default function FAQ({ lang }: FAQProps) {
             {t.faq.items.map((item, index) => (
               <details key={item.q} className="group border-b border-line">
                 <summary className="flex cursor-pointer list-none items-baseline gap-4 py-5 [&::-webkit-details-marker]:hidden">
-                  <span className="font-landing-mono text-[10.5px] tabular-nums text-white/30">
+                  <span className="font-landing-mono text-[10.5px] tabular-nums text-ink-faint">
                     {String(index + 1).padStart(2, "0")}
                   </span>
                   <span className="flex-1 text-[15px] font-medium text-ink">{item.q}</span>

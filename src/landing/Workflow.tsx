@@ -30,7 +30,7 @@ export default function Workflow({ lang }: WorkflowProps) {
           {t.workflow.steps.map((step, index) => (
             <Reveal key={step.title} delay={index * 0.06}>
               <article className="border-t border-line pt-6">
-                <span className="font-landing-mono text-[40px] leading-none tracking-[-0.04em] text-white/20">
+                <span className="font-landing-mono text-[40px] leading-none tracking-[-0.04em] text-white/40">
                   {String(index + 1).padStart(2, "0")}
                 </span>
                 <h3 className="mt-5 font-display text-[18px] font-medium text-ink">

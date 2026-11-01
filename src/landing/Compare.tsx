@@ -44,7 +44,7 @@ export default function Compare({ lang }: CompareProps) {
               <ul className="mt-8 space-y-5">
                 {t.compare.rows.map((row, index) => (
                   <li key={index} className="flex items-start gap-3">
-                    <span className="mt-0.5 font-landing-mono text-[10.5px] tabular-nums text-white/30">
+                    <span className="mt-0.5 font-landing-mono text-[10.5px] tabular-nums text-ink-faint">
                       {String(index + 1).padStart(2, "0")}
                     </span>
                     <span className="text-body leading-[1.65] text-ink-muted">{row.manual}</span>
@@ -69,7 +69,7 @@ export default function Compare({ lang }: CompareProps) {
               <ul className="mt-8 space-y-5">
                 {t.compare.rows.map((row, index) => (
                   <li key={index} className="flex items-start gap-3">
-                    <span className="mt-0.5 font-landing-mono text-[10.5px] tabular-nums text-data/70">
+                    <span className="mt-0.5 font-landing-mono text-[10.5px] tabular-nums text-data">
                       {String(index + 1).padStart(2, "0")}
                     </span>
                     <span className="text-body leading-[1.65] text-ink">{row.app}</span>

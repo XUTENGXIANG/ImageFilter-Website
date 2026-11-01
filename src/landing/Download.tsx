@@ -1,14 +1,14 @@
 // Copyright (c) 2026 XUTENGXIANG
 // SPDX-License-Identifier: MIT
 import { useEffect, useState } from "react";
-import BorderGlow from "@/components/BorderGlow";
-import LineSidebar from "@/components/LineSidebar";
-import SpecularButton from "@/components/SpecularButton";
-import SpotlightCard from "@/components/SpotlightCard";
-import { AnimatePresence, motion } from "motion/react";
 import { Apple, ChevronDown, DownloadCloud, Monitor } from "lucide-react";
+import Card from "./components/Card";
+import Reveal from "./components/Reveal";
+import SectionHead from "./components/SectionHead";
+import { buttonStyles } from "./components/Button";
 import type { Lang } from "./i18n";
 import { translations } from "./i18n";
+import { cn } from "./lib/cn";
 
 const REPOSITORY = "XUTENGXIANG/ImageFilter";
 const RELEASES_PAGE = `https://github.com/${REPOSITORY}/releases`;
@@ -95,205 +95,162 @@ export default function Download({ lang }: DownloadProps) {
     };
   }, []);
 
-  const versionLabel = latest?.tag ? latest.tag : failed ? t.download.fetchFailed : t.download.loading;
-
+  const versionLabel = latest?.tag
+    ? latest.tag
+    : failed
+      ? t.download.fetchFailed
+      : t.download.loading;
 
   return (
     <section
       id="download"
-      className="relative scroll-mt-28 px-4 pb-32 pt-8 sm:px-6 lg:px-8"
+      className="relative scroll-mt-24 px-6 py-20 lg:py-28 max-hero:px-[18px]"
     >
       <div className="mx-auto max-w-6xl">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-80px" }}
-          transition={{ duration: 0.55 }}
-          className="mx-auto max-w-2xl text-center"
-        >
-          <p className="text-xs font-medium uppercase tracking-normal text-violet-200/70">
-            {t.download.eyebrow}
-          </p>
-          <h2 className="mt-4 text-3xl font-semibold text-white sm:text-5xl">
-            {t.download.title}
-            <span
-              aria-live="polite"
-              className="ml-3 inline-block translate-y-[-0.35rem] rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-medium tabular-nums text-white/55"
-            >
-              {versionLabel}
-            </span>
-          </h2>
-        </motion.div>
+        <Reveal>
+          <SectionHead
+            eyebrow={t.download.eyebrow}
+            title={t.download.title}
+            actions={
+              <span
+                aria-live="polite"
+                className="mb-1 rounded-full border border-line bg-white/[0.03] px-3 py-1 font-landing-mono text-[10.5px] tabular-nums text-ink-faint"
+              >
+                {versionLabel}
+              </span>
+            }
+          />
+        </Reveal>
 
-        <div className="mt-14 grid gap-5 lg:grid-cols-3">
+        <div className="mt-10 grid gap-4 lg:grid-cols-3">
           {t.download.cards.map((card, index) => {
             const Icon = platformIcons[index];
             const asset = latest?.assets[index];
-            // 附件还没到 / 取失败 → 按钮落到 Releases 页: 不假装有直链, 也不留死链
             const href = asset?.url || RELEASES_PAGE;
             const fileName = asset?.name ?? "—";
+            const recommended = index === 0;
 
             return (
-              <motion.article
-                key={card.platform}
-                initial={{ opacity: 0, y: 24 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-80px" }}
-                transition={{ duration: 0.55, delay: index * 0.08 }}
-                className="h-full"
-              >
-                <BorderGlow
-                  className="h-full rounded-2xl"
-                  backgroundColor="rgba(255,255,255,0.04)"
-                  borderRadius={16}
-                  colors={["#a78bfa", "#22d3ee", "#7dd3fc"]}
-                  glowColor="250 85 80"
-                  glowRadius={28}
-                  glowIntensity={0.55}
-                  edgeSensitivity={22}
-                  fillOpacity={0.12}
+              <Reveal key={card.platform} delay={index * 0.05}>
+                <Card
+                  className={cn(
+                    "flex h-full flex-col p-6",
+                    recommended && "border-line-strong bg-surface",
+                  )}
                 >
-                <SpotlightCard
-                  className="h-full rounded-2xl bg-transparent"
-                  spotlightColor="rgba(139, 92, 246, 0.18)"
-                >
-                  <div className="flex h-full flex-col p-6">
-                    <div className="flex items-start justify-between gap-4">
-                      <div className="flex h-12 w-12 items-center justify-center rounded-xl border border-white/10 bg-gradient-to-br from-violet-400/20 to-cyan-300/15 text-violet-100">
-                        <Icon className="h-5 w-5" />
-                      </div>
-                      {card.badge ? (
-                        <span className="rounded-full border border-cyan-200/20 bg-cyan-300/10 px-2.5 py-1 text-[11px] font-medium text-cyan-100/80">
-                          {card.badge}
-                        </span>
-                      ) : null}
-                    </div>
-
-                    <h3 className="mt-5 text-base font-semibold text-white">
-                      {card.platform}
-                    </h3>
-                    <p
-                      className="mt-2 truncate font-mono text-xs text-white/65"
-                      title={fileName}
-                    >
-                      {fileName}
-                    </p>
-                    <p className="mt-3 text-sm leading-relaxed text-white/55">
-                      {card.description}
-                    </p>
-
-                    <div className="mt-auto pt-7">
-                      <a
-                        href={href}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="block w-full rounded-[18px] outline-none transition hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-cyan-200/70"
+                  <div className="flex items-start justify-between gap-4">
+                    <Icon className="size-5 text-white/55" aria-hidden="true" />
+                    {card.badge ? (
+                      <span
+                        className={cn(
+                          "rounded-full border px-2.5 py-1 font-landing-mono text-[10px] uppercase tracking-[0.08em]",
+                          recommended
+                            ? "border-data/30 bg-data/10 text-data"
+                            : "border-line text-ink-faint",
+                        )}
                       >
-                        <SpecularButton
-                          size="md"
-                          radius={16}
-                          tint="#0f172a"
-                          tintOpacity={0.55}
-                          blur={14}
-                          baseColor="#323a4d"
-                          lineColor="#c7d2fe"
-                          textColor="#f8fafc"
-                          intensity={1.1}
-                          proximity={360}
-                          className="w-full"
-                        >
-                          {card.action}
-                        </SpecularButton>
-                      </a>
-                    </div>
+                        {card.badge}
+                      </span>
+                    ) : null}
                   </div>
-                </SpotlightCard>
-                </BorderGlow>
-              </motion.article>
+
+                  <h3 className="mt-5 font-display text-title font-medium text-ink">
+                    {card.platform}
+                  </h3>
+                  <p
+                    className="mt-2 truncate font-landing-mono text-mono-sm text-ink-muted"
+                    title={fileName}
+                  >
+                    {fileName}
+                  </p>
+                  <p className="mt-3 text-body leading-[1.65] text-ink-muted">
+                    {card.description}
+                  </p>
+
+                  <div className="mt-auto pt-7">
+                    <a
+                      href={href}
+                      target="_blank"
+                      rel="noreferrer"
+                      className={buttonStyles({
+                        variant: recommended ? "solid" : "ghost",
+                        size: "md",
+                        className: "w-full",
+                      })}
+                    >
+                      {card.action}
+                    </a>
+                  </div>
+                </Card>
+              </Reveal>
             );
           })}
         </div>
 
         {/* 国内直链下载（蓝奏云） */}
-        <motion.div
-          initial={{ opacity: 0, y: 14 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-80px" }}
-          transition={{ duration: 0.5, delay: 0.2 }}
-          className="mt-12 flex flex-col items-center"
-        >
+        <Reveal delay={0.15} className="mt-10">
           <button
             type="button"
-            onClick={() => setCnOpen((o) => !o)}
+            onClick={() => setCnOpen((open) => !open)}
             aria-expanded={cnOpen}
-            className="group inline-flex items-center gap-2.5 rounded-full border border-white/10 bg-white/5 px-7 py-3 text-sm font-medium text-white/80 transition hover:border-violet-300/40 hover:bg-white/10 hover:text-white focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-cyan-200/70"
+            className={buttonStyles({ variant: "ghost", size: "md", className: "gap-2.5 px-5" })}
           >
-            <DownloadCloud className="h-4 w-4 text-violet-200/70" />
+            <DownloadCloud className="size-4" aria-hidden="true" />
             {t.download.cnDownload}
             <ChevronDown
-              className={`h-4 w-4 text-white/40 transition-transform duration-300 ${
-                cnOpen ? "rotate-180" : ""
-              }`}
+              className={cn(
+                "size-4 transition-transform duration-200",
+                cnOpen && "rotate-180",
+              )}
+              aria-hidden="true"
             />
           </button>
 
-          <AnimatePresence>
-            {cnOpen && (
-              <motion.div
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: "auto" }}
-                exit={{ opacity: 0, height: 0 }}
-                transition={{ duration: 0.3, ease: "easeOut" }}
-                className="w-full overflow-hidden"
-              >
-                <div className="mx-auto mt-6 max-w-lg rounded-2xl border border-white/10 bg-white/[0.03] p-6 backdrop-blur-sm">
-                  <LineSidebar
-                    items={CN_DOWNLOADS.map((d) =>
-                      d.password ? `${d.name}  密码：${d.password}` : d.name
-                    )}
-                    accentColor="#a78bfa"
-                    textColor="rgba(255,255,255,0.72)"
-                    markerColor="rgba(255,255,255,0.22)"
-                    proximityRadius={60}
-                    fontSize={0.95}
-                    showIndex={false}
-                    onItemClick={(index) =>
-                      window.open(CN_DOWNLOADS[index].href, "_blank", "noreferrer")
-                    }
-                  />
-                  <p className="mt-5 border-t border-white/10 pt-4 text-center text-xs text-white/45">
-                    {t.download.msiNote}{" "}
-                    <a
-                      href={RELEASES_PAGE}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="text-violet-200/80 underline-offset-2 transition hover:text-violet-100 hover:underline"
-                    >
-                      GitHub Releases
-                    </a>
-                  </p>
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </motion.div>
+          {cnOpen && (
+            <div className="mt-5 max-w-lg rounded-card border border-line bg-surface-sunken p-4">
+              {CN_DOWNLOADS.map((item) => (
+                <a
+                  key={item.href}
+                  href={item.href}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="flex items-center justify-between gap-4 border-b border-line py-3 last:border-b-0 hover:text-white"
+                >
+                  <span className="truncate font-landing-mono text-mono-sm text-ink-muted">
+                    {item.name}
+                  </span>
+                  {item.password ? (
+                    <span className="shrink-0 text-caption text-ink-faint">
+                      {t.download.password} {item.password}
+                    </span>
+                  ) : null}
+                </a>
+              ))}
+              <p className="mt-3 border-t border-line pt-3 text-caption text-ink-faint">
+                {t.download.msiNote}{" "}
+                <a
+                  href={RELEASES_PAGE}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-ink underline-offset-2 hover:underline"
+                >
+                  GitHub Releases
+                </a>
+              </p>
+            </div>
+          )}
+        </Reveal>
 
-        <motion.div
-          initial={{ opacity: 0, y: 14 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-80px" }}
-          transition={{ duration: 0.5, delay: 0.25 }}
-          className="mt-10 flex justify-center"
-        >
+        <div className="mt-8">
           <a
             href={RELEASES_PAGE}
             target="_blank"
             rel="noreferrer"
-            className="group inline-flex items-center gap-2 text-sm font-medium text-white/65 transition hover:text-white"
+            className="text-body text-ink-muted hover:text-ink"
           >
             {t.download.releases}
           </a>
-        </motion.div>
+        </div>
       </div>
     </section>
   );

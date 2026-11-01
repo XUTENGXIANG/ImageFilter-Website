@@ -86,6 +86,7 @@ export interface LandingMessages {
     }[];
     releases: string;
     cnDownload: string;
+    password: string;
     msiNote: string;
   };
   footer: {
@@ -241,6 +242,7 @@ export const zh: LandingMessages = {
     ],
     releases: "查看 GitHub Releases →",
     cnDownload: "国内直链下载",
+    password: "密码",
     msiNote: "MSI 安装包请前往",
   },
   footer: {
@@ -400,6 +402,7 @@ export const en: LandingMessages = {
     ],
     releases: "View GitHub Releases →",
     cnDownload: "Direct China Links",
+    password: "Password",
     msiNote: "MSI installer: see",
   },
   footer: {

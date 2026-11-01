@@ -35,6 +35,12 @@ npm run lint       # oxlint
 npx vitest run     # mock 数据层确定性测试
 ```
 
+## Favicon
+
+- 矢量源：`public/favicon.svg`（品牌标记）。页头 Logo 仍是 `src/assets/logo.png`，两者独立，改 favicon 不会动页头。
+- 回退：`public/favicon.png`（512×512）与 `public/favicon.ico`（16/32 多尺寸）。
+- `index.html` 的 PNG / ICO 链接带 `?v=2`；换图时把版本号递增，避免浏览器继续用旧图标缓存。
+
 ## demo/ui 同步（重要）
 
 `src/demo/ui/` 是主仓库 `src/` 的**逐文件副本**（网页演示"零修改"运行软件真实 UI）。主仓库每次改动 `src/` 后都必须同步，否则演示会跑旧代码：

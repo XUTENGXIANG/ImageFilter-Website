@@ -1,9 +1,12 @@
 // Copyright (c) 2026 XUTENGXIANG
 // SPDX-License-Identifier: MIT
+import { useEffect, useState } from "react";
 import logo from "../assets/logo.png";
+import { ButtonLink } from "./components/Button";
 import GitHubStarButton from "./GitHubStarButton";
 import type { Lang } from "./i18n";
 import { translations } from "./i18n";
+import { cn } from "./lib/cn";
 
 interface NavProps {
   lang: Lang;
@@ -12,6 +15,8 @@ interface NavProps {
 
 export default function Nav({ lang, onLangChange }: NavProps) {
   const t = translations[lang];
+  const [scrolled, setScrolled] = useState(false);
+
   const links = [
     { href: "#features", label: t.nav.features },
     { href: "#compare", label: t.nav.compare },
@@ -19,71 +24,92 @@ export default function Nav({ lang, onLangChange }: NavProps) {
     { href: "#download", label: t.nav.download },
   ];
 
-  const renderLinks = () =>
-    links.map((link) => (
-      <a
-        key={link.href}
-        href={link.href}
-        className="rounded-full px-3 py-2 text-xs text-white/65 transition hover:bg-white/10 hover:text-white sm:px-4 sm:text-sm"
-      >
-        {link.label}
-      </a>
-    ));
-
-  const changeLang = (next: Lang) => {
-    onLangChange(next);
-  };
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 8);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
   return (
-    <header className="fixed inset-x-0 top-0 z-50 border-b border-white/10 bg-[#06070d]/75 backdrop-blur-xl">
-      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
-        <a href="#top" className="group flex min-w-0 items-center gap-2.5">
-          <span className="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-white/10 bg-white/5 transition group-hover:border-violet-300/30 group-hover:bg-violet-300/10">
-            <img src={logo} alt="ImageFilter" className="h-6 w-6" />
-          </span>
-          <span className="hidden text-sm font-semibold text-white sm:inline">
+    <header
+      className={cn(
+        "fixed inset-x-0 top-0 z-50 transition-[background-color,border-color,backdrop-filter] duration-300 ease-brand",
+        scrolled
+          ? "border-b border-line bg-black/[0.72] backdrop-blur-xl backdrop-saturate-150"
+          : "border-b border-transparent bg-transparent",
+      )}
+    >
+      {!scrolled && (
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_bottom,rgba(0,0,0,.82),rgba(0,0,0,.34)_58%,transparent)]"
+        />
+      )}
+
+      <div className="relative mx-auto flex h-16 max-w-6xl items-center gap-2 px-6 max-hero:px-[18px]">
+        <a href="#top" className="flex shrink-0 items-center gap-[9px]">
+          <img src={logo} alt="" className="size-[26px]" />
+          <span className="font-display text-[15px] font-semibold text-ink max-hero:hidden">
             ImageFilter
           </span>
         </a>
 
-        <nav
-          className="hidden items-center justify-center gap-1 md:flex"
-          aria-label="Primary"
-        >
-          {renderLinks()}
+        <nav className="ml-3.5 hidden items-center gap-0.5 hero:flex" aria-label="Primary">
+          {links.map((link) => (
+            <a
+              key={link.href}
+              href={link.href}
+              className="rounded-md px-2.5 py-2 font-display text-[13.5px] font-medium text-white/[0.66] transition-colors duration-200 hover:bg-white/[0.06] hover:text-white"
+            >
+              {link.label}
+            </a>
+          ))}
         </nav>
 
-        <div className="hidden md:block">
+        <div className="ml-auto flex items-center gap-1.5">
           <GitHubStarButton lang={lang} />
-        </div>
 
-        <div
-          className="flex items-center rounded-full border border-white/10 bg-white/5 p-1"
-          aria-label="Language"
-        >
-          {(["zh", "en"] as Lang[]).map((item) => (
-            <button
-              key={item}
-              type="button"
-              onClick={() => changeLang(item)}
-              aria-pressed={lang === item}
-              className={`rounded-full px-3 py-1.5 text-xs font-medium transition ${
-                lang === item
-                  ? "bg-white/10 text-white"
-                  : "text-white/45 hover:text-white/80"
-              }`}
-            >
-              {item === "zh" ? "中" : "EN"}
-            </button>
-          ))}
+          <div
+            className="flex items-center gap-0.5 rounded-full border border-line bg-white/[0.03] p-0.5"
+            role="group"
+            aria-label="Language"
+          >
+            {(["zh", "en"] as Lang[]).map((item) => (
+              <button
+                key={item}
+                type="button"
+                onClick={() => onLangChange(item)}
+                aria-pressed={lang === item}
+                className={cn(
+                  "rounded-full px-2.5 py-1.5 text-[11.5px] font-medium transition-colors duration-200",
+                  lang === item ? "bg-white/10 text-white" : "text-white/50 hover:text-white/80",
+                )}
+              >
+                {item === "zh" ? "中" : "EN"}
+              </button>
+            ))}
+          </div>
+
+          <ButtonLink href="#download" variant="solid" size="sm">
+            {t.nav.download}
+          </ButtonLink>
         </div>
       </div>
 
       <nav
-        className="flex items-center gap-1 overflow-x-auto border-t border-white/5 px-4 py-2 md:hidden"
+        className="no-scrollbar flex items-center gap-1 overflow-x-auto border-t border-line/60 px-[18px] py-2 hero:hidden"
         aria-label="Primary mobile"
       >
-        {renderLinks()}
+        {links.map((link) => (
+          <a
+            key={link.href}
+            href={link.href}
+            className="shrink-0 rounded-md px-2.5 py-2 text-[13px] font-medium text-white/65 hover:bg-white/[0.06] hover:text-white"
+          >
+            {link.label}
+          </a>
+        ))}
       </nav>
     </header>
   );

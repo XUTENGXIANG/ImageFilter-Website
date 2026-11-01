@@ -36,7 +36,7 @@ export default function Features({ lang }: FeaturesProps) {
 
             return (
               <Reveal key={feature.title} delay={index * 0.04}>
-                <Card className="h-full p-6 transition-colors duration-200 hover:border-line-strong hover:bg-white/[0.015]">
+                <Card className="h-full p-6 transition-colors duration-200 hover:border-line-strong hover:bg-white/[0.06]">
                   <div className="flex items-start justify-between gap-4">
                     <Icon className="size-5 text-white/55" aria-hidden="true" />
                     <span className="font-landing-mono text-[10.5px] tabular-nums text-ink-faint">

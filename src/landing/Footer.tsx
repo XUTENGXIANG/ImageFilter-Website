@@ -45,7 +45,7 @@ export default function Footer({ lang }: FooterProps) {
   const t = translations[lang];
 
   return (
-    <footer className="border-t border-line bg-canvas px-6 pb-8 pt-14 max-hero:px-[18px]">
+    <footer className="relative z-10 border-t border-line bg-canvas px-6 pb-8 pt-14 max-hero:px-[18px]">
       <div className="mx-auto max-w-6xl">
         <div className="grid gap-10 lg:grid-cols-[minmax(0,1.2fr)_repeat(3,minmax(0,.6fr))]">
           <div>

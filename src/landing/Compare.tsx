@@ -55,7 +55,7 @@ export default function Compare({ lang }: CompareProps) {
           </Reveal>
 
           <Reveal delay={0.12}>
-            <Card className="h-full border-line-strong bg-surface p-6 sm:p-8">
+            <Card className="h-full bg-white/[0.06] p-6 ring-1 ring-white/15 sm:p-8">
               <div className="flex items-center gap-3">
                 <span className="flex size-9 items-center justify-center rounded-full border border-white/10 bg-data/10 text-data">
                   <Check className="size-4" aria-hidden="true" />

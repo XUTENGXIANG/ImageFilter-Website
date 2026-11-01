@@ -1,6 +1,7 @@
 // Copyright (c) 2026 XUTENGXIANG
 // SPDX-License-Identifier: MIT
 import { useEffect, useState } from "react";
+import LiquidCursorGradient from "./components/LiquidCursorGradient";
 import type { Lang } from "./i18n";
 import Compare from "./Compare";
 import DemoWindow from "./DemoWindow";
@@ -10,6 +11,7 @@ import Features from "./Features";
 import Footer from "./Footer";
 import Hero from "./Hero";
 import Nav from "./Nav";
+import TechTextBand from "./TechTextBand";
 import VersionsPage from "./VersionsPage";
 import Workflow from "./Workflow";
 
@@ -55,9 +57,11 @@ export default function LandingPage() {
 
   return (
     <div className="relative min-h-screen overflow-x-clip bg-canvas text-ink">
+      <LiquidCursorGradient />
       <Nav lang={lang} onLangChange={changeLang} />
       <main className="relative z-10">
         <Hero lang={lang} />
+        <TechTextBand />
         <DemoWindow lang={lang} />
         <Compare lang={lang} />
         <Features lang={lang} />

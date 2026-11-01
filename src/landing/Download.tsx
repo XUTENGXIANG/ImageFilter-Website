@@ -143,7 +143,7 @@ export default function Download({ lang }: DownloadProps) {
                 <Card
                   className={cn(
                     "flex h-full flex-col p-6",
-                    recommended && "border-line-strong bg-surface",
+                    recommended && "bg-white/[0.06] ring-1 ring-white/15",
                   )}
                 >
                   <div className="flex items-start justify-between gap-4">

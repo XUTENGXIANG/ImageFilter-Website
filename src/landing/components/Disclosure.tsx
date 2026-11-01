@@ -2,6 +2,7 @@ import { useId, useState, type ReactNode } from "react";
 import { motion, useReducedMotion } from "motion/react";
 import { Plus } from "lucide-react";
 import { cn } from "../lib/cn";
+import { glassCard } from "../lib/surfaces";
 
 interface DisclosureProps {
   title: string;
@@ -31,9 +32,7 @@ export default function Disclosure({
   return (
     <div
       className={cn(
-        isCard
-          ? "overflow-hidden rounded-card border border-line bg-surface-sunken"
-          : "border-b border-line",
+        isCard ? cn("overflow-hidden rounded-card", glassCard) : "border-b border-line",
         className,
       )}
     >

@@ -320,7 +320,7 @@ export const zh: LandingMessages = {
   versions: {
     eyebrow: "全部版本",
     title: "版本全览",
-    subtitle: "从 GitHub Releases 读取的完整版本与安装包；国内直链单独列出。",
+    subtitle: "从 GitHub Releases 读取的完整版本与安装包。",
     back: "返回首页",
     loading: "正在读取版本…",
     error: "版本获取失败，请直接前往 GitHub Releases。",
@@ -545,7 +545,7 @@ export const en: LandingMessages = {
   versions: {
     eyebrow: "All releases",
     title: "All versions",
-    subtitle: "Every release and installer pulled from GitHub Releases, with China direct links listed separately.",
+    subtitle: "Every release and installer pulled from GitHub Releases.",
     back: "Back to home",
     loading: "Loading releases…",
     error: "Could not load releases. Open GitHub Releases instead.",

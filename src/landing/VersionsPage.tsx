@@ -3,12 +3,15 @@ import { ArrowLeft, ArrowUpRight, Download, Loader2 } from "lucide-react";
 import logo from "../assets/logo.png";
 import DownloadMirrorToggle from "./components/DownloadMirrorToggle";
 import LanguageToggle from "./components/LanguageToggle";
+import LiquidCursorGradient from "./components/LiquidCursorGradient";
 import Reveal from "./components/Reveal";
 import SectionHead from "./components/SectionHead";
 import { ALL_RELEASES_API, RELEASES_PAGE } from "./downloadData";
 import type { Lang } from "./i18n";
+import { cn } from "./lib/cn";
 import { triggerIframeDownload } from "./lib/download";
 import { mirrorUrl, useDownloadMirror } from "./lib/downloadMirror";
+import { glassCard } from "./lib/surfaces";
 import { translations } from "./i18n";
 
 interface ReleaseAsset {
@@ -99,8 +102,9 @@ export default function VersionsPage({ lang, onLangChange }: VersionsPageProps) 
   };
 
   return (
-    <div className="min-h-svh bg-canvas text-ink">
-      <header className="border-b border-line px-6 py-4 max-hero:px-[18px]">
+    <div className="relative min-h-svh overflow-x-clip bg-canvas text-ink">
+      <LiquidCursorGradient />
+      <header className="relative z-10 border-b border-line px-6 py-4 max-hero:px-[18px]">
         <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-x-5 gap-y-3">
           <a href="#" className="flex items-center gap-2.5">
             <img src={logo} alt="" className="size-7" />
@@ -121,7 +125,7 @@ export default function VersionsPage({ lang, onLangChange }: VersionsPageProps) 
         </div>
       </header>
 
-      <main className="mx-auto max-w-6xl px-6 py-14 max-hero:px-[18px]">
+      <main className="relative z-10 mx-auto max-w-6xl px-6 py-14 max-hero:px-[18px]">
         <Reveal>
           <SectionHead
             eyebrow={t.versions.eyebrow}
@@ -136,7 +140,7 @@ export default function VersionsPage({ lang, onLangChange }: VersionsPageProps) 
 
         <div className="mt-10">
           {error ? (
-            <div className="rounded-card border border-line bg-surface-sunken p-6">
+            <div className={cn("rounded-card p-6", glassCard)}>
               <p className="text-body text-ink-muted">{t.versions.error}</p>
               <a
                 href={RELEASES_PAGE}
@@ -149,12 +153,17 @@ export default function VersionsPage({ lang, onLangChange }: VersionsPageProps) 
               </a>
             </div>
           ) : releases === null ? (
-            <div className="flex items-center gap-2.5 rounded-card border border-line bg-surface-sunken p-6 text-body text-ink-muted">
+            <div
+              className={cn(
+                "flex items-center gap-2.5 rounded-card p-6 text-body text-ink-muted",
+                glassCard,
+              )}
+            >
               <Loader2 className="size-4 animate-spin text-ink-faint" aria-hidden="true" />
               {t.versions.loading}
             </div>
           ) : releases.length === 0 ? (
-            <div className="rounded-card border border-line bg-surface-sunken p-6 text-body text-ink-muted">
+            <div className={cn("rounded-card p-6 text-body text-ink-muted", glassCard)}>
               {t.versions.empty}
             </div>
           ) : (
@@ -168,7 +177,7 @@ export default function VersionsPage({ lang, onLangChange }: VersionsPageProps) 
 
                 return (
                   <Reveal key={release.tag_name} delay={Math.min(index * 0.03, 0.2)}>
-                    <article className="rounded-card border border-line bg-surface-sunken p-5 sm:p-6">
+                    <article className={cn("rounded-card p-5 sm:p-6", glassCard)}>
                       <div className="flex flex-wrap items-start justify-between gap-3">
                         <div>
                           <div className="flex flex-wrap items-center gap-2">

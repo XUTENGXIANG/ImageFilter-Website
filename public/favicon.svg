@@ -1,0 +1,16 @@
+<!-- Copyright (c) 2026 XUTENGXIANG · SPDX-License-Identifier: MIT -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="ImageFilter">
+  <rect width="512" height="512" rx="112" fill="#18181B" />
+  <circle
+    cx="256"
+    cy="195"
+    r="80.5"
+    fill="none"
+    stroke="#10B981"
+    stroke-width="23"
+    stroke-linecap="round"
+  />
+  <path d="M248 250 L82 478" stroke="#10B981" stroke-width="29" stroke-linecap="round" />
+  <path d="M263 250 L430 478" stroke="#10B981" stroke-width="29" stroke-linecap="round" />
+  <path d="M232 250 L280 250 L256 300 Z" fill="#10B981" />
+</svg>

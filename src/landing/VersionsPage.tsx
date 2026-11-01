@@ -1,12 +1,14 @@
 import { useEffect, useState } from "react";
 import { ArrowLeft, ArrowUpRight, Download, Loader2 } from "lucide-react";
 import logo from "../assets/logo.png";
+import DownloadMirrorToggle from "./components/DownloadMirrorToggle";
 import LanguageToggle from "./components/LanguageToggle";
 import Reveal from "./components/Reveal";
 import SectionHead from "./components/SectionHead";
 import { ALL_RELEASES_API, CN_DOWNLOADS, RELEASES_PAGE } from "./downloadData";
 import type { Lang } from "./i18n";
 import { triggerIframeDownload } from "./lib/download";
+import { mirrorUrl, useDownloadMirror } from "./lib/downloadMirror";
 import { translations } from "./i18n";
 
 interface ReleaseAsset {
@@ -52,6 +54,7 @@ export default function VersionsPage({ lang, onLangChange }: VersionsPageProps) 
   const t = translations[lang];
   const [releases, setReleases] = useState<Release[] | null>(null);
   const [error, setError] = useState(false);
+  const [mirror, setMirror] = useDownloadMirror();
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -127,6 +130,10 @@ export default function VersionsPage({ lang, onLangChange }: VersionsPageProps) 
           />
         </Reveal>
 
+        <Reveal delay={0.04} className="mt-6">
+          <DownloadMirrorToggle lang={lang} mirror={mirror} onChange={setMirror} />
+        </Reveal>
+
         <div className="mt-10">
           {error ? (
             <div className="rounded-card border border-line bg-surface-sunken p-6">
@@ -196,7 +203,7 @@ export default function VersionsPage({ lang, onLangChange }: VersionsPageProps) 
                           {assets.map((asset) => (
                             <a
                               key={asset.name}
-                              href={asset.browser_download_url}
+                              href={mirrorUrl(asset.browser_download_url, mirror)}
                               target="_blank"
                               rel="noreferrer"
                               onClick={(event) => {
@@ -210,7 +217,9 @@ export default function VersionsPage({ lang, onLangChange }: VersionsPageProps) 
                                   return;
                                 }
                                 event.preventDefault();
-                                triggerIframeDownload(asset.browser_download_url);
+                                triggerIframeDownload(
+                                  mirrorUrl(asset.browser_download_url, mirror),
+                                );
                               }}
                               className="group flex flex-col gap-1 border-b border-line py-3 last:border-b-0 sm:flex-row sm:items-center sm:justify-between sm:gap-4"
                             >

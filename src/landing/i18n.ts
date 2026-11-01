@@ -99,6 +99,10 @@ export interface LandingMessages {
     moreVersions: string;
     downloading: string;
     downloaded: string;
+    mirrorLabel: string;
+    mirrorGithub: string;
+    mirrorFast: string;
+    mirrorNote: string;
   };
   versions: {
     eyebrow: string;
@@ -294,6 +298,10 @@ export const zh: LandingMessages = {
     moreVersions: "更多版本",
     downloading: "下载中…",
     downloaded: "已完成",
+    mirrorLabel: "下载线路",
+    mirrorGithub: "GitHub",
+    mirrorFast: "国内加速",
+    mirrorNote: "第三方加速，可能失效；安装前请核对文件大小。",
   },
   versions: {
     eyebrow: "全部版本",
@@ -507,6 +515,10 @@ export const en: LandingMessages = {
     moreVersions: "More versions",
     downloading: "Downloading…",
     downloaded: "Downloaded",
+    mirrorLabel: "Download via",
+    mirrorGithub: "GitHub",
+    mirrorFast: "Fast mirror",
+    mirrorNote: "Third-party mirror; may be unavailable. Check the file size before installing.",
   },
   versions: {
     eyebrow: "All releases",

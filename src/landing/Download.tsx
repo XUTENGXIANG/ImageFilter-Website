@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { Apple, ArrowUpRight, Layers, Monitor } from "lucide-react";
 import Card from "./components/Card";
+import DownloadMirrorToggle from "./components/DownloadMirrorToggle";
 import FlapLabel, { useFlapTrigger } from "./components/FlapLabel";
 import NeumorphicDownloadButton from "./components/NeumorphicDownloadButton";
 import Reveal from "./components/Reveal";
@@ -13,6 +14,7 @@ import { ASSET_MATCHERS, LATEST_RELEASE_API, RELEASES_PAGE } from "./downloadDat
 import type { Lang } from "./i18n";
 import { translations } from "./i18n";
 import { cn } from "./lib/cn";
+import { mirrorUrl, useDownloadMirror } from "./lib/downloadMirror";
 
 interface ReleaseAsset {
   name: string;
@@ -37,6 +39,7 @@ export default function Download({ lang }: DownloadProps) {
   // 这样发新版不用再回来改这 3 行 —— 之前那三条写死的链接停在 v1.0.0 上，落后了三个版本。
   const [latest, setLatest] = useState<LatestRelease | null>(null);
   const [failed, setFailed] = useState(false);
+  const [mirror, setMirror] = useDownloadMirror();
   const moreFlap = useFlapTrigger();
 
   useEffect(() => {
@@ -120,6 +123,10 @@ export default function Download({ lang }: DownloadProps) {
           </div>
         </Reveal>
 
+        <Reveal delay={0.04} className="mt-6">
+          <DownloadMirrorToggle lang={lang} mirror={mirror} onChange={setMirror} />
+        </Reveal>
+
         <div className="mt-10 grid gap-4 lg:grid-cols-3">
           {t.download.cards.map((card, index) => {
             const Icon = platformIcons[index];
@@ -128,6 +135,7 @@ export default function Download({ lang }: DownloadProps) {
             const fileName = asset?.name ?? "—";
             const recommended = index === 0;
             const isAsset = Boolean(asset?.url);
+            const downloadHref = isAsset ? mirrorUrl(href, mirror) : href;
 
             return (
               <Reveal key={card.platform} delay={index * 0.05}>
@@ -168,7 +176,7 @@ export default function Download({ lang }: DownloadProps) {
 
                   <div className="mt-auto pt-7">
                     <NeumorphicDownloadButton
-                      href={href}
+                      href={downloadHref}
                       filename={asset?.name}
                       external={!isAsset}
                       label={card.action}

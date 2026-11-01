@@ -12,10 +12,24 @@ export interface LandingMessages {
   };
   hero: {
     eyebrow: string;
-    title: string;
+    title: {
+      line1: string;
+      line2: string;
+      emphasis: string;
+    };
     subtitle: string;
     windows: string;
     macos: string;
+    micro: string;
+    dragHint: string;
+    windowAlt: string;
+  };
+  collage: {
+    archived: string;
+    blur: string;
+    overexposed: string;
+    duplicate: string;
+    windowMeta: string;
   };
   demo: {
     langHint: string;
@@ -88,11 +102,25 @@ export const zh: LandingMessages = {
     starOnGithub: "Star on GitHub",
   },
   hero: {
-    eyebrow: "摄影选片 · 归档 · 创作",
-    title: "ImageFilter",
-    subtitle: "为创作者而生的 RAW 选片与归档工作流",
-    windows: "Windows 下载",
-    macos: "macOS 下载",
+    eyebrow: "本地处理 · 照片不上传",
+    title: {
+      line1: "整张卡的照片",
+      line2: "只留",
+      emphasis: "你要的那几张",
+    },
+    subtitle: "插卡即看，星级初筛，AI 标出模糊与重复；命名归档一次完成。",
+    windows: "Windows",
+    macos: "macOS",
+    micro: "Windows 10 / 11 · macOS Universal · 本地处理",
+    dragHint: "拖动看看",
+    windowAlt: "ImageFilter 网格视图，已选 3 / 24",
+  },
+  collage: {
+    archived: "已归档",
+    blur: "AI · 模糊",
+    overexposed: "AI · 过曝",
+    duplicate: "AI · 连拍重复",
+    windowMeta: "网格 · 已选 3 / 24",
   },
   demo: {
     langHint: "中 / EN",
@@ -223,11 +251,26 @@ export const en: LandingMessages = {
     starOnGithub: "Star on GitHub",
   },
   hero: {
-    eyebrow: "Cull · Archive · Create",
-    title: "ImageFilter",
-    subtitle: "A RAW culling and archive workflow built for creators.",
-    windows: "Download for Windows",
-    macos: "Download for macOS",
+    eyebrow: "Local only · never uploaded",
+    title: {
+      line1: "Cull a whole card",
+      line2: "Keep only",
+      emphasis: "the keepers",
+    },
+    subtitle:
+      "Instant RAW previews, star-based culling, AI flags for blur and duplicates, and template archiving — all on your machine.",
+    windows: "Windows",
+    macos: "macOS",
+    micro: "Windows 10 / 11 · macOS Universal · Local processing",
+    dragHint: "Drag to explore",
+    windowAlt: "ImageFilter grid view, 3 of 24 selected",
+  },
+  collage: {
+    archived: "Archived",
+    blur: "AI · Blurry",
+    overexposed: "AI · Overexposed",
+    duplicate: "AI · Burst duplicate",
+    windowMeta: "Grid · 3 of 24 selected",
   },
   demo: {
     langHint: "中 / EN",

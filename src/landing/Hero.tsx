@@ -1,10 +1,11 @@
 // Copyright (c) 2026 XUTENGXIANG
 // SPDX-License-Identifier: MIT
-import ParticleText from "@/components/ParticleText";
-import SpecularButton from "@/components/SpecularButton";
-import { Apple, Monitor } from "lucide-react";
+import { useState } from "react";
+import { ButtonLink } from "./components/Button";
+import HeroCollage from "./HeroCollage";
 import type { Lang } from "./i18n";
 import { translations } from "./i18n";
+import { cn } from "./lib/cn";
 
 interface HeroProps {
   lang: Lang;
@@ -12,72 +13,62 @@ interface HeroProps {
 
 export default function Hero({ lang }: HeroProps) {
   const t = translations[lang];
-  const buttons = [
-    { label: t.hero.windows, icon: Monitor },
-    { label: t.hero.macos, icon: Apple },
-  ];
+  const [usedHint, setUsedHint] = useState(false);
+  const title = `${t.hero.title.line1} ${t.hero.title.line2}${t.hero.title.emphasis}`;
 
   return (
-    <section
-      id="top"
-      className="relative overflow-hidden px-4 pb-24 pt-36 sm:px-6 md:pt-44 lg:px-8"
-    >
-      {/* 标题粒子层: 覆盖 hero 全屏, 粒子从四处散布聚集成文字 */}
-      <div className="absolute inset-0 z-[5]">
-        <ParticleText
-          text={t.hero.title}
-          color="#f8fafc"
-          highlightColor="#8b5cf6"
-          particleSize={2.2}
-          density={4}
-          fontSize="clamp(3.5rem, 12vw, 9rem)"
-          fontWeight={800}
-          scatter={1300}
-          gatherDuration={2000}
-          stagger={500}
-          idleDrift={0}
-          glow
-        />
-      </div>
+    <section id="top" className="relative flex min-h-svh items-end overflow-hidden">
+      <HeroCollage lang={lang} onFirstDrag={() => setUsedHint(true)} />
 
-      <div className="relative z-10 mx-auto flex max-w-6xl flex-col items-center text-center">
-        <p className="inline-flex items-center rounded-full border border-white/10 bg-white/5 px-4 py-2 text-xs font-medium text-white/60 backdrop-blur">
-          {t.hero.eyebrow}
-        </p>
-        <h1
-          className="mt-8 h-[30vh] min-h-[220px] w-full max-w-5xl"
-          aria-label={t.hero.title}
-        ></h1>
-        <p className="mt-8 max-w-2xl text-pretty text-base leading-relaxed text-white/65 sm:text-lg">
-          {t.hero.subtitle}
-        </p>
-        <div className="mt-10 flex w-full max-w-xl flex-col items-center justify-center gap-3 sm:flex-row">
-          {buttons.map(({ label, icon: Icon }) => (
-            <a
-              key={label}
-              href="#download"
-              className="block w-full rounded-2xl outline-none transition hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-cyan-200/70 sm:w-auto"
+      <p
+        className={cn(
+          "absolute right-6 top-[88px] z-[3] hidden items-center gap-1.5 rounded-full bg-black/45 px-2.5 py-1 font-landing-mono text-[10px] uppercase tracking-[0.1em] text-white/60 backdrop-blur-sm transition-opacity duration-500 hero:flex",
+          usedHint && "opacity-0",
+        )}
+      >
+        {t.hero.dragHint}
+      </p>
+
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-x-0 bottom-0 h-[40%] bg-[linear-gradient(to_top,#000_0%,rgba(0,0,0,.94)_26%,rgba(0,0,0,.72)_52%,rgba(0,0,0,.3)_78%,transparent_100%)]"
+      />
+
+      <div className="relative z-10 mx-auto w-full max-w-6xl px-6 pb-14 max-hero:px-[18px] max-hero:pb-[30px]">
+        <div className="grid items-end gap-12 hero:grid-cols-[minmax(0,1.15fr)_minmax(0,.85fr)] max-hero:gap-5">
+          <div>
+            <p className="mb-[18px] flex items-center gap-2 font-landing-mono text-[11px] uppercase tracking-[0.12em] text-white/55">
+              <span className="size-[5px] rounded-full bg-data shadow-[0_0_0_3px_rgba(16,185,129,.14)]" />
+              {t.hero.eyebrow}
+            </p>
+            <h1
+              aria-label={title}
+              className="font-display text-display font-semibold text-ink text-balance"
             >
-              <SpecularButton
-                size="md"
-                radius={16}
-                tint="#0f172a"
-                tintOpacity={0.55}
-                blur={14}
-                baseColor="#323a4d"
-                lineColor="#c7d2fe"
-                textColor="#f8fafc"
-                intensity={1.1}
-                proximity={360}
-                className="w-full"
-              >
-                <span className="flex items-center justify-center gap-2.5">
-                  <Icon className="h-4 w-4" />
-                  <span>{label}</span>
-                </span>
-              </SpecularButton>
-            </a>
-          ))}
+              <span className="block">{t.hero.title.line1}</span>
+              <span className="block">
+                {t.hero.title.line2}
+                <em className="not-italic">{t.hero.title.emphasis}</em>
+              </span>
+            </h1>
+          </div>
+
+          <div className="max-w-[400px] justify-self-end pb-1.5 max-hero:max-w-[520px] max-hero:justify-self-start">
+            <p className="mb-[22px] text-[15px] leading-[1.65] text-ink-muted text-pretty">
+              {t.hero.subtitle}
+            </p>
+            <div className="flex flex-wrap gap-2">
+              <ButtonLink href="#download" variant="solid" size="lg">
+                {t.hero.windows}
+              </ButtonLink>
+              <ButtonLink href="#download" variant="ghost" size="lg">
+                {t.hero.macos}
+              </ButtonLink>
+            </div>
+            <p className="mt-4 font-landing-mono text-[10.5px] leading-[1.5] tracking-[0.04em] text-ink-faint">
+              {t.hero.micro}
+            </p>
+          </div>
         </div>
       </div>
     </section>

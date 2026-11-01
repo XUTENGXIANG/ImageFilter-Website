@@ -89,6 +89,14 @@ export interface LandingMessages {
     password: string;
     msiNote: string;
   };
+  faq: {
+    eyebrow: string;
+    title: string;
+    items: {
+      q: string;
+      a: string;
+    }[];
+  };
   footer: {
     tagline: string;
     github: string;
@@ -244,6 +252,28 @@ export const zh: LandingMessages = {
     cnDownload: "国内直链下载",
     password: "密码",
     msiNote: "MSI 安装包请前往",
+  },
+  faq: {
+    eyebrow: "FAQ",
+    title: "常见问题",
+    items: [
+      {
+        q: "照片会被上传吗？",
+        a: "不会。解码、AI 检测与导入都在本机完成；软件只在检查更新时访问 GitHub。手机图库服务只在局域网内监听，默认关闭。",
+      },
+      {
+        q: "支持哪些照片格式？",
+        a: "RAW 支持 ARW / CR2 / CR3 / NEF / DNG / ORF / RW2 / RAF / PEF / SRW；同时可浏览 JPG / PNG / GIF / BMP / TIFF / WebP / HEIC / HEIF，以及 MP4 / MOV / AVI / MKV 的视频缩略图。DNG 使用内置专用解码器。",
+      },
+      {
+        q: "可以商用或二次开发吗？",
+        a: "可以。项目采用 MIT 许可证，源码公开；保留版权与许可声明即可使用、修改和分发。",
+      },
+      {
+        q: "macOS 能用吗？",
+        a: "可以在 Releases 下载 Universal 安装包（Intel 与 Apple Silicon）。但 macOS 版尚未充分实机验证，遇到问题请附系统版本与复现步骤提交 Issue。Lightroom 衔接与 Mica 毛玻璃仅 Windows。",
+      },
+    ],
   },
   footer: {
     tagline: "RAW 选片与归档工作流",
@@ -404,6 +434,28 @@ export const en: LandingMessages = {
     cnDownload: "Direct China Links",
     password: "Password",
     msiNote: "MSI installer: see",
+  },
+  faq: {
+    eyebrow: "FAQ",
+    title: "Common questions",
+    items: [
+      {
+        q: "Are my photos uploaded anywhere?",
+        a: "No. Decoding, AI detection, and imports all run on your machine; the app only contacts GitHub to check for updates. The mobile gallery service listens on your LAN only and is off by default.",
+      },
+      {
+        q: "Which formats are supported?",
+        a: "RAW: ARW, CR2, CR3, NEF, DNG, ORF, RW2, RAF, PEF, SRW. Also JPG, PNG, GIF, BMP, TIFF, WebP, HEIC, HEIF, plus video thumbnails for MP4, MOV, AVI, MKV. DNG has a dedicated built-in decoder.",
+      },
+      {
+        q: "Can I use it commercially or fork it?",
+        a: "Yes. ImageFilter is MIT-licensed and the source is public; keep the copyright and license notice when you use, modify, or redistribute it.",
+      },
+      {
+        q: "Does it run on macOS?",
+        a: "Yes — a Universal build (Intel and Apple Silicon) is on Releases. That said, the macOS build has not been thoroughly tested on real hardware; please report issues with your OS version and repro steps. Lightroom hand-off and Mica glass are Windows-only.",
+      },
+    ],
   },
   footer: {
     tagline: "A RAW culling and archiving workflow",

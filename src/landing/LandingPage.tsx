@@ -5,6 +5,7 @@ import type { Lang } from "./i18n";
 import Compare from "./Compare";
 import DemoWindow from "./DemoWindow";
 import Download from "./Download";
+import FAQ from "./FAQ";
 import Features from "./Features";
 import Footer from "./Footer";
 import Hero from "./Hero";
@@ -46,6 +47,7 @@ export default function LandingPage() {
         <Features lang={lang} />
         <Workflow lang={lang} />
         <Download lang={lang} />
+        <FAQ lang={lang} />
       </main>
       <Footer lang={lang} />
     </div>

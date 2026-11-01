@@ -4,7 +4,7 @@
 
 ## 改版完成（2026-11）
 
-官网已按 [pryzm.design](https://pryzm.design/) 的视觉方向改版：纯黑单色 + emerald 数据色、Poppins / Inter / Geist Mono 自托管、首屏 6 张照片 + 主窗口的可拖拽拼贴；新增 FAQ，演示已同步到 **1.3.0**。
+官网已按 [pryzm.design](https://pryzm.design/) 的视觉方向改版：石墨黑单色 + emerald 数据色、Poppins / Inter / Geist Mono 自托管、首屏截图拼贴；追加了液态玻璃卡片、液态鼠标渐变背景、Hero 与 Demo 之间的 TechText 字标；新增 FAQ，演示已同步到 **1.3.0**。
 
 - 状态、决策、坑与验收记录：[docs/官网改版-交接.md](docs/官网改版-交接.md)
 - 设计规格与实施计划：[docs/superpowers/specs/2026-11-01-website-redesign.md](docs/superpowers/specs/2026-11-01-website-redesign.md) · [docs/superpowers/plans/2026-11-01-website-redesign.md](docs/superpowers/plans/2026-11-01-website-redesign.md)
@@ -17,9 +17,11 @@
 ```
 src/
   landing/       落地页组件(Hero/DemoWindow/Compare/Features/Workflow/Download/Footer/Nav)
+                  TechTextBand.tsx  Hero 与 Demo 之间的 ImageFilter 字标
                   VersionsPage.tsx  #/versions 版本全览页
-                  downloadData.ts   GitHub releases / 国内直链常量
-                  components/  基础组件；React Bits 的 RubberSegment（语言切换）、SplitFlapText（下载区翻页板）、FlapButtonLink/FlapLabel（CTA 翻页标签）、NeumorphicDownloadButton（安装包下载按钮）
+                  downloadData.ts   GitHub releases 常量
+                  lib/surfaces.ts   毛玻璃卡片表面
+                  components/  基础组件；React Bits 的 RubberSegment、SplitFlapText、TechText；rewampui 适配的 NeumorphicDownloadButton、LiquidCursorGradient；FlapButtonLink/FlapLabel
   demo/          软件迷你演示(真实 UI + mock 数据层)
     ui/          ← 从主仓库 src/ 同步的副本(见下方"demo/ui 同步")
     mock/        Tauri 命令 mock(fake-data/tauri-mock/placeholder)
@@ -43,6 +45,13 @@ npx vitest run     # mock 数据层确定性测试
 - 矢量源：`public/favicon.svg`（品牌标记）。页头 Logo 仍是 `src/assets/logo.png`，两者独立，改 favicon 不会动页头。
 - 回退：`public/favicon.png`（512×512）与 `public/favicon.ico`（16/32 多尺寸）。
 - `index.html` 的 PNG / ICO 链接带 `?v=2`；换图时把版本号递增，避免浏览器继续用旧图标缓存。
+
+## 液态玻璃 / 背景 / 字标
+
+- 卡片表面统一用 `src/landing/lib/surfaces.ts` 的 `glassCard`：3.5% 白底 + `backdrop-blur-lg` + 发丝线 + inset 高光；Compare、Features、Download、macOS 说明、版本页 release 卡共用。
+- `LiquidCursorGradient` 是固定 `z-0`、`pointer-events-none`、`aria-hidden` 的背景层；石墨/emerald 低透明度光斑，鼠标光斑用 spring 跟随。不要把它放到内容层之上，也不要让它拦截点击。
+- `TechTextBand` 在 Hero 与 Demo 之间，React Bits `TechText` 渲染「ImageFilter」；`sweep={false}` 保证静态时字形完整，hover 才出现轮廓/选择框；`fontSize` 会随容器自动缩小。
+- 毛玻璃只加在卡片上；demo 窗口、首屏截图卡、FAQ 行保持原样。
 
 ## demo/ui 同步（重要）
 

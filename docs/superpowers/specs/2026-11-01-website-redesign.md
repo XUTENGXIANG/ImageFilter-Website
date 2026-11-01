@@ -46,6 +46,8 @@
 | `--color-data` | `#10b981` | **只给数据**：星级、归档、勾选、Star 数（不叫 `accent`，避免覆盖 demo 的 shadcn `accent`） |
 
 > 与交接文档的偏差：原型用 `white/38` 做 10px 微标签，对比度约 3.2:1，低于 WCAG AA 的 4.5:1。规格把信息性小字统一提到 `white/50`（约 5.3:1）；`white/38` 只允许用于纯装饰线/点。
+>
+> 2026-11-01 追加的液态背景使用**低透明度 emerald 环境光**（§4.12）；这是用户明确要求的视觉层，emerald 的数据色语义不变，不把背景绿当成状态。
 
 ### 3.2 字体
 
@@ -268,6 +270,22 @@
 - **返回**：`href="#"` 清空 hash，回首页；页面标题在版本页为「版本全览 · ImageFilter」，返回后恢复。
 - 响应式：390 单列、768/1024/1440 保持版心；无横向溢出。
 
+### 4.11 TechText 字标带
+
+- 位置：Hero 与 Demo 之间；填补原首屏与演示区之间的空白，不放进 Hero 的拖拽层。
+- React Bits `TechText`，`text="ImageFilter"`，Poppins 600，字号 170 自动缩放到容器；最大高度 `clamp(180px, 18vw, 260px)`，`max-w-6xl`。
+- **静止时 `sweep={false}`**：字形完整可读；hover 时才出现字母轮廓、选择框和 emerald specks。`labels={false}`、`guides={false}`。
+- 颜色 `#fafafa`，交互强调 `#10b981`；Canvas 透明，露出后面的液态背景；`role="img" aria-label="ImageFilter"`。
+- 顶部加 112px 黑→透明渐变，和 Hero 底部黑场衔接，避免硬边。
+
+### 4.12 液态玻璃卡片与液体背景
+
+- 共享 `glassCard`：`bg-white/[0.035]` + `backdrop-blur-lg` + `border-line` + `inset 0 1px 0 rgba(255,255,255,.06)`。
+- 应用：Compare 两卡、Features 六卡、Download 三卡、macOS 说明卡、VersionsPage release 卡与状态卡；demo 窗口、首屏截图卡、FAQ 行保持不透明。
+- `LiquidCursorGradient`：固定 `z-0`、`pointer-events-none`、`aria-hidden`；石墨 + 低透明度 emerald 光斑，鼠标光斑 spring 跟随；`prefers-reduced-motion` 下停止漂浮与跟随。
+- 层级：背景 `z-0`，`main`/Footer `z-10`，Nav `z-50`；背景层不得拦截 Hero 拖拽、导航、Demo 或下载按钮。
+- 页脚保留不透明黑底；版本页同样加背景，玻璃卡才有可模糊的底。
+
 ## 5. 首屏拼贴规格
 
 ### 5.1 桌面布局（≥900px）
@@ -419,4 +437,6 @@ mock 形状（按主仓库类型）：
 15. **下载线路切换**：默认 GitHub；「国内加速」给安装包 URL 加 `ghfast.top` 前缀，不需要逐个上传；选择存 localStorage，首页/版本页共享，并显示第三方风险提示。
 16. **macOS 签名说明**：下载区默认收起的 Disclosure，三步 + 一条 quarantine 命令 + Issue 链接；不引导关闭 Gatekeeper/SIP。
 17. **折叠动效 / UI 优化**：FAQ 与 macOS 说明共用 `Disclosure`；高度/透明度 260ms expand 曲线、plus 旋转、inset focus ring、`inert` + `aria-controls`、命中区 ≥44px；`prefers-reduced-motion` 下直接开合。
-18. **仍未完成**：`vite base` 仍为 `/`（可选）。
+18. **液态玻璃卡片**：`lib/surfaces.ts` 的 `glassCard` 应用到 Compare/Features/Download/macOS 说明/版本页卡片；demo 窗口、首屏截图卡、FAQ 行保持不透明。
+19. **液态背景 + TechText**：`LiquidCursorGradient` 固定 `z-0`/`pointer-events-none` 背景，石墨 + 低透明度 emerald 光斑与 spring 鼠标光斑；`TechTextBand` 在 Hero/Demo 之间渲染 ImageFilter，`sweep=false` 保证静止可读，hover 才显示轮廓/选择框。版本页同样加背景。
+20. **仍未完成**：`vite base` 仍为 `/`（可选）。

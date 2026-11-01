@@ -23,6 +23,7 @@ export interface SplitFlapTextProps {
   depth?: number;
   className?: string;
   style?: CSSProperties;
+  as?: "div" | "span";
 }
 
 export default function SplitFlapText(props: SplitFlapTextProps): ReactElement;

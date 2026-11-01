@@ -3,6 +3,8 @@
 import { useEffect, useState } from "react";
 import { Apple, ChevronDown, DownloadCloud, Monitor } from "lucide-react";
 import Card from "./components/Card";
+import FlapButtonLink from "./components/FlapButtonLink";
+import FlapLabel, { useFlapTrigger } from "./components/FlapLabel";
 import Reveal from "./components/Reveal";
 import SectionHead from "./components/SectionHead";
 import SplitFlapText from "./components/SplitFlapText";
@@ -67,6 +69,7 @@ export default function Download({ lang }: DownloadProps) {
   // 这样发新版不用再回来改这 3 行 —— 之前那三条写死的链接停在 v1.0.0 上，落后了三个版本。
   const [latest, setLatest] = useState<LatestRelease | null>(null);
   const [failed, setFailed] = useState(false);
+  const cnFlap = useFlapTrigger();
 
   useEffect(() => {
     let cancelled = false;
@@ -195,18 +198,14 @@ export default function Download({ lang }: DownloadProps) {
                   </p>
 
                   <div className="mt-auto pt-7">
-                    <a
+                    <FlapButtonLink
                       href={href}
-                      target="_blank"
-                      rel="noreferrer"
-                      className={buttonStyles({
-                        variant: recommended ? "solid" : "ghost",
-                        size: "md",
-                        className: "w-full",
-                      })}
-                    >
-                      {card.action}
-                    </a>
+                      external
+                      variant={recommended ? "solid" : "ghost"}
+                      size="md"
+                      className="w-full"
+                      label={card.action}
+                    />
                   </div>
                 </Card>
               </Reveal>
@@ -219,11 +218,17 @@ export default function Download({ lang }: DownloadProps) {
           <button
             type="button"
             onClick={() => setCnOpen((open) => !open)}
+            onMouseEnter={() => cnFlap.trigger()}
+            onFocus={() => cnFlap.trigger()}
             aria-expanded={cnOpen}
             className={buttonStyles({ variant: "ghost", size: "md", className: "gap-2.5 px-5" })}
           >
             <DownloadCloud className="size-4" aria-hidden="true" />
-            {t.download.cnDownload}
+            <FlapLabel
+              label={t.download.cnDownload}
+              intro={cnFlap.intro}
+              flipKey={cnFlap.flipKey}
+            />
             <ChevronDown
               className={cn(
                 "size-4 transition-transform duration-200",

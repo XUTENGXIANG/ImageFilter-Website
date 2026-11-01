@@ -1,7 +1,7 @@
 // Copyright (c) 2026 XUTENGXIANG
 // SPDX-License-Identifier: MIT
 import { useState } from "react";
-import { ButtonLink } from "./components/Button";
+import FlapButtonLink from "./components/FlapButtonLink";
 import HeroCollage from "./HeroCollage";
 import type { Lang } from "./i18n";
 import { translations } from "./i18n";
@@ -60,12 +60,18 @@ export default function Hero({ lang }: HeroProps) {
               {t.hero.subtitle}
             </p>
             <div className="flex flex-wrap gap-2">
-              <ButtonLink href="#download" variant="solid" size="lg">
-                {t.hero.windows}
-              </ButtonLink>
-              <ButtonLink href="#download" variant="ghost" size="lg">
-                {t.hero.macos}
-              </ButtonLink>
+              <FlapButtonLink
+                href="#download"
+                variant="solid"
+                size="lg"
+                label={t.hero.windows}
+              />
+              <FlapButtonLink
+                href="#download"
+                variant="ghost"
+                size="lg"
+                label={t.hero.macos}
+              />
             </div>
             <p className="mt-4 font-landing-mono text-[10.5px] leading-[1.5] tracking-[0.04em] text-ink-faint">
               {t.hero.micro}

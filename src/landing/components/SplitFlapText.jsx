@@ -48,6 +48,11 @@ const buildSequence = (target, flips, charset) => {
 
 const toGlyph = char => (char === ' ' ? ' ' : char);
 
+const isCjkChar = char => {
+  const code = String(char).charCodeAt(0);
+  return code >= 0x3400 && code <= 0x9fff;
+};
+
 const shuffleIndices = count => {
   const list = Array.from({ length: count }, (_, index) => index);
   for (let i = count - 1; i > 0; i -= 1) {
@@ -112,6 +117,7 @@ const SplitFlapText = ({
   tileStyle = 'board',
   className = '',
   style = {},
+  as: Root = 'div',
   ...props
 }) => {
   const prefersReducedMotion = usePrefersReducedMotion();
@@ -364,11 +370,13 @@ const SplitFlapText = ({
   };
 
   return (
-    <div className={rootClass} style={componentStyle} {...props}>
+    <Root className={rootClass} style={componentStyle} {...props}>
       <span className="split-flap-text__sr">{label}</span>
       {tiles.map((tile, index) => (
         <span
-          className={`split-flap-text__tile${tile.flipping ? ' is-flipping' : ''}`}
+          className={`split-flap-text__tile${tile.flipping ? ' is-flipping' : ''}${
+            isCjkChar(tile.current) || isCjkChar(tile.next) ? ' is-cjk' : ''
+          }`}
           aria-hidden="true"
           key={`${index}-${tiles.length}`}
         >
@@ -403,7 +411,7 @@ const SplitFlapText = ({
           )}
         </span>
       ))}
-    </div>
+    </Root>
   );
 };
 

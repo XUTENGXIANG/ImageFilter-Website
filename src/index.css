@@ -147,3 +147,29 @@ body {
     font-size: 26px;
   }
 }
+
+/* 按钮内标签：用 minimal 翻页，继承按钮字体与颜色，不画深色翻页块。
+   中文单字占 1em；英文用 0.78em，避免按钮被撑得过宽。 */
+.split-flap-text.flap-button-label {
+  font-family: var(--font-landing-mono);
+  font-weight: inherit;
+  font-size: inherit;
+  line-height: 1;
+  letter-spacing: 0;
+  color: currentColor;
+}
+
+.flap-button-label .split-flap-text__tile {
+  width: 0.7em;
+}
+
+.flap-button-label .split-flap-text__tile.is-cjk {
+  width: 1em;
+}
+
+/* 1024 宽英文站的「Download Windows Installer」是最长标签；12px 时仍能完整放进 265px 按钮。 */
+@media (max-width: 1100px) {
+  #download .flap-button-label {
+    font-size: 12px;
+  }
+}

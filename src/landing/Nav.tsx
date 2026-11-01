@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 import { useEffect, useState } from "react";
 import logo from "../assets/logo.png";
-import { ButtonLink } from "./components/Button";
+import FlapButtonLink from "./components/FlapButtonLink";
 import RubberSegment from "./components/RubberSegment";
 import GitHubStarButton from "./GitHubStarButton";
 import type { Lang } from "./i18n";
@@ -95,9 +95,12 @@ export default function Nav({ lang, onLangChange }: NavProps) {
             className="border border-line"
           />
 
-          <ButtonLink href="#download" variant="solid" size="sm">
-            {t.nav.download}
-          </ButtonLink>
+          <FlapButtonLink
+            href="#download"
+            variant="solid"
+            size="sm"
+            label={t.nav.download}
+          />
         </div>
       </div>
 

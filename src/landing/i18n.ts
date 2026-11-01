@@ -25,10 +25,18 @@ export interface LandingMessages {
     windowAlt: string;
   };
   collage: {
-    archived: string;
-    blur: string;
-    overexposed: string;
-    duplicate: string;
+    deviceTree: string;
+    deviceTreeMeta: string;
+    folders: string;
+    foldersMeta: string;
+    grid: string;
+    gridMeta: string;
+    mainUi: string;
+    mainUiMeta: string;
+    details: string;
+    detailsMeta: string;
+    demoData: string;
+    demoDataMeta: string;
     windowMeta: string;
   };
   demo: {
@@ -154,10 +162,18 @@ export const zh: LandingMessages = {
     windowAlt: "ImageFilter 网格视图，已选 3 / 24",
   },
   collage: {
-    archived: "已归档",
-    blur: "AI · 模糊",
-    overexposed: "AI · 过曝",
-    duplicate: "AI · 连拍重复",
+    deviceTree: "设备树",
+    deviceTreeMeta: "插卡识别",
+    folders: "目录",
+    foldersMeta: "按相机分卷",
+    grid: "网格",
+    gridMeta: "彩色 Demo",
+    mainUi: "主界面",
+    mainUiMeta: "v1.3.0",
+    details: "详细信息",
+    detailsMeta: "EXIF · 评分",
+    demoData: "演示数据",
+    demoDataMeta: "占位卡片",
     windowMeta: "网格 · 已选 3 / 24",
   },
   demo: {
@@ -356,10 +372,18 @@ export const en: LandingMessages = {
     windowAlt: "ImageFilter grid view, 3 of 24 selected",
   },
   collage: {
-    archived: "Archived",
-    blur: "AI · Blurry",
-    overexposed: "AI · Overexposed",
-    duplicate: "AI · Burst duplicate",
+    deviceTree: "Device tree",
+    deviceTreeMeta: "Card detected",
+    folders: "Folders",
+    foldersMeta: "By camera",
+    grid: "Grid",
+    gridMeta: "Colored demo",
+    mainUi: "Main UI",
+    mainUiMeta: "v1.3.0",
+    details: "Details",
+    detailsMeta: "EXIF · rating",
+    demoData: "Demo data",
+    demoDataMeta: "Placeholder cards",
     windowMeta: "Grid · 3 of 24 selected",
   },
   demo: {

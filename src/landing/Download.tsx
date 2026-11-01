@@ -133,10 +133,10 @@ export default function Download({ lang }: DownloadProps) {
                 order="left"
                 align="center"
                 tileStyle="board"
-                tileColor="#141414"
+                tileColor="#1c1c1c"
                 textColor="#fafafa"
                 glare={0}
-                depth={0.5}
+                depth={0.6}
                 tileRadius={9}
                 gap={5}
                 fontSize={34}

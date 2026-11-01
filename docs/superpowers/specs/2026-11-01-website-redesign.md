@@ -392,4 +392,5 @@ mock 形状（按主仓库类型）：
 7. **`buttonStyles`** 拆到 `src/landing/components/buttonStyles.ts`，避免同一文件既导出组件又导出函数触发 fast-refresh 警告。
 8. **装饰编号对比度**：compare / features / FAQ 的 10.5px 编号统一到 `ink-faint`（5.3:1），workflow 的 40px 大编号到 `white/40`（3.6:1），避免低对比度审计 blocker；视觉上仍保留「幽灵编号」的层次。
 9. **覆盖层对比度**：移动端导航第二行用 `bg-black/75 backdrop-blur-xl`；首屏拖拽提示用 `bg-black/80` + `text-white/70`，避免压在照片/软件截图上不可读。
-10. **仍未完成**：6 张真实照片（当前为图库占位图）、`CN_DOWNLOADS` 仍是 1.0.0、`vite base` 仍为 `/`（可选）。
+10. **demo 外壳修复**（用户验收反馈）：`src/demo/index.css` 补回主仓库的树行样式（28px 行高、`.tree-kids` 裁剪与高度过渡、`.tree-caret` 旋转），修复设备栏重叠；给 `.ifdemo-scope` 补深/浅主题底色，修复浅色主题中间露黑底；把 `.ifdemo-scope .fixed` 改成 `absolute`，让图片查看器/对话框限制在 demo 框内；隐藏 titlebar 齿轮，官网演示不开放设置面板。
+11. **仍未完成**：6 张真实照片（当前为图库占位图）、`CN_DOWNLOADS` 仍是 1.0.0、`vite base` 仍为 `/`（可选）。

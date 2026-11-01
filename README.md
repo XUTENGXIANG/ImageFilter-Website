@@ -66,6 +66,15 @@ Remove-Item "$dst\hooks\use-mobile.ts" -ErrorAction SilentlyContinue
 >
 > 1.3.0 同步新增：Phase 8 的 16 个命令（图库服务 / mDNS 配对）、`@tauri-apps/api/event` 的 `listen` mock 与类型声明、第 6 项语义色 token。
 
+### 官网 demo 外壳适配（不在主仓库同步范围）
+
+以下规则只存在于 `src/demo/index.css`，是为了让软件 UI 在落地页的框里正常显示，**不要**同步回主仓库：
+
+- **树行样式**：`.tree-row` 的 28px 行高、`.tree-kids` 的 overflow/height 过渡、`.tree-caret` 旋转、`.press-row` 按下反馈。漏掉时文件夹树展开会互相压住。
+- **浅色主题底色**：`:root[data-theme="light"] .ifdemo-scope { background:#fbfbfb }`；App 根容器是透明的，不补这一层，浅色主题中间会露出落地页黑底。
+- **弹层约束**：`.ifdemo-scope .fixed { position:absolute !important }`，把图片查看器、对话框、toast 限制在 demo 框内，而不是铺满整个落地页。
+- **隐藏设置入口**：`.ifdemo-scope button:has(.i-icon-setting) { display:none }`。官网演示不开放 1.3.0 的设置面板；主仓库真机不受影响。
+
 ## 部署
 
 - GitHub Pages：push `master` 后 Actions 自动构建部署

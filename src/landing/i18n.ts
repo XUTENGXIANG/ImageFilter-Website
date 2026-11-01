@@ -105,6 +105,9 @@ export interface LandingMessages {
     mit: string;
     backToDemo: string;
     copyright: string;
+    product: string;
+    resources: string;
+    contact: string;
   };
 }
 
@@ -283,6 +286,9 @@ export const zh: LandingMessages = {
     mit: "MIT 许可",
     backToDemo: "回到演示",
     copyright: "© 2026 XUTENGXIANG · MIT License",
+    product: "产品",
+    resources: "资源",
+    contact: "联系",
   },
 };
 
@@ -465,6 +471,9 @@ export const en: LandingMessages = {
     mit: "MIT License",
     backToDemo: "Back to Demo",
     copyright: "© 2026 XUTENGXIANG · MIT License",
+    product: "Product",
+    resources: "Resources",
+    contact: "Contact",
   },
 };
 

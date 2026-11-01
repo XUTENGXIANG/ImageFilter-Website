@@ -5,7 +5,7 @@ import { Apple, ChevronDown, DownloadCloud, Monitor } from "lucide-react";
 import Card from "./components/Card";
 import Reveal from "./components/Reveal";
 import SectionHead from "./components/SectionHead";
-import { buttonStyles } from "./components/Button";
+import { buttonStyles } from "./components/buttonStyles";
 import type { Lang } from "./i18n";
 import { translations } from "./i18n";
 import { cn } from "./lib/cn";

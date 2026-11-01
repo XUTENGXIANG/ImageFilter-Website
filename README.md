@@ -107,6 +107,8 @@ Remove-Item "$dst\hooks\use-mobile.ts" -ErrorAction SilentlyContinue
 
 蓝奏云国内直链已移除（手动逐个上传太麻烦）；国内加速走下载线路切换，自动跟随 GitHub 最新版。
 
+下载区有一块默认收起的 **macOS 签名说明**：未做 Apple 公证、首次启动被 Gatekeeper 拦截，以及「右键打开 / 隐私与安全性 → 仍要打开」和 `sudo xattr -rd com.apple.quarantine` 两条处理路径。
+
 
 ## 动效组件说明
 

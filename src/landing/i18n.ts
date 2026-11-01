@@ -101,6 +101,15 @@ export interface LandingMessages {
     mirrorFast: string;
     mirrorNote: string;
   };
+  macosSign: {
+    label: string;
+    title: string;
+    intro: string;
+    steps: string[];
+    command: string;
+    note: string;
+    issue: string;
+  };
   versions: {
     eyebrow: string;
     title: string;
@@ -294,6 +303,19 @@ export const zh: LandingMessages = {
     mirrorGithub: "GitHub",
     mirrorFast: "国内加速",
     mirrorNote: "第三方加速，可能失效；安装前请核对文件大小。",
+  },
+  macosSign: {
+    label: "macOS / SIGNING",
+    title: "打不开？签名与首次启动",
+    intro: "macOS 包未做 Apple 公证，Gatekeeper 会拦截首次启动。",
+    steps: [
+      "把 ImageFilter 拖进「应用程序」。",
+      "先双击一次，再到 系统设置 → 隐私与安全性 → 仍要打开；或右键 ImageFilter → 打开。",
+      "若提示「已损坏」：终端执行下面命令，再打开。",
+    ],
+    command: "sudo xattr -rd com.apple.quarantine /Applications/ImageFilter.app",
+    note: "仍然打不开？附 macOS 版本和报错截图提 Issue。",
+    issue: "提交 Issue",
   },
   versions: {
     eyebrow: "全部版本",
@@ -506,6 +528,19 @@ export const en: LandingMessages = {
     mirrorGithub: "GitHub",
     mirrorFast: "Fast mirror",
     mirrorNote: "Third-party mirror; may be unavailable. Check the file size before installing.",
+  },
+  macosSign: {
+    label: "macOS / SIGNING",
+    title: "Won't open? Signing & first launch",
+    intro: "The macOS build is not notarized by Apple, so Gatekeeper blocks the first launch.",
+    steps: [
+      "Drag ImageFilter into Applications.",
+      "Open it once, then go to System Settings → Privacy & Security → Open Anyway; or right-click ImageFilter → Open.",
+      "If macOS says the app is damaged: run the command below, then open it.",
+    ],
+    command: "sudo xattr -rd com.apple.quarantine /Applications/ImageFilter.app",
+    note: "Still stuck? Open an issue with your macOS version and a screenshot of the error.",
+    issue: "Open an issue",
   },
   versions: {
     eyebrow: "All releases",

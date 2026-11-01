@@ -5,6 +5,7 @@ import { Apple, ArrowUpRight, Layers, Monitor } from "lucide-react";
 import Card from "./components/Card";
 import DownloadMirrorToggle from "./components/DownloadMirrorToggle";
 import FlapLabel, { useFlapTrigger } from "./components/FlapLabel";
+import MacOSSigningNote from "./components/MacOSSigningNote";
 import NeumorphicDownloadButton from "./components/NeumorphicDownloadButton";
 import Reveal from "./components/Reveal";
 import SectionHead from "./components/SectionHead";
@@ -190,8 +191,12 @@ export default function Download({ lang }: DownloadProps) {
           })}
         </div>
 
-        {/* 更多版本：进入 #/versions，列出全部 releases 与国内直链 */}
-        <Reveal delay={0.15} className="mt-10">
+        <Reveal delay={0.12} className="mt-6">
+          <MacOSSigningNote lang={lang} />
+        </Reveal>
+
+        {/* 更多版本：进入 #/versions，列出全部 releases */}
+        <Reveal delay={0.15} className="mt-6">
           <a
             href="#/versions"
             onMouseEnter={() => moreFlap.trigger()}

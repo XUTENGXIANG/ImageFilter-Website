@@ -105,7 +105,7 @@ Remove-Item "$dst\hooks\use-mobile.ts" -ErrorAction SilentlyContinue
 - 选择写入 `localStorage`，首页和版本页共享；第三方前缀可能失效或改写内容，页面会显示风险提示，安装前请核对文件大小。
 - 要换加速服务只改 `MIRROR_PREFIX`；要换成自建 Worker 就改成自建前缀（见 `workers/`）。
 
-`src/landing/downloadData.ts` 的 `CN_DOWNLOADS`（蓝奏云国内直链）仍是手动的：换了安装包得自己重传、并把 `name` 里的版本号与 `password` 一起改掉（版本全览页不会跟着变）。
+蓝奏云国内直链已移除（手动逐个上传太麻烦）；国内加速走下载线路切换，自动跟随 GitHub 最新版。
 
 
 ## 动效组件说明

@@ -5,7 +5,7 @@ import DownloadMirrorToggle from "./components/DownloadMirrorToggle";
 import LanguageToggle from "./components/LanguageToggle";
 import Reveal from "./components/Reveal";
 import SectionHead from "./components/SectionHead";
-import { ALL_RELEASES_API, CN_DOWNLOADS, RELEASES_PAGE } from "./downloadData";
+import { ALL_RELEASES_API, RELEASES_PAGE } from "./downloadData";
 import type { Lang } from "./i18n";
 import { triggerIframeDownload } from "./lib/download";
 import { mirrorUrl, useDownloadMirror } from "./lib/downloadMirror";
@@ -257,37 +257,6 @@ export default function VersionsPage({ lang, onLangChange }: VersionsPageProps) 
             </div>
           )}
         </div>
-
-        <section className="mt-14">
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-            <h2 className="font-display text-display-lg font-semibold text-ink">
-              {t.versions.cnTitle}
-            </h2>
-            <p className="max-w-2xl text-body text-ink-muted text-pretty">
-              {t.versions.cnNote}
-            </p>
-          </div>
-          <div className="mt-6 grid gap-3 sm:grid-cols-2">
-            {CN_DOWNLOADS.map((item) => (
-              <a
-                key={item.href}
-                href={item.href}
-                target="_blank"
-                rel="noreferrer"
-                className="rounded-card border border-line bg-surface-sunken p-5 transition-colors hover:border-line-strong hover:bg-white/[0.015]"
-              >
-                <span className="block truncate font-landing-mono text-mono-sm text-ink">
-                  {item.name}
-                </span>
-                {item.password ? (
-                  <span className="mt-2 block text-caption text-ink-faint">
-                    {t.download.password} {item.password}
-                  </span>
-                ) : null}
-              </a>
-            ))}
-          </div>
-        </section>
 
         <footer className="mt-16 border-t border-line pt-6">
           <div className="flex flex-wrap items-center justify-between gap-3">

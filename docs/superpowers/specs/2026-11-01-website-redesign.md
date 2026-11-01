@@ -209,10 +209,9 @@
 - 3 张卡：`surface-sunken` + hairline；第一张（Windows 安装包）加 `line-strong` 边框 + `white/[0.02]` 底 + mono `推荐` 徽章。
 - 卡片内容：平台名 16px、文件名 Geist Mono 11px 截断、说明 14px、按钮。
 - 按钮：三张卡使用 rewampui `NeumorphicDownloadButton`（全宽、72px 高，下载中/已完成文案）；点击时通过隐藏 iframe 触发浏览器原生下载，当前页面不跳转、不开新标签页；2.2s 进度环为视觉反馈，不是真实字节进度。
-- 国内直链入口：改成「更多版本」→ `#/versions`；蓝奏云链接/密码移到版本全览页。
+- 更多版本入口：`#/versions`；蓝奏云国内直链已**移除**（手动逐个上传成本太高）。
 - **下载线路**：卡片上方提供 GitHub / 国内加速两档；默认 GitHub，国内加速给 GitHub 资源加 `ghfast.top` 前缀，选择存 localStorage；显示第三方加速风险提示。
 - 保留：`GitHub Releases →` 链接、加载/失败态；MSI 说明不再放在折叠区（版本页直接列 MSI 资产）。
-- 已知内容问题（记录，不在本次改数据）：`CN_DOWNLOADS` 仍是 1.0.0，需用户重传后手动更新。
 
 ### 4.8 FAQ（新增）
 
@@ -263,7 +262,7 @@
 - **数据**：打开页面时取 `https://api.github.com/repos/XUTENGXIANG/ImageFilter/releases?per_page=100`；失败显示错误 + Releases 链接；空列表显示空态。
 - **下载线路**：页头下复用与首页一致的 GitHub / 国内加速切换；加速时资产行 href 与 iframe 都走 `ghfast.top` 前缀。
 - **版本卡**：按 GitHub 顺序列出 tag、名称、发布日期、预发布标记；首条标「最新」。每条只列安装包资产（`-setup.exe` / `.msi` / `.dmg` / `.apk` / `.zip`），过滤 updater 的 `.tar.gz` / `.sig`；资产行显示文件名、类型、大小，点击用隐藏 iframe 下载（当前页不跳；Ctrl/Cmd/中键保留新标签页语义）；底部「发布说明」。
-- **国内直链**：页面末尾列出 `CN_DOWNLOADS`（蓝奏云）+ 密码 + 「手动维护，可能不是最新版」说明。
+- **国内直链**：已移除；国内加速由页面顶部的下载线路切换提供。
 - **页脚**：版权 + GitHub Releases 链接。
 - **返回**：`href="#"` 清空 hash，回首页；页面标题在版本页为「版本全览 · ImageFilter」，返回后恢复。
 - 响应式：390 单列、768/1024/1440 保持版心；无横向溢出。
@@ -381,7 +380,7 @@ mock 形状（按主仓库类型）：
 | 2 | 卡片说明的文件名/日期是占位 mock | 收到照片后同步改成用户实际文件名与拍摄信息 |
 | 3 | demo 同步可能暴露 README 五项之外的漂移（CSS token、动态 import） | 本 spec 已补第 6 项；同步后以 `build` + 实机点设置面板为准 |
 | 4 | FAQ 的 macOS / 许可表述需用户最终确认 | 文案已按主仓库 README 写；发布前请用户过目 |
-| 5 | `CN_DOWNLOADS` 仍是 1.0.0 | 不在本次改数据；提醒用户重传蓝奏云后更新名称/密码 |
+| 5 | ~~`CN_DOWNLOADS` 仍是 1.0.0~~ | **已移除**；国内加速改走下载线路切换 |
 | 6 | `vite base` 仍是 `/`，github.io 地址取不到资源 | 可选项，不在本次范围；线上以 `tensyn.online/imagefilter/` 为准 |
 | 7 | 原型拖拽提示元素缺失导致首次拖拽控制台报错 | 正式实现补 `hint` 元素并做空值保护 |
 
@@ -406,15 +405,15 @@ mock 形状（按主仓库类型）：
 2. **移动端 Nav**：第二行 4 个锚点加 `bg-black/60 backdrop-blur-xl`。原型没有这条移动端导航；不加底色时，链接落在首屏照片上不可读。
 3. **移动端演示**：`ImageFilterDemo` 在 `<900px` 设 `min-width:720px`，外层 `overflow-x-auto`，可横向滑动查看软件 UI；页面本身仍无横向溢出。说明文字补「窄屏可左右滑动 / Swipe horizontally on narrow screens」。
 4. **英文标题空格**：`Keep only` 与 `the keepers` 之间由组件按语言补空格，避免 `Keep onlythe keepers`。
-5. **i18n 补充**：新增 `download.password`（蓝奏云密码标签），避免英文界面出现中文「密码」。
+5. **i18n 补充**：新增下载完成/下载中、下载线路等文案；蓝奏云移除后对应的 `password` / `cnTitle` 等 key 已删除。
 6. **demo 同步**：按 README 五项 + 本规格第 6 项（语义色 token）完成。实测设置面板可打开，开启局域网服务后显示 `http://192.168.1.10:47832`，配对按钮显示「配对窗口已打开」，无控制台异常。
 7. **`buttonStyles`** 拆到 `src/landing/components/buttonStyles.ts`，避免同一文件既导出组件又导出函数触发 fast-refresh 警告。
 8. **装饰编号对比度**：compare / features / FAQ 的 10.5px 编号统一到 `ink-faint`（5.3:1），workflow 的 40px 大编号到 `white/40`（3.6:1），避免低对比度审计 blocker；视觉上仍保留「幽灵编号」的层次。
 9. **覆盖层对比度**：移动端导航第二行用 `bg-black/75 backdrop-blur-xl`；首屏拖拽提示用 `bg-black/80` + `text-white/70`，避免压在照片/软件截图上不可读。
 10. **demo 外壳修复**（用户验收反馈）：`src/demo/index.css` 补回主仓库的树行样式（28px 行高、`.tree-kids` 裁剪与高度过渡、`.tree-caret` 旋转），修复设备栏重叠；给 `.ifdemo-scope` 补深/浅主题底色，修复浅色主题中间露黑底；把 `.ifdemo-scope .fixed` 改成 `absolute`，让图片查看器/对话框限制在 demo 框内；隐藏 titlebar 齿轮，官网演示不开放设置面板。
 11. **安装包下载按钮**：接入 rewampui registry 的 `neumorphic-download-button`，三张卡全宽使用；点击用隐藏 iframe 触发浏览器原生下载（当前页不跳、不开新标签页），2.2s emerald 进度环只是视觉反馈，进度/完成文案中英双语。CLI 因 `components.json` 缺 `registryUrl` 失败，按同一份 registry 源码落在 `src/landing/components/`，用项目已有的 `motion/react` 替代 `framer-motion`。
-12. **更多版本 / 版本全览**：原「国内直链下载」折叠区改为「更多版本」→ `#/versions`；`VersionsPage` 读取全部 releases，过滤 updater 资产，资产行同样用隐藏 iframe 下载，保留蓝奏云直链；hash 路由，带返回首页、语言切换、页面标题。
+12. **更多版本 / 版本全览**：原「国内直链下载」折叠区改为「更多版本」→ `#/versions`；`VersionsPage` 读取全部 releases，过滤 updater 资产，资产行同样用隐藏 iframe 下载；hash 路由，带返回首页、语言切换、页面标题。蓝奏云直链后续按用户要求移除。
 13. **FlapLabel 指针穿透**：`.flap-button-label { pointer-events:none }` 修复 hover 重挂载导致快速点击丢失；按钮标签仍保留 `aria-hidden` tile + SR 原文。
 14. **首屏截图拼贴**：按用户选择，6 张图库占位照片替换为「按用户浅色 demo 状态重截的修复后整窗图 + 重新截取的设备树 + 彩色 DEMO 网格」；图注改为界面说明，`src/assets/photos/` 已移除，新增 `src/assets/screens/`。
 15. **下载线路切换**：默认 GitHub；「国内加速」给安装包 URL 加 `ghfast.top` 前缀，不需要逐个上传；选择存 localStorage，首页/版本页共享，并显示第三方风险提示。
-16. **仍未完成**：`CN_DOWNLOADS` 仍是 1.0.0（可选/可移除）、`vite base` 仍为 `/`（可选）。
+16. **仍未完成**：`vite base` 仍为 `/`（可选）。

@@ -93,9 +93,6 @@ export interface LandingMessages {
       action: string;
     }[];
     releases: string;
-    cnDownload: string;
-    password: string;
-    msiNote: string;
     moreVersions: string;
     downloading: string;
     downloaded: string;
@@ -117,8 +114,6 @@ export interface LandingMessages {
     published: string;
     releaseNotes: string;
     noAssets: string;
-    cnTitle: string;
-    cnNote: string;
     openReleases: string;
   };
   faq: {
@@ -292,9 +287,6 @@ export const zh: LandingMessages = {
       },
     ],
     releases: "查看 GitHub Releases →",
-    cnDownload: "国内直链下载",
-    password: "密码",
-    msiNote: "MSI 安装包请前往",
     moreVersions: "更多版本",
     downloading: "下载中…",
     downloaded: "已完成",
@@ -316,8 +308,6 @@ export const zh: LandingMessages = {
     published: "发布于",
     releaseNotes: "发布说明",
     noAssets: "这个版本没有可下载的安装包。",
-    cnTitle: "国内直链",
-    cnNote: "蓝奏云链接为手动维护，可能不是最新版；提取密码见每条链接。",
     openReleases: "在 GitHub 查看全部 Releases",
   },
   faq: {
@@ -509,9 +499,6 @@ export const en: LandingMessages = {
       },
     ],
     releases: "View GitHub Releases →",
-    cnDownload: "Direct China Links",
-    password: "Password",
-    msiNote: "MSI installer: see",
     moreVersions: "More versions",
     downloading: "Downloading…",
     downloaded: "Downloaded",
@@ -533,8 +520,6 @@ export const en: LandingMessages = {
     published: "Published",
     releaseNotes: "Release notes",
     noAssets: "This release has no installer assets.",
-    cnTitle: "China direct links",
-    cnNote: "China links are maintained manually and may not be the latest; the extraction password is shown on each link.",
     openReleases: "View all releases on GitHub",
   },
   faq: {

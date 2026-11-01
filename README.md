@@ -17,7 +17,9 @@
 ```
 src/
   landing/       落地页组件(Hero/DemoWindow/Compare/Features/Workflow/Download/Footer/Nav)
-                  components/  基础组件；React Bits 的 RubberSegment（语言切换）、SplitFlapText（下载区翻页板）、FlapButtonLink/FlapLabel（CTA 翻页标签）
+                  VersionsPage.tsx  #/versions 版本全览页
+                  downloadData.ts   GitHub releases / 国内直链常量
+                  components/  基础组件；React Bits 的 RubberSegment（语言切换）、SplitFlapText（下载区翻页板）、FlapButtonLink/FlapLabel（CTA 翻页标签）、NeumorphicDownloadButton（安装包下载按钮）
   demo/          软件迷你演示(真实 UI + mock 数据层)
     ui/          ← 从主仓库 src/ 同步的副本(见下方"demo/ui 同步")
     mock/        Tauri 命令 mock(fake-data/tauri-mock/placeholder)
@@ -93,12 +95,16 @@ Remove-Item "$dst\hooks\use-mobile.ts" -ErrorAction SilentlyContinue
 
 下载区的**版本号与三条直链都不再写死**：打开页面时问一次 GitHub 的 `/releases/latest`，徽章显示 `tag_name`、三张卡片的文件名与直链都从该 release 的附件里挑（`-setup.exe` / `.msi` / `.dmg`）。取不到就显示"版本获取失败"，按钮退到 Releases 页 —— 所以**发新版不用再回来改这里**。
 
-只有 `src/landing/Download.tsx` 的 `CN_DOWNLOADS`（蓝奏云国内直链）仍是手动的：换了安装包得自己重传、并把 `name` 里的版本号与 `password` 一起改掉（页面不会跟着变）。
+下载区的「更多版本」跳到 `#/versions` 的版本全览页：该页读取 `/releases?per_page=100`，列出每个版本的安装包（过滤掉 updater 的 `.tar.gz`/`.sig`），并把国内直链放在页面底部。这是 hash 路由，静态托管不需要 404 回退。
+
+`src/landing/downloadData.ts` 的 `CN_DOWNLOADS`（蓝奏云国内直链）仍是手动的：换了安装包得自己重传、并把 `name` 里的版本号与 `password` 一起改掉（版本全览页不会跟着变）。
 
 
 ## 动效组件说明
 
 `src/demo/ui/components/` 下的 BorderGlow/ClickSpark/LiquidEther/ParticleText/SpecularButton 等为 React Bits 风格动效（JS/JSX 变体 + `.d.ts` 声明）。2026-11 改版后落地页已不再引用它们，文件保留以备复用。`src/main.tsx` 仍关闭 StrictMode（既有决定）；恢复前需单独验证 demo 的双挂载行为。
+
+> `NeumorphicDownloadButton` 来自 rewampui registry 的 `neumorphic-download-button`。本项目的 `components.json` 没有 `registryUrl`（只配了 react-bits 的 `registries`），CLI 的 `add` 会报 `Cannot read properties of undefined (reading 'replace')`；因此按同一份 registry 源码手工落在 `src/landing/components/`，并把 `framer-motion` 换成项目已有的 `motion/react`。不要把它写进 `src/demo/ui/components/`，否则会被主仓库同步覆盖。
 
 ## 许可
 

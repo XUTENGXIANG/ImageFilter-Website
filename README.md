@@ -2,14 +2,15 @@
 
 [ImageFilter](https://github.com/XUTENGXIANG/ImageFilter) 桌面应用的落地页与在线演示。线上地址：[https://xutengxiang.github.io/ImageFilter-Website/](https://xutengxiang.github.io/ImageFilter-Website/)（别名 [tensyn.online/imagefilter](https://tensyn.online/imagefilter/)）。
 
-## 改版进行中（2026-11）
+## 改版完成（2026-11）
 
-官网正按 [pryzm.design](https://pryzm.design/) 的视觉方向改版：纯黑单色 + emerald 数据色、Poppins / Inter / Geist Mono 自托管、首屏可拖拽照片拼贴。**目前只完成首屏原型，正式页面尚未改动。**
+官网已按 [pryzm.design](https://pryzm.design/) 的视觉方向改版：纯黑单色 + emerald 数据色、Poppins / Inter / Geist Mono 自托管、首屏 6 张照片 + 主窗口的可拖拽拼贴；新增 FAQ，演示已同步到 **1.3.0**。
 
-- 状态、决策与实施计划：[docs/官网改版-交接.md](docs/官网改版-交接.md)
-- 首屏原型（自包含 HTML）：[docs/prototype/hero.html](docs/prototype/hero.html)
+- 状态、决策、坑与验收记录：[docs/官网改版-交接.md](docs/官网改版-交接.md)
+- 设计规格与实施计划：[docs/superpowers/specs/2026-11-01-website-redesign.md](docs/superpowers/specs/2026-11-01-website-redesign.md) · [docs/superpowers/plans/2026-11-01-website-redesign.md](docs/superpowers/plans/2026-11-01-website-redesign.md)
+- 首屏原型（自包含 HTML，保留作参考）：[docs/prototype/hero.html](docs/prototype/hero.html)
 
-> 注意：`src/demo/ui/` 仍是主仓库 **1.1.2** 的副本，尚未同步到 1.3.0。
+> 注意：首屏 6 张照片仍是**图库占位图**，上线前必须替换为用户自有作品（清单见 `src/assets/photos/README.md`）。
 
 ## 结构
 
@@ -59,8 +60,11 @@ Remove-Item "$dst\hooks\use-mobile.ts" -ErrorAction SilentlyContinue
 | 3 | **构建期全局**（如 `__APP_VERSION__`）：声明 + `define` 都要有（主仓库 `vite-env.d.ts` 不在同步名单里） | `src/vite-env.d.ts` + `vite.config.ts` |
 | 4 | **`App` 的必传参数**：1.1.1 起是 `osCapabilities`（真机由主仓库 `main.tsx` 探测后传入，而 `main.tsx` 不参与同步） | `src/demo/ImageFilterDemo.tsx` |
 | 5 | **版本号**：改成主仓库 `package.json` 的 version（不能拿本仓库的 `0.0.0` 顶替） | `src/demo/app-version.ts` |
+| 6 | **CSS 语义色 token（README 原先漏写）**：1.3.0 的 `text-brand` / `bg-brand-strong` / `text-danger` 等类需要 `--brand*` / `--danger*` / `--warning` / `--info` 变量与 `@theme inline` 映射；漏了不报错，但按钮/状态会静默失色 | `src/demo/index.css` |
 
 > 1.1.2 这次同步踩到的就是 1/2/3/4/5 全部五项：Phase 7 那 5 个命令漂移、`plugin-opener` 与 `api/app` 没 alias/声明、`__APP_VERSION__` 没有 define、`App` 多要一个 `osCapabilities`、版本号停在 1.0.0。
+>
+> 1.3.0 同步新增：Phase 8 的 16 个命令（图库服务 / mDNS 配对）、`@tauri-apps/api/event` 的 `listen` mock 与类型声明、第 6 项语义色 token。
 
 ## 部署
 
@@ -78,7 +82,7 @@ Remove-Item "$dst\hooks\use-mobile.ts" -ErrorAction SilentlyContinue
 
 ## 动效组件说明
 
-`src/demo/ui/components/` 下的 BorderGlow/ClickSpark/LiquidEther/ParticleText/SpecularButton 等为 React Bits 风格动效（JS/JSX 变体 + `.d.ts` 声明）。改 GL 生命周期相关代码（LiquidEther）时注意：`main.tsx` 为兼容其 WebGL 双挂载行为禁用了 StrictMode，除非同时修好 dispose 路径，不要重新启用。
+`src/demo/ui/components/` 下的 BorderGlow/ClickSpark/LiquidEther/ParticleText/SpecularButton 等为 React Bits 风格动效（JS/JSX 变体 + `.d.ts` 声明）。2026-11 改版后落地页已不再引用它们，文件保留以备复用。`src/main.tsx` 仍关闭 StrictMode（既有决定）；恢复前需单独验证 demo 的双挂载行为。
 
 ## 许可
 

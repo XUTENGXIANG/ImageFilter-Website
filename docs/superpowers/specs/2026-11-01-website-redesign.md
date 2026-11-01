@@ -1,6 +1,6 @@
 # ImageFilter 官网改版 · 设计规格
 
-> 状态：**待确认**（本文件只定义规格，不改代码）
+> 状态：**已确认并实施**（2026-11-01；实施记录见文末 §12）
 > 日期：2026-11-01
 > 范围：只改 `A:\ImageFilter-Website`。主仓库 `A:\tenent` 只读，不提交、不切分支。
 > 依据：`docs/官网改版-交接.md`、`docs/prototype/hero.html`、`README.md`、主仓库 README 与 `src-tauri` 只读取证。
@@ -378,3 +378,16 @@ mock 形状（按主仓库类型）：
   - `package.json` / `package-lock.json`（仅字体依赖）
   - `docs/**`、`README.md`（状态与规格）
 - 禁止：`A:\tenent` 的任何写操作；推送 `origin`；删除 `src/demo/ui/components/` 下现有动效文件；改 demo mock 的既有行为。
+
+## 12. 实施记录（2026-11-01）
+
+已完成 P1 设计层、P2 全部九个区块、P3 demo 1.3.0 同步、P4 验收。与规格的偏差与补充：
+
+1. **字体**：没有新增 npm 依赖，直接把 4 个 latin woff2（Poppins 500/600、Inter variable、Geist Mono variable，约 88KB）复制到 `src/assets/fonts/`，并附带三份 OFL 许可证；`@font-face` 手写在 `src/index.css`。
+2. **移动端 Nav**：第二行 4 个锚点加 `bg-black/60 backdrop-blur-xl`。原型没有这条移动端导航；不加底色时，链接落在首屏照片上不可读。
+3. **移动端演示**：`ImageFilterDemo` 在 `<900px` 设 `min-width:720px`，外层 `overflow-x-auto`，可横向滑动查看软件 UI；页面本身仍无横向溢出。说明文字补「窄屏可左右滑动 / Swipe horizontally on narrow screens」。
+4. **英文标题空格**：`Keep only` 与 `the keepers` 之间由组件按语言补空格，避免 `Keep onlythe keepers`。
+5. **i18n 补充**：新增 `download.password`（蓝奏云密码标签），避免英文界面出现中文「密码」。
+6. **demo 同步**：按 README 五项 + 本规格第 6 项（语义色 token）完成。实测设置面板可打开，开启局域网服务后显示 `http://192.168.1.10:47832`，配对按钮显示「配对窗口已打开」，无控制台异常。
+7. **`buttonStyles`** 拆到 `src/landing/components/buttonStyles.ts`，避免同一文件既导出组件又导出函数触发 fast-refresh 警告。
+8. **仍未完成**：6 张真实照片（当前为图库占位图）、`CN_DOWNLOADS` 仍是 1.0.0、`vite base` 仍为 `/`（可选）。

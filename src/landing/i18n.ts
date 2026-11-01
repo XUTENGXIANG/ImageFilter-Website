@@ -41,6 +41,7 @@ export interface LandingMessages {
     swipeHint: string;
   };
   compare: {
+    eyebrow: string;
     title: string;
     subtitle: string;
     manual: string;
@@ -137,6 +138,7 @@ export const zh: LandingMessages = {
     swipeHint: "窄屏可左右滑动",
   },
   compare: {
+    eyebrow: "工作流差异",
     title: "对比",
     subtitle: "同样是整理照片，传统方式与 ImageFilter 的差距，在一次导入后就显现。",
     manual: "传统方式",
@@ -292,6 +294,7 @@ export const en: LandingMessages = {
     swipeHint: "Swipe horizontally on narrow screens",
   },
   compare: {
+    eyebrow: "Workflow difference",
     title: "Compare",
     subtitle: "Both handle photos — one import later, the gap shows.",
     manual: "Manual",

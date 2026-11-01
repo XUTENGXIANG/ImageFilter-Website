@@ -1,7 +1,9 @@
 // Copyright (c) 2026 XUTENGXIANG
 // SPDX-License-Identifier: MIT
-import { motion } from "motion/react";
-import { Close, Check } from "@icon-park/react";
+import { Check, X } from "lucide-react";
+import Card from "./components/Card";
+import Reveal from "./components/Reveal";
+import SectionHead from "./components/SectionHead";
 import type { Lang } from "./i18n";
 import { translations } from "./i18n";
 
@@ -13,91 +15,69 @@ export default function Compare({ lang }: CompareProps) {
   const t = translations[lang];
 
   return (
-    <section id="compare" className="relative scroll-mt-28 px-4 py-24 sm:px-6 lg:px-8">
+    <section
+      id="compare"
+      className="relative scroll-mt-24 px-6 py-20 lg:py-28 max-hero:px-[18px]"
+    >
       <div className="mx-auto max-w-6xl">
-        <motion.div
-          initial={{ opacity: 0, y: 24 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-80px" }}
-          transition={{ duration: 0.55 }}
-          className="text-center"
-        >
-          <p className="text-xs font-medium uppercase tracking-[0.2em] text-violet-300/70">
-            {t.compare.title}
-          </p>
-          <h2 className="mt-3 text-3xl font-bold text-white sm:text-4xl">
-            {t.compare.title}
-          </h2>
-          <p className="mx-auto mt-4 max-w-2xl text-sm leading-relaxed text-white/55 sm:text-base">
-            {t.compare.subtitle}
-          </p>
-        </motion.div>
+        <Reveal>
+          <SectionHead
+            eyebrow={t.compare.eyebrow}
+            title={t.compare.title}
+            subtitle={t.compare.subtitle}
+          />
+        </Reveal>
 
-        <div className="mt-14 grid gap-4 lg:grid-cols-[1fr_auto_1fr] lg:gap-6">
-          {/* 传统方式列 */}
-          <motion.div
-            initial={{ opacity: 0, y: 24 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-80px" }}
-            transition={{ duration: 0.55, delay: 0.1 }}
-            className="rounded-2xl border border-white/8 bg-white/[0.03] p-6 sm:p-8"
-          >
-            <div className="flex items-center gap-3">
-              <span className="flex h-10 w-10 items-center justify-center rounded-xl border border-white/8 bg-white/5 text-zinc-400">
-                <Close size={18} theme="outline" />
-              </span>
-              <div>
-                <p className="text-sm font-semibold text-zinc-300">{t.compare.manual}</p>
-                <p className="text-xs text-zinc-500">{t.compare.manualCaption}</p>
+        <div className="mt-10 grid gap-4 lg:grid-cols-2">
+          <Reveal delay={0.06}>
+            <Card className="h-full p-6 sm:p-8">
+              <div className="flex items-center gap-3">
+                <span className="flex size-9 items-center justify-center rounded-full border border-line bg-white/[0.03] text-white/45">
+                  <X className="size-4" aria-hidden="true" />
+                </span>
+                <div>
+                  <p className="text-body font-medium text-ink-muted">{t.compare.manual}</p>
+                  <p className="text-caption text-ink-faint">{t.compare.manualCaption}</p>
+                </div>
               </div>
-            </div>
-            <ul className="mt-8 space-y-6">
-              {t.compare.rows.map((row, i) => (
-                <li key={i} className="flex items-start gap-3">
-                  <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-white/5 text-zinc-500">
-                    <Close size={10} />
-                  </span>
-                  <span className="text-sm leading-relaxed text-zinc-400">{row.manual}</span>
-                </li>
-              ))}
-            </ul>
-          </motion.div>
 
-          {/* 中间 VS 徽标 */}
-          <div className="hidden items-center lg:flex" aria-hidden="true">
-            <span className="mx-auto flex h-12 w-12 items-center justify-center rounded-full border border-violet-400/30 bg-violet-500/10 text-sm font-bold tracking-widest text-violet-200">
-              VS
-            </span>
-          </div>
+              <ul className="mt-8 space-y-5">
+                {t.compare.rows.map((row, index) => (
+                  <li key={index} className="flex items-start gap-3">
+                    <span className="mt-0.5 font-landing-mono text-[10.5px] tabular-nums text-white/30">
+                      {String(index + 1).padStart(2, "0")}
+                    </span>
+                    <span className="text-body leading-[1.65] text-ink-muted">{row.manual}</span>
+                  </li>
+                ))}
+              </ul>
+            </Card>
+          </Reveal>
 
-          {/* ImageFilter 列 */}
-          <motion.div
-            initial={{ opacity: 0, y: 24 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-80px" }}
-            transition={{ duration: 0.55, delay: 0.2 }}
-            className="rounded-2xl border border-violet-400/25 bg-gradient-to-b from-violet-500/[0.08] to-cyan-400/[0.05] p-6 shadow-[0_0_48px_rgba(139,92,246,0.12)] sm:p-8"
-          >
-            <div className="flex items-center gap-3">
-              <span className="flex h-10 w-10 items-center justify-center rounded-xl border border-violet-300/25 bg-violet-400/15 text-violet-200">
-                <Check size={18} theme="outline" />
-              </span>
-              <div>
-                <p className="text-sm font-semibold text-white">{t.compare.imagefilter}</p>
-                <p className="text-xs text-violet-200/60">{t.compare.imagefilterCaption}</p>
+          <Reveal delay={0.12}>
+            <Card className="h-full border-line-strong bg-surface p-6 sm:p-8">
+              <div className="flex items-center gap-3">
+                <span className="flex size-9 items-center justify-center rounded-full border border-white/10 bg-data/10 text-data">
+                  <Check className="size-4" aria-hidden="true" />
+                </span>
+                <div>
+                  <p className="text-body font-medium text-ink">{t.compare.imagefilter}</p>
+                  <p className="text-caption text-ink-faint">{t.compare.imagefilterCaption}</p>
+                </div>
               </div>
-            </div>
-            <ul className="mt-8 space-y-6">
-              {t.compare.rows.map((row, i) => (
-                <li key={i} className="flex items-start gap-3">
-                  <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-violet-400/20 text-violet-200">
-                    <Check size={10} />
-                  </span>
-                  <span className="text-sm leading-relaxed text-white/80">{row.app}</span>
-                </li>
-              ))}
-            </ul>
-          </motion.div>
+
+              <ul className="mt-8 space-y-5">
+                {t.compare.rows.map((row, index) => (
+                  <li key={index} className="flex items-start gap-3">
+                    <span className="mt-0.5 font-landing-mono text-[10.5px] tabular-nums text-data/70">
+                      {String(index + 1).padStart(2, "0")}
+                    </span>
+                    <span className="text-body leading-[1.65] text-ink">{row.app}</span>
+                  </li>
+                ))}
+              </ul>
+            </Card>
+          </Reveal>
         </div>
       </div>
     </section>

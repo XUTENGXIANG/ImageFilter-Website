@@ -127,6 +127,7 @@ export default function Download({ lang }: DownloadProps) {
             const href = asset?.url || RELEASES_PAGE;
             const fileName = asset?.name ?? "—";
             const recommended = index === 0;
+            const isAsset = Boolean(asset?.url);
 
             return (
               <Reveal key={card.platform} delay={index * 0.05}>
@@ -168,7 +169,8 @@ export default function Download({ lang }: DownloadProps) {
                   <div className="mt-auto pt-7">
                     <NeumorphicDownloadButton
                       href={href}
-                      external
+                      filename={asset?.name}
+                      external={!isAsset}
                       label={card.action}
                       downloadingLabel={t.download.downloading}
                       doneLabel={t.download.downloaded}

@@ -6,6 +6,7 @@ import Reveal from "./components/Reveal";
 import SectionHead from "./components/SectionHead";
 import { ALL_RELEASES_API, CN_DOWNLOADS, RELEASES_PAGE } from "./downloadData";
 import type { Lang } from "./i18n";
+import { triggerIframeDownload } from "./lib/download";
 import { translations } from "./i18n";
 
 interface ReleaseAsset {
@@ -198,6 +199,19 @@ export default function VersionsPage({ lang, onLangChange }: VersionsPageProps) 
                               href={asset.browser_download_url}
                               target="_blank"
                               rel="noreferrer"
+                              onClick={(event) => {
+                                if (
+                                  event.metaKey ||
+                                  event.ctrlKey ||
+                                  event.shiftKey ||
+                                  event.altKey ||
+                                  event.button !== 0
+                                ) {
+                                  return;
+                                }
+                                event.preventDefault();
+                                triggerIframeDownload(asset.browser_download_url);
+                              }}
                               className="group flex flex-col gap-1 border-b border-line py-3 last:border-b-0 sm:flex-row sm:items-center sm:justify-between sm:gap-4"
                             >
                               <span className="min-w-0 truncate font-landing-mono text-mono-sm text-ink">

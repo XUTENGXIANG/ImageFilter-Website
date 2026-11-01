@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import { Check, CloudDownload } from "lucide-react";
+import { triggerIframeDownload } from "../lib/download";
 
 const DISC = 44;
 const STROKE = 4;
@@ -26,6 +27,7 @@ function lerpColor(a, b, t) {
 
 export default function NeumorphicDownloadButton({
   href,
+  filename,
   label,
   downloadingLabel,
   doneLabel,
@@ -47,8 +49,12 @@ export default function NeumorphicDownloadButton({
 
   const startDownload = () => {
     if (phase !== "idle") return;
+
+    // 文件直接交给浏览器下载管理器；进度环是视觉反馈，不代表真实字节进度。
+    triggerIframeDownload(href);
     setPhase("downloading");
     setProgress(0);
+
     const start = performance.now();
     const tick = (now) => {
       const t = Math.min(1, (now - start) / DURATION);
@@ -66,17 +72,25 @@ export default function NeumorphicDownloadButton({
     rafRef.current = requestAnimationFrame(tick);
   };
 
+  const handleClick = (event) => {
+    if (!filename) return;
+    event.preventDefault();
+    startDownload();
+  };
+
   const colorT = Math.min(1, progress * 1.3);
-  const iconColor = phase === "idle" ? "#8f8f8f" : lerpColor("#8f8f8f", "#10b981", colorT);
+  const iconColor =
+    phase === "idle" ? "#8f8f8f" : lerpColor("#8f8f8f", "#10b981", colorT);
   const offset = CIRC * (1 - progress);
   const statusLabel =
     phase === "idle" ? label : phase === "downloading" ? downloadingLabel : doneLabel;
+  const isFile = Boolean(filename);
 
   return (
     <a
       href={href}
-      {...(external ? { target: "_blank", rel: "noreferrer" } : {})}
-      onClick={startDownload}
+      {...(!isFile && external ? { target: "_blank", rel: "noreferrer" } : {})}
+      onClick={handleClick}
       aria-busy={phase === "downloading" || undefined}
       className={`relative flex w-full select-none items-center gap-3 rounded-full py-1.5 pl-1.5 pr-5 transition-[filter] duration-200 hover:brightness-110 ${className}`}
       style={{
@@ -127,7 +141,16 @@ export default function NeumorphicDownloadButton({
           }}
         >
           <AnimatePresence mode="wait" initial={false}>
-            {phase !== "done" ? (
+            {phase === "done" ? (
+              <motion.span
+                key="done"
+                initial={{ opacity: 0, scale: 0.6 }}
+                animate={{ opacity: 1, scale: [0.6, 1.2, 1] }}
+                transition={{ duration: 0.35 }}
+              >
+                <Check size={18} strokeWidth={2.2} style={{ color: "#10b981" }} />
+              </motion.span>
+            ) : (
               <motion.span
                 key="cloud"
                 initial={{ opacity: 0, scale: 0.7 }}
@@ -136,15 +159,6 @@ export default function NeumorphicDownloadButton({
                 transition={{ duration: 0.2 }}
               >
                 <CloudDownload size={18} strokeWidth={1.8} style={{ color: iconColor }} />
-              </motion.span>
-            ) : (
-              <motion.span
-                key="done"
-                initial={{ opacity: 0, scale: 0.6 }}
-                animate={{ opacity: 1, scale: [0.6, 1.2, 1] }}
-                transition={{ duration: 0.35 }}
-              >
-                <Check size={18} strokeWidth={2.2} style={{ color: "#10b981" }} />
               </motion.span>
             )}
           </AnimatePresence>

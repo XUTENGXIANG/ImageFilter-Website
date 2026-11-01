@@ -274,7 +274,8 @@
 
 - 位置：Hero 与 Demo 之间；填补原首屏与演示区之间的空白，不放进 Hero 的拖拽层。
 - React Bits `TechText`，`text="ImageFilter"`，Poppins 600，字号 170 自动缩放到容器；最大高度 `clamp(180px, 18vw, 260px)`，`max-w-6xl`。
-- **静止时 `sweep={false}`**：字形完整可读；hover 时才出现字母轮廓、选择框和 emerald specks。`labels={false}`、`guides={false}`。
+- **静止时 `sweep={false}`**：字形完整可读；hover 用 `reveal="area"` + `softness=0.9` + 细实线轮廓做**径向渐变过渡**，不是整字硬切或虚线残影。
+- 关闭 `draggable` / `clickKick` / `selection` / `specks`：避免拖出第二个字母、虚线框和 specks 干扰阅读；`labels={false}`、`guides={false}`。
 - 颜色 `#fafafa`，交互强调 `#10b981`；Canvas 透明，露出后面的液态背景；`role="img" aria-label="ImageFilter"`。
 - 顶部加 112px 黑→透明渐变，和 Hero 底部黑场衔接，避免硬边。
 
@@ -438,5 +439,5 @@ mock 形状（按主仓库类型）：
 16. **macOS 签名说明**：下载区默认收起的 Disclosure，三步 + 一条 quarantine 命令 + Issue 链接；不引导关闭 Gatekeeper/SIP。
 17. **折叠动效 / UI 优化**：FAQ 与 macOS 说明共用 `Disclosure`；高度/透明度 260ms expand 曲线、plus 旋转、inset focus ring、`inert` + `aria-controls`、命中区 ≥44px；`prefers-reduced-motion` 下直接开合。
 18. **液态玻璃卡片**：`lib/surfaces.ts` 的 `glassCard` 应用到 Compare/Features/Download/macOS 说明/版本页卡片；demo 窗口、首屏截图卡、FAQ 行保持不透明。
-19. **液态背景 + TechText**：`LiquidCursorGradient` 固定 `z-0`/`pointer-events-none` 背景，石墨 + 低透明度 emerald 光斑与 spring 鼠标光斑；`TechTextBand` 在 Hero/Demo 之间渲染 ImageFilter，`sweep=false` 保证静止可读，hover 才显示轮廓/选择框。版本页同样加背景。
+19. **液态背景 + TechText**：`LiquidCursorGradient` 固定 `z-0`/`pointer-events-none` 背景，石墨 + 低透明度 emerald 光斑与 spring 鼠标光斑；`TechTextBand` 在 Hero/Demo 之间渲染 ImageFilter，`sweep=false` 保证静止可读，hover 用 `reveal="area"` + `softness=0.9` 做径向渐变轮廓；关闭拖拽/点击/选择框/specks 避免残影。版本页同样加背景。
 20. **仍未完成**：`vite base` 仍为 `/`（可选）。

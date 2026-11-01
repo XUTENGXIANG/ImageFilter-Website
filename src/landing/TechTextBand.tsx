@@ -17,16 +17,19 @@ export default function TechTextBand() {
           align="center"
           color="#fafafa"
           accentColor="#10b981"
-          reveal="letter"
-          dashLength={4}
-          dashGap={2}
-          specks={14}
+          reveal="area"
+          reach={260}
+          softness={0.9}
+          lineStyle="solid"
+          strokeWidth={1}
+          specks={0}
+          selection={false}
           labels={false}
           intro="none"
           guides={false}
           sweep={false}
-          draggable
-          clickKick
+          draggable={false}
+          clickKick={false}
         />
       </div>
     </section>

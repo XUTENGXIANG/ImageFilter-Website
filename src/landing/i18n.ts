@@ -88,6 +88,26 @@ export interface LandingMessages {
     cnDownload: string;
     password: string;
     msiNote: string;
+    moreVersions: string;
+    downloading: string;
+    downloaded: string;
+  };
+  versions: {
+    eyebrow: string;
+    title: string;
+    subtitle: string;
+    back: string;
+    loading: string;
+    error: string;
+    empty: string;
+    latest: string;
+    prerelease: string;
+    published: string;
+    releaseNotes: string;
+    noAssets: string;
+    cnTitle: string;
+    cnNote: string;
+    openReleases: string;
   };
   faq: {
     eyebrow: string;
@@ -255,6 +275,26 @@ export const zh: LandingMessages = {
     cnDownload: "国内直链下载",
     password: "密码",
     msiNote: "MSI 安装包请前往",
+    moreVersions: "更多版本",
+    downloading: "下载中…",
+    downloaded: "已完成",
+  },
+  versions: {
+    eyebrow: "全部版本",
+    title: "版本全览",
+    subtitle: "从 GitHub Releases 读取的完整版本与安装包；国内直链单独列出。",
+    back: "返回首页",
+    loading: "正在读取版本…",
+    error: "版本获取失败，请直接前往 GitHub Releases。",
+    empty: "还没有可显示的版本。",
+    latest: "最新",
+    prerelease: "预发布",
+    published: "发布于",
+    releaseNotes: "发布说明",
+    noAssets: "这个版本没有可下载的安装包。",
+    cnTitle: "国内直链",
+    cnNote: "蓝奏云链接为手动维护，可能不是最新版；提取密码见每条链接。",
+    openReleases: "在 GitHub 查看全部 Releases",
   },
   faq: {
     eyebrow: "FAQ",
@@ -440,6 +480,26 @@ export const en: LandingMessages = {
     cnDownload: "Direct China Links",
     password: "Password",
     msiNote: "MSI installer: see",
+    moreVersions: "More versions",
+    downloading: "Downloading…",
+    downloaded: "Downloaded",
+  },
+  versions: {
+    eyebrow: "All releases",
+    title: "All versions",
+    subtitle: "Every release and installer pulled from GitHub Releases, with China direct links listed separately.",
+    back: "Back to home",
+    loading: "Loading releases…",
+    error: "Could not load releases. Open GitHub Releases instead.",
+    empty: "No releases to show yet.",
+    latest: "Latest",
+    prerelease: "Pre-release",
+    published: "Published",
+    releaseNotes: "Release notes",
+    noAssets: "This release has no installer assets.",
+    cnTitle: "China direct links",
+    cnNote: "China links are maintained manually and may not be the latest; the extraction password is shown on each link.",
+    openReleases: "View all releases on GitHub",
   },
   faq: {
     eyebrow: "FAQ",

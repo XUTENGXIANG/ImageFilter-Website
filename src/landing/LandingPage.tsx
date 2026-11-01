@@ -10,6 +10,7 @@ import Features from "./Features";
 import Footer from "./Footer";
 import Hero from "./Hero";
 import Nav from "./Nav";
+import VersionsPage from "./VersionsPage";
 import Workflow from "./Workflow";
 
 function getInitialLang(): Lang {
@@ -23,6 +24,9 @@ function getInitialLang(): Lang {
 
 export default function LandingPage() {
   const [lang, setLang] = useState<Lang>(getInitialLang);
+  const [route, setRoute] = useState<"landing" | "versions">(() =>
+    window.location.hash === "#/versions" ? "versions" : "landing",
+  );
 
   const changeLang = (next: Lang) => {
     setLang(next);
@@ -36,6 +40,18 @@ export default function LandingPage() {
   useEffect(() => {
     document.documentElement.lang = lang === "zh" ? "zh-CN" : "en";
   }, [lang]);
+
+  useEffect(() => {
+    const onHashChange = () => {
+      setRoute(window.location.hash === "#/versions" ? "versions" : "landing");
+    };
+    window.addEventListener("hashchange", onHashChange);
+    return () => window.removeEventListener("hashchange", onHashChange);
+  }, []);
+
+  if (route === "versions") {
+    return <VersionsPage lang={lang} onLangChange={changeLang} />;
+  }
 
   return (
     <div className="relative min-h-screen overflow-x-clip bg-canvas text-ink">

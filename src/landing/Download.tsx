@@ -1,49 +1,18 @@
 // Copyright (c) 2026 XUTENGXIANG
 // SPDX-License-Identifier: MIT
 import { useEffect, useState } from "react";
-import { Apple, ChevronDown, DownloadCloud, Monitor } from "lucide-react";
+import { Apple, ArrowUpRight, Layers, Monitor } from "lucide-react";
 import Card from "./components/Card";
-import FlapButtonLink from "./components/FlapButtonLink";
 import FlapLabel, { useFlapTrigger } from "./components/FlapLabel";
+import NeumorphicDownloadButton from "./components/NeumorphicDownloadButton";
 import Reveal from "./components/Reveal";
 import SectionHead from "./components/SectionHead";
 import SplitFlapText from "./components/SplitFlapText";
 import { buttonStyles } from "./components/buttonStyles";
+import { ASSET_MATCHERS, LATEST_RELEASE_API, RELEASES_PAGE } from "./downloadData";
 import type { Lang } from "./i18n";
 import { translations } from "./i18n";
 import { cn } from "./lib/cn";
-
-const REPOSITORY = "XUTENGXIANG/ImageFilter";
-const RELEASES_PAGE = `https://github.com/${REPOSITORY}/releases`;
-const LATEST_RELEASE_API = `https://api.github.com/repos/${REPOSITORY}/releases/latest`;
-
-// ─── 国内直链（蓝奏云）────────────────────────────────────────
-// 手动添加直链的方法：
-//   1. 在蓝奏云上传新版本安装包，复制分享链接
-//   2. 在下面的数组中新增一条记录（建议按平台排序）：
-//      { name: "文件名（页面展示用，建议带版本号）", href: "蓝奏云分享链接", password: "访问密码(无则省略)" }
-//   3. 列表会按数组顺序自动渲染，点击即在新标签页打开
-// 注意：这一份是**手动**的 —— 走 GitHub 的三张卡片已经自动取最新版了，这里不会跟着变。
-// 换了新安装包就得自己重传蓝奏云、把 name 里的版本号与 password 一起改掉。
-const CN_DOWNLOADS = [
-  {
-    name: "ImageFilter_1.0.0_x64-setup.exe",
-    password: "fih2",
-    href: "https://wwbny.lanzoue.com/iO3ka420hdmj?webpage=AjMAYF47UjBVNlQ2BmECM1M9AjBScQU0AjVWZ1M7UmcDM1o_aCmQAbQgiUzQ_c",
-  },
-  {
-    name: "ImageFilter_1.0.0_universal.dmg",
-    password: "hx0o",
-    href: "https://wwbny.lanzoue.com/i6bKM420hclc?webpage=BDVSMghtDmxVNgJgBmFWZwFvU2ECIQc2ADdUZQJqWm9XZwJnDWBTNVJ4AmU_c",
-  },
-];
-
-/** 三张卡片（= t.download.cards 的顺序）各自从 release 附件里挑哪一个 */
-const ASSET_MATCHERS: ((name: string) => boolean)[] = [
-  (n) => /-setup\.exe$/i.test(n), // NSIS 安装包
-  (n) => /\.msi$/i.test(n), // MSI
-  (n) => /\.dmg$/i.test(n), // macOS
-];
 
 interface ReleaseAsset {
   name: string;
@@ -64,12 +33,11 @@ interface DownloadProps {
 
 export default function Download({ lang }: DownloadProps) {
   const t = translations[lang];
-  const [cnOpen, setCnOpen] = useState(false);
   // 版本号不再写死在页面里：打开页面时去问一次 GitHub 的最新正式版，附件直链也从那里取。
   // 这样发新版不用再回来改这 3 行 —— 之前那三条写死的链接停在 v1.0.0 上，落后了三个版本。
   const [latest, setLatest] = useState<LatestRelease | null>(null);
   const [failed, setFailed] = useState(false);
-  const cnFlap = useFlapTrigger();
+  const moreFlap = useFlapTrigger();
 
   useEffect(() => {
     let cancelled = false;
@@ -198,13 +166,12 @@ export default function Download({ lang }: DownloadProps) {
                   </p>
 
                   <div className="mt-auto pt-7">
-                    <FlapButtonLink
+                    <NeumorphicDownloadButton
                       href={href}
                       external
-                      variant={recommended ? "solid" : "ghost"}
-                      size="md"
-                      className="w-full"
                       label={card.action}
+                      downloadingLabel={t.download.downloading}
+                      doneLabel={t.download.downloaded}
                     />
                   </div>
                 </Card>
@@ -213,64 +180,22 @@ export default function Download({ lang }: DownloadProps) {
           })}
         </div>
 
-        {/* 国内直链下载（蓝奏云） */}
+        {/* 更多版本：进入 #/versions，列出全部 releases 与国内直链 */}
         <Reveal delay={0.15} className="mt-10">
-          <button
-            type="button"
-            onClick={() => setCnOpen((open) => !open)}
-            onMouseEnter={() => cnFlap.trigger()}
-            onFocus={() => cnFlap.trigger()}
-            aria-expanded={cnOpen}
+          <a
+            href="#/versions"
+            onMouseEnter={() => moreFlap.trigger()}
+            onFocus={() => moreFlap.trigger()}
             className={buttonStyles({ variant: "ghost", size: "md", className: "gap-2.5 px-5" })}
           >
-            <DownloadCloud className="size-4" aria-hidden="true" />
+            <Layers className="size-4" aria-hidden="true" />
             <FlapLabel
-              label={t.download.cnDownload}
-              intro={cnFlap.intro}
-              flipKey={cnFlap.flipKey}
+              label={t.download.moreVersions}
+              intro={moreFlap.intro}
+              flipKey={moreFlap.flipKey}
             />
-            <ChevronDown
-              className={cn(
-                "size-4 transition-transform duration-200",
-                cnOpen && "rotate-180",
-              )}
-              aria-hidden="true"
-            />
-          </button>
-
-          {cnOpen && (
-            <div className="mt-5 max-w-lg rounded-card border border-line bg-surface-sunken p-4">
-              {CN_DOWNLOADS.map((item) => (
-                <a
-                  key={item.href}
-                  href={item.href}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="flex items-center justify-between gap-4 border-b border-line py-3 last:border-b-0 hover:text-white"
-                >
-                  <span className="truncate font-landing-mono text-mono-sm text-ink-muted">
-                    {item.name}
-                  </span>
-                  {item.password ? (
-                    <span className="shrink-0 text-caption text-ink-faint">
-                      {t.download.password} {item.password}
-                    </span>
-                  ) : null}
-                </a>
-              ))}
-              <p className="mt-3 border-t border-line pt-3 text-caption text-ink-faint">
-                {t.download.msiNote}{" "}
-                <a
-                  href={RELEASES_PAGE}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="text-ink underline-offset-2 hover:underline"
-                >
-                  GitHub Releases
-                </a>
-              </p>
-            </div>
-          )}
+            <ArrowUpRight className="size-4" aria-hidden="true" />
+          </a>
         </Reveal>
 
         <div className="mt-8">

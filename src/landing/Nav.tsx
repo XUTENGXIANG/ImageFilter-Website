@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import logo from "../assets/logo.png";
 import FlapButtonLink from "./components/FlapButtonLink";
-import RubberSegment from "./components/RubberSegment";
+import LanguageToggle from "./components/LanguageToggle";
 import GitHubStarButton from "./GitHubStarButton";
 import type { Lang } from "./i18n";
 import { translations } from "./i18n";
@@ -71,29 +71,7 @@ export default function Nav({ lang, onLangChange }: NavProps) {
         <div className="ml-auto flex items-center gap-1.5">
           <GitHubStarButton lang={lang} />
 
-          <RubberSegment
-            items={[
-              { value: "zh", label: "中" },
-              { value: "en", label: "EN" },
-            ]}
-            value={lang}
-            onChange={(next) => onLangChange(next as Lang)}
-            trackColor="rgba(255,255,255,0.03)"
-            thumbColor="#fafafa"
-            textColor="rgba(255,255,255,0.90)"
-            activeTextColor="#18181b"
-            size="sm"
-            radius={999}
-            inset={2}
-            equalSlots
-            stretch={80}
-            squash={2}
-            speed={1}
-            glide={60}
-            draggable
-            aria-label="Language"
-            className="border border-line"
-          />
+          <LanguageToggle lang={lang} onChange={onLangChange} />
 
           <FlapButtonLink
             href="#download"

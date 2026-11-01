@@ -157,6 +157,8 @@ body {
   line-height: 1;
   letter-spacing: 0;
   color: currentColor;
+  /* 标签在 hover 时会重挂载；指针穿透到父级 a/button，避免快速点击落在被替换的 tile 上。 */
+  pointer-events: none;
 }
 
 .flap-button-label .split-flap-text__tile {
@@ -169,7 +171,8 @@ body {
 
 /* 1024 宽英文站的「Download Windows Installer」是最长标签；12px 时仍能完整放进 265px 按钮。 */
 @media (max-width: 1100px) {
-  #download .flap-button-label {
+  #download .flap-button-label,
+  .neumorphic-download-label {
     font-size: 12px;
   }
 }

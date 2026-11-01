@@ -79,6 +79,66 @@ img {
 .no-scrollbar::-webkit-scrollbar { display: none; }
 .no-scrollbar { scrollbar-width: none; -ms-overflow-style: none; }
 
+/* ── 左侧文件夹树（从主仓库 src/index.css 同步的可视规则）──
+   1.3.0 的树行依赖 .tree-row 的固定 28px 行高与 .tree-kids 的实测高度。
+   官网副本原先漏了这一段，行高退化成 18px，展开后的子树会互相压住。 */
+.tree-row {
+  height: 28px;
+}
+.tree-caret i {
+  display: inline-block;
+  font-style: normal;
+  transition: transform 160ms ease-out;
+}
+.tree-row[aria-expanded="true"] .tree-caret i {
+  transform: rotate(90deg);
+}
+.press-row {
+  transition: background-color 150ms ease-out, color 150ms ease-out;
+}
+.press-row:active {
+  background-color: #3f3f46b3;
+}
+.press-row[data-selected="true"]:active {
+  background-color: #065f46a6;
+}
+.press-solid:active {
+  background-color: #52525b;
+}
+.tree-enter {
+  animation: tree-enter 180ms ease-out both;
+}
+@keyframes tree-enter {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.tree-kids {
+  overflow: hidden;
+  transition: height 200ms ease-in-out;
+}
+.tree-row-skeleton {
+  cursor: default;
+}
+.tree-skeleton-bar {
+  display: inline-block;
+  height: 8px;
+  width: 64px;
+  border-radius: 2px;
+  background: #3f3f46;
+  animation: tree-skeleton-pulse 1s ease-in-out infinite;
+}
+@keyframes tree-skeleton-pulse {
+  50% {
+    opacity: 0.4;
+  }
+}
+
 /* 缩略图滑块 — 双色填充渐变 + 无边框球 */
 .thumb-slider {
   -webkit-appearance: none;
@@ -276,4 +336,26 @@ img {
 .ifdemo-scope > div {
   width: 100% !important;
   height: 100% !important;
+}
+
+/* ── 网页 demo 的定位与主题底色 ──
+   App 根容器是透明的，深色主题靠页面黑底；浅色主题必须由 demo 容器自己给浅色底，
+   否则中间区域会露出落地页的黑。 */
+.ifdemo-scope {
+  position: relative;
+  background: #0a0a0a;
+}
+:root[data-theme="light"] .ifdemo-scope {
+  background: #fbfbfb;
+}
+
+/* 图片查看器 / 设置对话框 / toast 在真机里是相对窗口的 fixed；
+   网页 demo 里把它们改成相对 demo 容器的 absolute，避免铺满整个落地页。 */
+.ifdemo-scope .fixed {
+  position: absolute !important;
+}
+
+/* 1.3.0 设置面板在官网 demo 里不开放；按钮本身在 titlebar 的 icon-park SVG 上。 */
+.ifdemo-scope button:has(.i-icon-setting) {
+  display: none !important;
 }

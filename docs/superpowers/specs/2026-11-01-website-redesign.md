@@ -208,7 +208,7 @@
 - **保持现有运行时逻辑不变**：`fetch GitHub /releases/latest` → 版本号 + 三条附件直链；失败 → `版本获取失败` + 按钮退到 Releases 页。
 - 3 张卡：`surface-sunken` + hairline；第一张（Windows 安装包）加 `line-strong` 边框 + `white/[0.02]` 底 + mono `推荐` 徽章。
 - 卡片内容：平台名 16px、文件名 Geist Mono 11px 截断、说明 14px、按钮。
-- 按钮：三张卡使用 rewampui `NeumorphicDownloadButton`（真实 `<a href>`，2.2s 进度环，emerald 进度，下载中/已完成文案），全宽、72px 高。
+- 按钮：三张卡使用 rewampui `NeumorphicDownloadButton`（全宽、72px 高，下载中/已完成文案）；点击时通过隐藏 iframe 触发浏览器原生下载，当前页面不跳转、不开新标签页；2.2s 进度环为视觉反馈，不是真实字节进度。
 - 国内直链入口：改成「更多版本」→ `#/versions`；蓝奏云链接/密码移到版本全览页。
 - 保留：`GitHub Releases →` 链接、加载/失败态；MSI 说明不再放在折叠区（版本页直接列 MSI 资产）。
 - 已知内容问题（记录，不在本次改数据）：`CN_DOWNLOADS` 仍是 1.0.0，需用户重传后手动更新。
@@ -260,7 +260,7 @@
 - **hash 路由**：首页 `LandingPage` 监听 `hashchange`；`#/versions` 渲染 `VersionsPage`，其他 hash 保持首页。静态托管无需 404 回退。
 - **页头**：品牌 +「返回首页」+ 语言切换（复用 `LanguageToggle`），不渲染首页 Nav。
 - **数据**：打开页面时取 `https://api.github.com/repos/XUTENGXIANG/ImageFilter/releases?per_page=100`；失败显示错误 + Releases 链接；空列表显示空态。
-- **版本卡**：按 GitHub 顺序列出 tag、名称、发布日期、预发布标记；首条标「最新」。每条只列安装包资产（`-setup.exe` / `.msi` / `.dmg` / `.apk` / `.zip`），过滤 updater 的 `.tar.gz` / `.sig`；资产行显示文件名、类型、大小，点击新标签下载；底部「发布说明」。
+- **版本卡**：按 GitHub 顺序列出 tag、名称、发布日期、预发布标记；首条标「最新」。每条只列安装包资产（`-setup.exe` / `.msi` / `.dmg` / `.apk` / `.zip`），过滤 updater 的 `.tar.gz` / `.sig`；资产行显示文件名、类型、大小，点击用隐藏 iframe 下载（当前页不跳；Ctrl/Cmd/中键保留新标签页语义）；底部「发布说明」。
 - **国内直链**：页面末尾列出 `CN_DOWNLOADS`（蓝奏云）+ 密码 + 「手动维护，可能不是最新版」说明。
 - **页脚**：版权 + GitHub Releases 链接。
 - **返回**：`href="#"` 清空 hash，回首页；页面标题在版本页为「版本全览 · ImageFilter」，返回后恢复。
@@ -404,7 +404,7 @@ mock 形状（按主仓库类型）：
 8. **装饰编号对比度**：compare / features / FAQ 的 10.5px 编号统一到 `ink-faint`（5.3:1），workflow 的 40px 大编号到 `white/40`（3.6:1），避免低对比度审计 blocker；视觉上仍保留「幽灵编号」的层次。
 9. **覆盖层对比度**：移动端导航第二行用 `bg-black/75 backdrop-blur-xl`；首屏拖拽提示用 `bg-black/80` + `text-white/70`，避免压在照片/软件截图上不可读。
 10. **demo 外壳修复**（用户验收反馈）：`src/demo/index.css` 补回主仓库的树行样式（28px 行高、`.tree-kids` 裁剪与高度过渡、`.tree-caret` 旋转），修复设备栏重叠；给 `.ifdemo-scope` 补深/浅主题底色，修复浅色主题中间露黑底；把 `.ifdemo-scope .fixed` 改成 `absolute`，让图片查看器/对话框限制在 demo 框内；隐藏 titlebar 齿轮，官网演示不开放设置面板。
-11. **安装包下载按钮**：接入 rewampui registry 的 `neumorphic-download-button`，改为真实 `<a href>` + 2.2s emerald 进度环；三张卡全宽使用，进度/完成文案中英双语。CLI 因 `components.json` 缺 `registryUrl` 失败，按同一份 registry 源码落在 `src/landing/components/`，用项目已有的 `motion/react` 替代 `framer-motion`。
-12. **更多版本 / 版本全览**：原「国内直链下载」折叠区改为「更多版本」→ `#/versions`；`VersionsPage` 读取全部 releases，过滤 updater 资产，保留蓝奏云直链；hash 路由，带返回首页、语言切换、页面标题。
+11. **安装包下载按钮**：接入 rewampui registry 的 `neumorphic-download-button`，三张卡全宽使用；点击用隐藏 iframe 触发浏览器原生下载（当前页不跳、不开新标签页），2.2s emerald 进度环只是视觉反馈，进度/完成文案中英双语。CLI 因 `components.json` 缺 `registryUrl` 失败，按同一份 registry 源码落在 `src/landing/components/`，用项目已有的 `motion/react` 替代 `framer-motion`。
+12. **更多版本 / 版本全览**：原「国内直链下载」折叠区改为「更多版本」→ `#/versions`；`VersionsPage` 读取全部 releases，过滤 updater 资产，资产行同样用隐藏 iframe 下载，保留蓝奏云直链；hash 路由，带返回首页、语言切换、页面标题。
 13. **FlapLabel 指针穿透**：`.flap-button-label { pointer-events:none }` 修复 hover 重挂载导致快速点击丢失；按钮标签仍保留 `aria-hidden` tile + SR 原文。
 14. **仍未完成**：6 张真实照片（当前为图库占位图）、`CN_DOWNLOADS` 仍是 1.0.0、`vite base` 仍为 `/`（可选）。

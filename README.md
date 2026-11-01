@@ -97,6 +97,8 @@ Remove-Item "$dst\hooks\use-mobile.ts" -ErrorAction SilentlyContinue
 
 下载区的「更多版本」跳到 `#/versions` 的版本全览页：该页读取 `/releases?per_page=100`，列出每个版本的安装包（过滤掉 updater 的 `.tar.gz`/`.sig`），并把国内直链放在页面底部。这是 hash 路由，静态托管不需要 404 回退。
 
+安装包按钮与版本页的资产行都用 **隐藏 iframe** 触发浏览器原生下载（`src/landing/lib/download.ts`）：GitHub 资源带 `Content-Disposition: attachment`，下载时当前页面保持不变，不会开新标签页；按钮的 2.2s 进度环只是视觉反馈，真实进度看浏览器下载栏。失败时错误页只会出现在隐藏 iframe 里，不会顶掉落地页。
+
 `src/landing/downloadData.ts` 的 `CN_DOWNLOADS`（蓝奏云国内直链）仍是手动的：换了安装包得自己重传、并把 `name` 里的版本号与 `password` 一起改掉（版本全览页不会跟着变）。
 
 

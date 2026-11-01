@@ -1,6 +1,6 @@
 // Copyright (c) 2026 XUTENGXIANG
 // SPDX-License-Identifier: MIT
-import { Plus } from "lucide-react";
+import Disclosure from "./components/Disclosure";
 import Reveal from "./components/Reveal";
 import SectionHead from "./components/SectionHead";
 import type { Lang } from "./i18n";
@@ -26,21 +26,14 @@ export default function FAQ({ lang }: FAQProps) {
         <Reveal delay={0.06}>
           <div className="border-t border-line">
             {t.faq.items.map((item, index) => (
-              <details key={item.q} className="group border-b border-line">
-                <summary className="flex cursor-pointer list-none items-baseline gap-4 py-5 [&::-webkit-details-marker]:hidden">
-                  <span className="font-landing-mono text-[10.5px] tabular-nums text-ink-faint">
-                    {String(index + 1).padStart(2, "0")}
-                  </span>
-                  <span className="flex-1 text-[15px] font-medium text-ink">{item.q}</span>
-                  <Plus
-                    className="size-4 shrink-0 translate-y-0.5 text-ink-faint transition-transform duration-200 group-open:rotate-45"
-                    aria-hidden="true"
-                  />
-                </summary>
-                <p className="max-w-prose pb-5 pl-[30px] text-body leading-[1.7] text-ink-muted">
-                  {item.a}
-                </p>
-              </details>
+              <Disclosure
+                key={item.q}
+                variant="faq"
+                index={String(index + 1).padStart(2, "0")}
+                title={item.q}
+              >
+                {item.a}
+              </Disclosure>
             ))}
           </div>
         </Reveal>

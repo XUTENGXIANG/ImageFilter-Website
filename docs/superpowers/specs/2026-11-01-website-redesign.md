@@ -211,14 +211,14 @@
 - 按钮：三张卡使用 rewampui `NeumorphicDownloadButton`（全宽、72px 高，下载中/已完成文案）；点击时通过隐藏 iframe 触发浏览器原生下载，当前页面不跳转、不开新标签页；2.2s 进度环为视觉反馈，不是真实字节进度。
 - 更多版本入口：`#/versions`；蓝奏云国内直链已**移除**（手动逐个上传成本太高）。
 - **下载线路**：卡片上方提供 GitHub / 国内加速两档；默认 GitHub，国内加速给 GitHub 资源加 `ghfast.top` 前缀，选择存 localStorage；显示第三方加速风险提示。
-- **macOS 签名说明**：卡片下方一个默认收起的 `<details>`，说明未公证/Gatekeeper 拦截、右键打开或「隐私与安全性 → 仍要打开」、以及 `sudo xattr -rd com.apple.quarantine /Applications/ImageFilter.app`；附提 Issue 入口，不关闭系统安全设置。
+- **macOS 签名说明**：卡片下方一个默认收起的 Disclosure 折叠块，说明未公证/Gatekeeper 拦截、右键打开或「隐私与安全性 → 仍要打开」、以及 `sudo xattr -rd com.apple.quarantine /Applications/ImageFilter.app`；附提 Issue 入口，不关闭系统安全设置。
 - 保留：`GitHub Releases →` 链接、加载/失败态；MSI 说明不再放在折叠区（版本页直接列 MSI 资产）。
 
 ### 4.8 FAQ（新增）
 
 - `id="faq"`，放在 Download 与 Footer 之间；版心 `max-w-6xl`，`py-20 lg:py-28`。
 - 左侧 SectionHead：eyebrow `FAQ`，H2「常见问题 / Common questions」；右侧（桌面）或下方（移动）4 条问答。
-- 用原生 `<details>` + `<summary>`：发丝线分隔，编号 Geist Mono `01–04`，问题 16px，右侧 `+` 旋转 45° 变 `×`；答案 14px `ink-muted`，`max-w-prose`。
+- 用共享 `Disclosure`（button + `role="region"`）：发丝线分隔，编号 Geist Mono `01–04`，问题 15px，右侧 `+` 旋转 45° 变 `×`；答案 14px `ink-muted`，`max-w-prose`；高度/透明度展开 260ms，关闭时 `inert` + `aria-hidden`。
 - 默认全部收起；键盘可操作；不使用 JS。
 
 问答内容（已按主仓库 README / `src-tauri` 只读取证）：
@@ -417,5 +417,6 @@ mock 形状（按主仓库类型）：
 13. **FlapLabel 指针穿透**：`.flap-button-label { pointer-events:none }` 修复 hover 重挂载导致快速点击丢失；按钮标签仍保留 `aria-hidden` tile + SR 原文。
 14. **首屏截图拼贴**：按用户选择，6 张图库占位照片替换为「按用户浅色 demo 状态重截的修复后整窗图 + 重新截取的设备树 + 彩色 DEMO 网格」；图注改为界面说明，`src/assets/photos/` 已移除，新增 `src/assets/screens/`。
 15. **下载线路切换**：默认 GitHub；「国内加速」给安装包 URL 加 `ghfast.top` 前缀，不需要逐个上传；选择存 localStorage，首页/版本页共享，并显示第三方风险提示。
-16. **macOS 签名说明**：下载区默认收起的 `<details>`，三步 + 一条 quarantine 命令 + Issue 链接；不引导关闭 Gatekeeper/SIP。
-17. **仍未完成**：`vite base` 仍为 `/`（可选）。
+16. **macOS 签名说明**：下载区默认收起的 Disclosure，三步 + 一条 quarantine 命令 + Issue 链接；不引导关闭 Gatekeeper/SIP。
+17. **折叠动效 / UI 优化**：FAQ 与 macOS 说明共用 `Disclosure`；高度/透明度 260ms expand 曲线、plus 旋转、inset focus ring、`inert` + `aria-controls`、命中区 ≥44px；`prefers-reduced-motion` 下直接开合。
+18. **仍未完成**：`vite base` 仍为 `/`（可选）。

@@ -1,7 +1,7 @@
 // Copyright (c) 2026 XUTENGXIANG
 // SPDX-License-Identifier: MIT
 import { useEffect, useState } from "react";
-import { Apple, ArrowUpRight, Layers, Monitor } from "lucide-react";
+import { Apple, ArrowUpRight, Layers, Monitor, Smartphone } from "lucide-react";
 import Card from "./components/Card";
 import DownloadMirrorToggle from "./components/DownloadMirrorToggle";
 import FlapLabel, { useFlapTrigger } from "./components/FlapLabel";
@@ -17,6 +17,12 @@ import { translations } from "./i18n";
 import { cn } from "./lib/cn";
 import { mirrorUrl, useDownloadMirror } from "./lib/downloadMirror";
 
+// 1.3.0 的 APK 还没进 GitHub Release；先由官网直链提供，发布后再自动切到 Release 附件。
+const LOCAL_ANDROID = {
+  name: "ImageFilter-Mobile-1.3.0-ui.apk",
+  url: "downloads/ImageFilter-Mobile-1.3.0-ui.apk",
+};
+
 interface ReleaseAsset {
   name: string;
   url: string;
@@ -28,7 +34,7 @@ interface LatestRelease {
   assets: (ReleaseAsset | undefined)[];
 }
 
-const platformIcons = [Monitor, Monitor, Apple];
+const platformIcons = [Monitor, Monitor, Apple, Smartphone];
 
 interface DownloadProps {
   lang: Lang;
@@ -128,10 +134,10 @@ export default function Download({ lang }: DownloadProps) {
           <DownloadMirrorToggle lang={lang} mirror={mirror} onChange={setMirror} />
         </Reveal>
 
-        <div className="mt-10 grid gap-4 lg:grid-cols-3">
+        <div className="mt-10 grid gap-4 md:grid-cols-2">
           {t.download.cards.map((card, index) => {
             const Icon = platformIcons[index];
-            const asset = latest?.assets[index];
+            const asset = latest?.assets[index] ?? (index === 3 ? LOCAL_ANDROID : undefined);
             const href = asset?.url || RELEASES_PAGE;
             const fileName = asset?.name ?? "—";
             const recommended = index === 0;
@@ -190,6 +196,10 @@ export default function Download({ lang }: DownloadProps) {
             );
           })}
         </div>
+
+        <p className="mt-4 max-w-2xl text-caption leading-[1.6] text-ink-faint text-pretty">
+          {t.download.mobileNote}
+        </p>
 
         <Reveal delay={0.12} className="mt-6">
           <MacOSSigningNote lang={lang} />

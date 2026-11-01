@@ -102,9 +102,11 @@ Remove-Item "$dst\hooks\use-mobile.ts" -ErrorAction SilentlyContinue
 
 ## 下载信息维护
 
-下载区的**版本号与三条直链都不再写死**：打开页面时问一次 GitHub 的 `/releases/latest`，徽章显示 `tag_name`、三张卡片的文件名与直链都从该 release 的附件里挑（`-setup.exe` / `.msi` / `.dmg`）。取不到就显示"版本获取失败"，按钮退到 Releases 页 —— 所以**发新版不用再回来改这里**。
+下载区的**版本号与三条 GitHub 直链都不再写死**：打开页面时问一次 GitHub 的 `/releases/latest`，徽章显示 `tag_name`、三张桌面卡片的文件名与直链都从该 release 的附件里挑（`-setup.exe` / `.msi` / `.dmg`）。取不到就显示"版本获取失败"，按钮退到 Releases 页 —— 所以**发新版不用再回来改这里**。
 
-下载区的「更多版本」跳到 `#/versions` 的版本全览页：该页读取 `/releases?per_page=100`，列出每个版本的安装包（过滤掉 updater 的 `.tar.gz`/`.sig`），并把国内直链放在页面底部。这是 hash 路由，静态托管不需要 404 回退。
+Android 卡优先取 release 的 `.apk` 附件；当前 1.3.0 release 没有 APK，回退到 `public/downloads/ImageFilter-Mobile-1.3.0-ui.apk`（官网直链，不走 GitHub 加速）。iOS 暂未提供。换 APK 时替换该文件并同步修改 `Download.tsx` 的 `LOCAL_ANDROID` 文件名。
+
+下载区的「更多版本」跳到 `#/versions` 的版本全览页：该页读取 `/releases?per_page=100`，列出每个版本的安装包（过滤掉 updater 的 `.tar.gz`/`.sig`）。这是 hash 路由，静态托管不需要 404 回退。
 
 安装包按钮与版本页的资产行都用 **隐藏 iframe** 触发浏览器原生下载（`src/landing/lib/download.ts`）：GitHub 资源带 `Content-Disposition: attachment`，下载时当前页面保持不变，不会开新标签页；按钮的 2.2s 进度环只是视觉反馈，真实进度看浏览器下载栏。失败时错误页只会出现在隐藏 iframe 里，不会顶掉落地页。
 
@@ -113,6 +115,7 @@ Remove-Item "$dst\hooks\use-mobile.ts" -ErrorAction SilentlyContinue
 - 默认 **GitHub**；切到「国内加速」后，所有 GitHub 安装包 URL 会加 `https://ghfast.top/` 前缀，不需要上传任何文件。
 - 选择写入 `localStorage`，首页和版本页共享；第三方前缀可能失效或改写内容，页面会显示风险提示，安装前请核对文件大小。
 - 要换加速服务只改 `MIRROR_PREFIX`；要换成自建 Worker 就改成自建前缀（见 `workers/`）。
+- Android 卡是官网直链（`public/downloads/`），不走 GitHub，也不受线路切换影响；iOS 暂无。
 
 蓝奏云国内直链已移除（手动逐个上传太麻烦）；国内加速走下载线路切换，自动跟随 GitHub 最新版。
 

@@ -96,6 +96,7 @@ export interface LandingMessages {
     moreVersions: string;
     downloading: string;
     downloaded: string;
+    mobileNote: string;
     mirrorLabel: string;
     mirrorGithub: string;
     mirrorFast: string;
@@ -294,11 +295,18 @@ export const zh: LandingMessages = {
         description: "同时支持 Intel 与 Apple Silicon。",
         action: "下载 macOS 安装包",
       },
+      {
+        platform: "Android 客户端",
+        badge: "1.3.0",
+        description: "连接桌面端图库服务；官网直链，无需走 GitHub 加速。",
+        action: "下载 APK",
+      },
     ],
     releases: "查看 GitHub Releases →",
     moreVersions: "更多版本",
     downloading: "下载中…",
     downloaded: "已完成",
+    mobileNote: "Android 客户端需与桌面端处于同一局域网；iOS 暂未提供。",
     mirrorLabel: "下载线路",
     mirrorGithub: "GitHub",
     mirrorFast: "国内加速",
@@ -351,6 +359,10 @@ export const zh: LandingMessages = {
       {
         q: "macOS 能用吗？",
         a: "可以在 Releases 下载 Universal 安装包（Intel 与 Apple Silicon）。但 macOS 版尚未充分实机验证，遇到问题请附系统版本与复现步骤提交 Issue。Lightroom 衔接与 Mica 毛玻璃仅 Windows。",
+      },
+      {
+        q: "有手机端吗？",
+        a: "有 Android 客户端：与桌面端处于同一局域网，在桌面端设置 → 图库服务开启后扫码配对。iOS 暂未提供。",
       },
     ],
   },
@@ -519,11 +531,18 @@ export const en: LandingMessages = {
         description: "Supports both Intel and Apple Silicon.",
         action: "Download for macOS",
       },
+      {
+        platform: "Android app",
+        badge: "1.3.0",
+        description: "Connects to the desktop gallery service; served directly from this site.",
+        action: "Download APK",
+      },
     ],
     releases: "View GitHub Releases →",
     moreVersions: "More versions",
     downloading: "Downloading…",
     downloaded: "Downloaded",
+    mobileNote: "The Android app needs the desktop on the same LAN; iOS is not available yet.",
     mirrorLabel: "Download via",
     mirrorGithub: "GitHub",
     mirrorFast: "Fast mirror",
@@ -576,6 +595,10 @@ export const en: LandingMessages = {
       {
         q: "Does it run on macOS?",
         a: "Yes — a Universal build (Intel and Apple Silicon) is on Releases. That said, the macOS build has not been thoroughly tested on real hardware; please report issues with your OS version and repro steps. Lightroom hand-off and Mica glass are Windows-only.",
+      },
+      {
+        q: "Is there a mobile app?",
+        a: "Yes, an Android app. Keep it on the same LAN as the desktop, enable Settings → Gallery service, then pair by QR code. iOS is not available yet.",
       },
     ],
   },

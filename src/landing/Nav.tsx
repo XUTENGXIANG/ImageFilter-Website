@@ -36,6 +36,7 @@ export default function Nav({ lang, onLangChange }: NavProps) {
     <header
       className={cn(
         "fixed inset-x-0 top-0 z-50 transition-[background-color,border-color,backdrop-filter] duration-300 ease-brand",
+        "max-hero:bg-black/80 max-hero:backdrop-blur-xl",
         scrolled
           ? "border-b border-line bg-black/[0.72] backdrop-blur-xl backdrop-saturate-150"
           : "border-b border-transparent bg-transparent",

@@ -140,7 +140,7 @@
   - Star 胶囊（ghost）：GitHub 图标 + `Star` + 实时 star 数；数字用 Geist Mono + emerald。
   - 语言胶囊：中 / EN，选中态 `white/10` 底、白字。
   - 下载：白底黑字胶囊，高 34px。
-- `<900px`：字标隐藏；Star 只留图标（`aria-label` 保留）；语言与下载保留；4 个锚点放进第二行，横向可滚动，顶部发丝线。
+- `<900px`：字标隐藏；Star 只留图标（`aria-label` 保留）；语言与下载保留；4 个锚点放进第二行，横向可滚动，顶部发丝线。顶部导航**整体**加 `bg-black/80 backdrop-blur-xl`，避免首屏浅色截图从透明导航后面透出来；桌面端保持透明。
 - 锚点目标统一 `scroll-mt-24`。
 - 保留：Star 实时数、语言切换（localStorage `site-lang`）、移动端锚点可达。
 
@@ -208,9 +208,10 @@
 
 - `id="download"`；SectionHead 左对齐，H2 旁保留版本徽章（mono，`aria-live="polite"`）。
 - **保持现有运行时逻辑不变**：`fetch GitHub /releases/latest` → 版本号 + 三条附件直链；失败 → `版本获取失败` + 按钮退到 Releases 页。
-- 3 张卡：`surface-sunken` + hairline；第一张（Windows 安装包）加 `line-strong` 边框 + `white/[0.02]` 底 + mono `推荐` 徽章。
+- 4 张卡：2×2 网格（Windows 安装包 / Windows MSI / macOS Universal / Android 客户端）；第一张加 `line-strong` 边框 + `white/[0.06]` 底 + mono `推荐` 徽章。
+- Android 卡：优先取 Release 的 `.apk`；当前 1.3.0 Release 没有 APK，回退到 `public/downloads/ImageFilter-Mobile-1.3.0-ui.apk`（官网直链，不受国内加速开关影响）；iOS 暂未提供。卡片下方有一行「需与桌面端同一局域网；iOS 暂未提供」。
 - 卡片内容：平台名 16px、文件名 Geist Mono 11px 截断、说明 14px、按钮。
-- 按钮：三张卡使用 rewampui `NeumorphicDownloadButton`（全宽、72px 高，下载中/已完成文案）；点击时通过隐藏 iframe 触发浏览器原生下载，当前页面不跳转、不开新标签页；2.2s 进度环为视觉反馈，不是真实字节进度。
+- 按钮：四张卡使用 rewampui `NeumorphicDownloadButton`（全宽、72px 高，下载中/已完成文案）；点击时通过隐藏 iframe 触发浏览器原生下载，当前页面不跳转、不开新标签页；2.2s 进度环为视觉反馈，不是真实字节进度。
 - 更多版本入口：`#/versions`；蓝奏云国内直链已**移除**（手动逐个上传成本太高）。
 - **下载线路**：卡片上方提供 GitHub / 国内加速两档；默认 GitHub，国内加速给 GitHub 资源加 `ghfast.top` 前缀，选择存 localStorage；显示第三方加速风险提示。
 - **macOS 签名说明**：卡片下方一个默认收起的 Disclosure 折叠块，说明未公证/Gatekeeper 拦截、右键打开或「隐私与安全性 → 仍要打开」、以及 `sudo xattr -rd com.apple.quarantine /Applications/ImageFilter.app`；附提 Issue 入口，不关闭系统安全设置。
@@ -219,8 +220,8 @@
 ### 4.8 FAQ（新增）
 
 - `id="faq"`，放在 Download 与 Footer 之间；版心 `max-w-6xl`，`py-20 lg:py-28`。
-- 左侧 SectionHead：eyebrow `FAQ`，H2「常见问题 / Common questions」；右侧（桌面）或下方（移动）4 条问答。
-- 用共享 `Disclosure`（button + `role="region"`）：发丝线分隔，编号 Geist Mono `01–04`，问题 15px，右侧 `+` 旋转 45° 变 `×`；答案 14px `ink-muted`，`max-w-prose`；高度/透明度展开 260ms，关闭时 `inert` + `aria-hidden`。
+- 左侧 SectionHead：eyebrow `FAQ`，H2「常见问题 / Common questions」；右侧（桌面）或下方（移动）5 条问答。
+- 用共享 `Disclosure`（button + `role="region"`）：发丝线分隔，编号 Geist Mono `01–05`，问题 15px，右侧 `+` 旋转 45° 变 `×`；答案 14px `ink-muted`，`max-w-prose`；高度/透明度展开 260ms，关闭时 `inert` + `aria-hidden`。
 - 默认全部收起；键盘可操作；不使用 JS。
 
 问答内容（已按主仓库 README / `src-tauri` 只读取证）：
@@ -235,6 +236,8 @@
    可以。项目采用 MIT 许可证，源码公开；保留版权与许可声明即可使用、修改和分发。
 4. **macOS 能用吗？**
    可以在 Releases 下载 Universal 安装包（Intel 与 Apple Silicon）。但 macOS 版尚未充分实机验证，遇到问题请附系统版本与复现步骤提交 Issue。Lightroom 衔接与 Mica 毛玻璃仅 Windows。
+5. **有手机端吗？**
+   有 Android 客户端：与桌面端处于同一局域网，在桌面端设置 → 图库服务开启后扫码配对。iOS 暂未提供。
 
 **en**
 
@@ -246,6 +249,8 @@
    Yes. ImageFilter is MIT-licensed and the source is public; keep the copyright and license notice when you use, modify, or redistribute it.
 4. **Does it run on macOS?**
    Yes — a Universal build (Intel and Apple Silicon) is on Releases. That said, the macOS build has not been thoroughly tested on real hardware; please report issues with your OS version and repro steps. Lightroom hand-off and Mica glass are Windows-only.
+5. **Is there a mobile app?**
+   Yes, an Android app. Keep it on the same LAN as the desktop, enable Settings → Gallery service, then pair by QR code. iOS is not available yet.
 
 ### 4.9 Footer
 
@@ -422,7 +427,7 @@ mock 形状（按主仓库类型）：
 已完成 P1 设计层、P2 全部九个区块、P3 demo 1.3.0 同步、P4 验收。与规格的偏差与补充：
 
 1. **字体**：没有新增 npm 依赖，直接把 4 个 latin woff2（Poppins 500/600、Inter variable、Geist Mono variable，约 88KB）复制到 `src/assets/fonts/`，并附带三份 OFL 许可证；`@font-face` 手写在 `src/index.css`。
-2. **移动端 Nav**：第二行 4 个锚点加 `bg-black/60 backdrop-blur-xl`。原型没有这条移动端导航；不加底色时，链接落在首屏照片上不可读。
+2. **移动端 Nav**：第二行 4 个锚点加 `bg-black/75 backdrop-blur-xl`；顶部导航整体在 `<900px` 加 `bg-black/80 backdrop-blur-xl`。原型没有这条移动端导航，且首屏浅色截图会从透明导航后透出（用户反馈穿帮）。
 3. **移动端演示**：`ImageFilterDemo` 在 `<900px` 设 `min-width:720px`，外层 `overflow-x-auto`，可横向滑动查看软件 UI；页面本身仍无横向溢出。说明文字补「窄屏可左右滑动 / Swipe horizontally on narrow screens」。
 4. **英文标题空格**：`Keep only` 与 `the keepers` 之间由组件按语言补空格，避免 `Keep onlythe keepers`。
 5. **i18n 补充**：新增下载完成/下载中、下载线路等文案；蓝奏云移除后对应的 `password` / `cnTitle` 等 key 已删除。
@@ -440,4 +445,6 @@ mock 形状（按主仓库类型）：
 17. **折叠动效 / UI 优化**：FAQ 与 macOS 说明共用 `Disclosure`；高度/透明度 260ms expand 曲线、plus 旋转、inset focus ring、`inert` + `aria-controls`、命中区 ≥44px；`prefers-reduced-motion` 下直接开合。
 18. **液态玻璃卡片**：`lib/surfaces.ts` 的 `glassCard` 应用到 Compare/Features/Download/macOS 说明/版本页卡片；demo 窗口、首屏截图卡、FAQ 行保持不透明。
 19. **液态背景 + TechText**：`LiquidCursorGradient` 固定 `z-0`/`pointer-events-none` 背景，石墨 + 低透明度 emerald 光斑与 spring 鼠标光斑；`TechTextBand` 在 Hero/Demo 之间渲染 ImageFilter，`sweep=false` 保证静止可读；保留 letter 揭示、dashed 轮廓、选择框、specks 与拖拽，用 `dragLimit=16` 限制拖拽范围，避免拖出第二个字母。版本页同样加背景。
-20. **仍未完成**：`vite base` 仍为 `/`（可选）。
+20. **Android 版**：下载区改为 2×2 四卡，新增 Android 客户端卡；优先取 Release 的 `.apk`，当前回退到 `public/downloads/ImageFilter-Mobile-1.3.0-ui.apk`（官网直链，不受国内加速开关影响）；新增 5th FAQ 和局域网/iOS 说明。
+21. **移动端导航穿帮**：`<900px` 顶部导航整体加 `bg-black/80 backdrop-blur-xl`，首屏浅色截图不再从透明导航后透出；桌面保持透明。
+22. **仍未完成**：`vite base` 仍为 `/`（可选）。

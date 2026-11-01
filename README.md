@@ -50,7 +50,7 @@ npx vitest run     # mock 数据层确定性测试
 
 - 卡片表面统一用 `src/landing/lib/surfaces.ts` 的 `glassCard`：3.5% 白底 + `backdrop-blur-lg` + 发丝线 + inset 高光；Compare、Features、Download、macOS 说明、版本页 release 卡共用。
 - `LiquidCursorGradient` 是固定 `z-0`、`pointer-events-none`、`aria-hidden` 的背景层；石墨/emerald 低透明度光斑，鼠标光斑用 spring 跟随。不要把它放到内容层之上，也不要让它拦截点击。
-- `TechTextBand` 在 Hero 与 Demo 之间，React Bits `TechText` 渲染「ImageFilter」；`sweep={false}` 保证静态时字形完整，hover 用 `reveal="area"` + `softness` 做径向渐变轮廓；关闭 `draggable` / `clickKick` / `selection` / `specks`，避免拖出第二个字母和虚线残影；`fontSize` 会随容器自动缩小。
+- `TechTextBand` 在 Hero 与 Demo 之间，React Bits `TechText` 渲染「ImageFilter」；`sweep={false}` 保证静态时字形完整；保留 `reveal="letter"`、dashed 轮廓、选择框和 specks；拖拽用 `dragLimit={16}` 限制在 ±16px，避免拖出第二个字母；`fontSize` 会随容器自动缩小。
 - 毛玻璃只加在卡片上；demo 窗口、首屏截图卡、FAQ 行保持原样。
 
 ## demo/ui 同步（重要）

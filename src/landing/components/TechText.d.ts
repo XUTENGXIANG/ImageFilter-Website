@@ -20,6 +20,7 @@ export interface TechTextProps {
   selection?: boolean;
   labels?: boolean;
   draggable?: boolean;
+  dragLimit?: number;
   bounce?: number;
   clickKick?: boolean;
   intro?: "none" | "type" | "assemble" | "metrics";

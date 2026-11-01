@@ -53,6 +53,7 @@ const TechText = ({
   selection = true,
   labels = true,
   draggable = true,
+  dragLimit = 0,
   bounce = 0.4,
   sweep = true,
   speed = 1,
@@ -89,6 +90,7 @@ const TechText = ({
       selection,
       labels,
       draggable,
+      dragLimit,
       bounce,
       sweep,
       speed,
@@ -729,8 +731,19 @@ const TechText = ({
       let moving = false;
       glyphs.forEach((glyph, i) => {
         if (i === dragging) {
-          glyph.offset.x = approach(glyph.offset.x, pointer.x - grab.x, dt, 0.03);
-          glyph.offset.y = approach(glyph.offset.y, pointer.y - grab.y, dt, 0.03);
+          const limit = s.dragLimit > 0 ? s.dragLimit : Infinity;
+          glyph.offset.x = approach(
+            glyph.offset.x,
+            Math.max(-limit, Math.min(limit, pointer.x - grab.x)),
+            dt,
+            0.03
+          );
+          glyph.offset.y = approach(
+            glyph.offset.y,
+            Math.max(-limit, Math.min(limit, pointer.y - grab.y)),
+            dt,
+            0.03
+          );
           glyph.velocity.x = 0;
           glyph.velocity.y = 0;
           moving = true;
